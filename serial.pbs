@@ -1,0 +1,11 @@
+#PBS -S /bin/bash
+#PBS -N <<RUNNAME>>
+#PBS -l ncpus=8
+#PBS -l walltime=<<WALLTIME>>
+#PBS -q hyper
+
+cd <<DIRNAME>>
+export OMP_NUM_THREADS=8
+./clean
+./mk
+./rn

@@ -1,0 +1,185 @@
+!highmass
+
+&star_job
+
+!PMS
+
+      create_pre_main_sequence_model = .true.
+      pre_ms_T_c = 5d5
+
+!MISC. SETUP
+	  
+      history_columns_file = 'my_history_columns.list'
+	  
+      !parameters to be used for mass on/off for overshoot & rotation
+      extras_lrpar = 4
+      extras_rpar(1) = 1.1 !full off
+      extras_rpar(2) = 1.7 !full on
+      extras_rpar(3) = 1.2 !full off
+      extras_rpar(4) = 1.8 !full on
+
+!OPACITY, NETWORK, RATE
+
+	  !run the first 100 models with basic then switch to a new network
+      change_net = .true.
+      new_net_name = 'basic.net'
+	  extras_lcpar = 1
+	  extras_cpar(1) = 'approx21_extras.net'
+
+      kappa_file_prefix = 'a09'
+      kappa_lowT_prefix = 'lowT_fa05_a09p'
+	  kappa_CO_prefix = 'a09_co'
+
+      !use jina
+      set_rates_preference = .true.
+      new_rates_preference = 2
+	  
+!CHANGE SOLAR ABUNDANCES
+
+      set_uniform_initial_composition = .true.
+      initial_h1 = 0.71785675078296
+      initial_h2 = 0.0
+      initial_he3 = 0.00002673104291
+      initial_he4 = 0.26728369805127
+      !for initial Z = 0.01483282012286
+
+      initial_zfracs = 6 ! AGSS09_zfracs = 6
+
+!ROTATION FLAG
+!      set_near_zams_omega_div_omega_crit_steps = 10
+!      new_omega_div_omega_crit = 0.4
+	          
+/ ! end of star_job namelist
+
+&controls
+
+	report_why_dt_limits = .false.
+      initial_mass = <<MASS>>
+
+!OUTPUT OPTIONS
+
+      history_interval = 1
+      terminal_interval = 100
+      write_header_frequency = 10
+      photostep = 2500
+         
+      star_history_name = '<<MASS>>M<<BC_LABEL>>_history.data'
+      write_controls_info_with_profile = .false.
+      write_profiles_flag = .false.
+				
+!WHEN TO STOP
+      
+      !in run_star_extras, it's set to C12 depletion in the core
+      gamma_center_limit = 1d2
+         
+!PHYSICS
+	 
+      which_atm_option = '<<BC_TABLE>>'
+	 
+      use_Ledoux_criterion = .true.
+      alpha_semiconvection = 0.01
+      thermo_haline_coeff = 666.66 !(2/3 of 1000 as found by Charbonnel 2007)
+		 
+      mixing_length_alpha = 1.8141d0
+      mlt_option = 'Henyey'
+	  
+      okay_to_reduce_gradT_excess = .true.
+      
+!      gradT_excess_f1 = 1d-4
+!      gradT_excess_f2 = 1d-2
+!      gradT_excess_age_fraction = 0.9d0
+
+!      gradT_excess_lambda1 = 10.0
+!      gradT_excess_beta1 = 0.4
+
+!      gradT_excess_lambda2 = 0.5
+!      gradT_excess_beta2 = 0.1
+       
+      overshoot_f_above_nonburn = 0.01298
+      overshoot_f_below_nonburn = 0.01298
+      overshoot_f_above_burn_h  = 0.01298
+      overshoot_f_below_burn_h  = 0.01298
+      overshoot_f_above_burn_he = 0.01298
+      overshoot_f_below_burn_he = 0.01298
+      overshoot_f_above_burn_z  = 0.01298
+      overshoot_f_below_burn_z  = 0.01298
+
+      !always have overshooting on in the inlist, core overshooting
+      !will be restricted in run_star_extras.f
+      mass_for_overshoot_full_on  = 0.0
+      mass_for_overshoot_full_off = 0.0
+
+      !CO enhanced opacities
+      use_Type2_opacities = .true.
+      kap_Type2_full_off_X = 1d-3
+      kap_Type2_full_on_X = 1d-6
+	  Zbase = 0.00 ! this is set to Z of the star in run_star_extras.fs
+	     
+      !rotational mixing	 
+      D_SH_factor =  1.0
+      D_SSI_factor = 1.0
+      D_ES_factor =  1.0
+      D_GSF_factor = 1.0
+      D_DSI_factor = 1.0
+      D_ST_factor = 0.0
+      am_D_mix_factor = 0.0228
+      am_gradmu_factor = 0.1
+		 
+      RGB_wind_scheme = 'Dutch'
+      AGB_wind_scheme = 'Dutch'
+      RGB_to_AGB_wind_switch = 1d-4
+      Dutch_wind_eta = 0.6
+      max_rotational_mdot_boost = 10
+
+      do_element_diffusion = .true.
+      diffusion_dt_limit = 3.15e13
+
+      radiation_turbulence_coeff = 1.0
+		 		 
+!MESH AND TIMESTEP PARAMETERS
+
+      mesh_delta_coeff = 0.5  ! leave at 0.5 until after c burn, default is 1
+      varcontrol_target = 2d-4 ! default is  1d-4
+
+      max_allowed_nz = 20000 ! maximum number of grid points allowed
+
+      max_iter_for_resid_tol1 = 3
+      tol_residual_norm1 = 1d-5
+      
+      min_timestep_limit = 1d-12 ! (seconds)
+
+      !limits on max drop in abundance mass fraction, this considers both nuclear rate and offsetting effect of mixing flow
+      dX_nuc_drop_limit = 5d-3
+		 
+	  !limit on magnitude of relative change at any grid point
+	  delta_lgP_limit = -1
+      delta_lgL_He_limit = -1
+      delta_lgTeff_limit = 0.5  
+      delta_lgL_limit = 0.5
+      delta_lgRho_cntr_limit = 0.02  
+
+      mesh_dlog_pp_dlogP_extra = 0.4
+      mesh_dlog_cno_dlogP_extra = 0.4
+  
+      mesh_dlog_burn_n_dlogP_extra = 0.4
+      mesh_dlog_3alf_dlogP_extra = 0.4
+      mesh_dlog_burn_c_dlogP_extra = 0.4
+   
+      mesh_dlog_photo_dlogP_extra = 1
+
+ 	  xa_function_species(1) = 'h1'
+ 	  xa_function_weight(1) = 70
+ 	  xa_function_param(1) = 1d-3
+
+	  xa_function_species(2) = 'he4'
+	  xa_function_weight(2) = 70
+	  xa_function_param(2) = 1d-3
+
+      !if there is any convection in surface zones with T < T_mix_limit, then extend the innermost such convective region outward all the way to the surface.
+      T_mix_limit = 0 ! means omit this operation.
+
+/ ! end of controls namelist
+
+&pgstar
+         
+/ ! end of pgstar namelist

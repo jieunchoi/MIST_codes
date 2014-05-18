@@ -1,0 +1,182 @@
+!intermediatemass
+
+&star_job
+      
+!PMS
+
+      create_pre_main_sequence_model = .true.
+      pre_ms_T_c = 5d5
+
+!MISC. SETUP
+	  
+      history_columns_file = 'my_history_columns.list'
+	  
+      !parameters to be used for mass on/off for overshoot & rotation
+      extras_lrpar = 4
+      extras_rpar(1) = 1.1 !full off
+      extras_rpar(2) = 1.7 !full on
+      extras_rpar(3) = 1.2 !full off
+      extras_rpar(4) = 1.8 !full on
+
+!OPACITY, NETWORK, RATE
+
+	  !run the first 100 models with basic then switch to a new network
+      change_net = .true.
+      new_net_name = 'basic.net'
+	  extras_lcpar = 1
+	  extras_cpar(1) = 'approx21_extras.net'
+
+      kappa_file_prefix = 'a09'
+      kappa_lowT_prefix = 'lowT_fa05_a09p'
+	  kappa_CO_prefix = 'a09_co'
+
+	  !uses jina 
+      set_rates_preference = .true.
+      new_rates_preference = 2
+	  
+!CHANGE SOLAR ABUNDANCES
+
+      set_uniform_initial_composition = .true.
+      initial_h1 = 0.71785675078296
+      initial_h2 = 0.0
+      initial_he3 = 0.00002673104291
+      initial_he4 = 0.26728369805127
+      !for initial Z = 0.01483282012286
+
+      initial_zfracs = 6 ! AGSS09_zfracs = 6	  
+
+!ROTATION FLAG
+!      set_near_zams_omega_div_omega_crit_steps = 10
+!      new_omega_div_omega_crit = 0.0
+	          
+/ ! end of star_job namelist
+
+&controls
+
+	report_why_dt_limits = .false.
+      initial_mass = <<MASS>>
+
+!OUTPUT OPTIONS
+
+      history_interval = 1
+      terminal_interval = 100
+      write_header_frequency = 10
+      photostep = 2500
+
+      star_history_name = '<<MASS>>M<<BC_LABEL>>_history.data'
+      write_controls_info_with_profile = .false.
+      write_profiles_flag = .false.
+
+!WHEN TO STOP
+
+      gamma_center_limit = 1d2
+
+!PHYSICS
+
+      which_atm_option = '<<BC_TABLE>>'
+
+      use_Ledoux_criterion = .true.
+      alpha_semiconvection = 0.01
+      thermo_haline_coeff = 666.66 !(2/3 of 1000 as found by Charbonnel 2007)
+
+      mixing_length_alpha = 1.8141d0
+      mlt_option = 'Henyey'
+
+      okay_to_reduce_gradT_excess = .true.	
+	  
+      overshoot_f_above_nonburn = 0.01298
+      overshoot_f_below_nonburn = 0.01298
+      overshoot_f_above_burn_h  = 0.01298
+      overshoot_f_below_burn_h  = 0.01298
+      overshoot_f_above_burn_he = 0.01298
+      overshoot_f_below_burn_he = 0.01298
+      overshoot_f_above_burn_z  = 0.01298
+      overshoot_f_below_burn_z  = 0.01298
+      overshoot_below_noburn_factor = 10
+
+      !always have overshooting on in the inlist, core overshooting
+      !will be restricted in run_star_extras.f
+      mass_for_overshoot_full_on  = 0.0
+      mass_for_overshoot_full_off = 0.0
+      
+      !CO enhanced opacities
+      use_Type2_opacities = .true.
+      kap_Type2_full_off_X = 1d-3
+      kap_Type2_full_on_X = 1d-6
+	  Zbase = 0.00 ! this is set to Z of the star in run_star_extras.f
+	  
+      !rotational mixing	 
+      D_SH_factor =  1.0
+      D_SSI_factor = 1.0
+      D_ES_factor =  1.0
+      D_GSF_factor = 1.0
+	  D_DSI_factor = 1.0
+      D_ST_factor = 0.0
+      am_D_mix_factor = 0.0228
+      am_gradmu_factor = 0.1
+	  
+      RGB_wind_scheme = 'Reimers'
+      AGB_wind_scheme = 'Blocker'
+      RGB_to_AGB_wind_switch = 1d-4
+      Reimers_wind_eta = 0.5d0
+      Blocker_wind_eta = 0.5d0
+
+      do_element_diffusion = .true.
+      diffusion_dt_limit = 3.15e13
+
+      radiation_turbulence_coeff = 1.0
+	  
+!MESH AND TIMESTEP PARAMETERS
+
+      mesh_delta_coeff = 1.0
+      varcontrol_target = 1d-4
+	  
+	  !increase resolution
+      mesh_dlog_3alf_dlogP_extra = 0.225
+      mesh_dlog_burn_c_dlogP_extra = 0.225
+      mesh_dlog_burn_n_dlogP_extra = 0.225
+      mesh_dlog_burn_o_dlogP_extra = 0.225
+
+      mesh_logX_species(1) = 'h1'
+      mesh_logX_min_for_extra(1) = -6
+      mesh_dlogX_dlogP_extra(1) = 0.25
+      
+      mesh_logX_species(1) = 'he4'
+      mesh_logX_min_for_extra(1) = -6
+      mesh_dlogX_dlogP_extra(1) = 0.25
+
+      ! multiply mesh_delta_coeff in overshooting regions by this factor
+      ! value < 1 gives increased resolution
+      xtra_coef_os_above_nonburn = 0.5
+      xtra_coef_os_below_nonburn = 0.25
+
+      xtra_coef_os_above_burn_h = 0.25
+      xtra_coef_os_below_burn_h = 0.15
+
+      xtra_coef_os_above_burn_he = 0.25
+      xtra_coef_os_below_burn_he = 0.25
+
+      xtra_coef_os_above_burn_z = 0.25
+      xtra_coef_os_below_burn_z = 0.25
+
+      ! continue to increase resolution for this distance beyond
+      ! the edge of the overshooting region, with distance measured in units
+      ! of the pressure scale height at the edge of the overshooting region.
+      ! this applies to both edges of the overshooting region.
+      xtra_dist_os_above_nonburn = 0.1
+      xtra_dist_os_below_nonburn = 0.2
+   
+      xtra_dist_os_above_burn_h = 0.2
+      xtra_dist_os_below_burn_h = 0.2
+   
+      xtra_dist_os_above_burn_he = 0.2
+      xtra_dist_os_below_burn_he = 0.2
+   
+      xtra_dist_os_above_burn_z = 0.2
+      xtra_dist_os_below_burn_z = 0.2
+      
+/ ! end of controls namelist
+
+&pgstar         
+
+/ ! end of pgstar namelist

@@ -1,0 +1,125 @@
+! the first few lines of the log file contain parameter values as of the start of the run
+! for completeness, those items are described here:
+   
+   ! initial_mass -- star mass at start of run (Msun units)
+   ! initial_z -- starting metallicity
+   ! h1_boundary_limit -- defines abundance limit for h1_boundary_mass 
+   ! he4_boundary_limit -- defines abundance limit for he4_boundary_mass
+   ! burn_min1 -- 1st limit for reported burning, in erg/g/s
+   ! burn_min2 -- 2nd limit for reported burning, in erg/g/s
+
+
+   ! some general info about the model
+   
+      num_zones
+      model_number ! counting from the start of the run
+      star_age ! elapsed simulated time in years since the start of the run
+      star_mass ! in Msun units
+      star_mdot ! d(star_mass)/dt (in msolar per year)
+      log_dt ! log10 time_step
+     
+   ! information about abundance transitions
+   
+      he_core_mass ! h1 boundary is outermost location where h1 mass fraction is < 0.01
+      c_core_mass ! he4 boundary is outermost location where h1 mass fraction is < 0.01
+      o_core_mass ! c12 boundary is outermost location where h1 mass fraction is < 0.01
+         
+   ! conditions near surface
+   
+      log_L ! log10 luminosity in Lsun units
+      log_L_div_Ledd
+      log_LH ! log10 power_h_burn
+      log_LHe ! log10 power_he_burn
+      log_LZ  !log10 total burning power excluding LH and LHe and photodisintegrations
+      log_Teff ! log10 effective temperature
+      log_R ! log10 radius in Rsun units
+      log_g ! log10 gravity
+      log_surf_z
+      surf_avg_omega !surf_v_rot/R
+      surf_avg_v_rot !km/sec rotational velocity at equator
+      surf_num_c12_div_num_o16 !ratio of number fractions, >1 for C star
+
+   ! just for massive rotating stars
+
+      surf_avg_omega_crit
+      surf_avg_omega_div_omega_crit
+      surf_avg_v_crit ! critical rotational velocity at equator
+      surf_avg_v_div_v_crit
+      surf_avg_L_div_Ledd
+      v_div_csound_surf
+
+   ! mass fractions near surface
+     
+      surface h1
+      surface h2
+      surface he3
+      surface he4
+      surface li7
+      surface be7
+      surface b8
+      surface c12
+      surface n14
+      surface o14
+      surface o16
+      surface f19
+      surface ne18
+      surface ne19
+      surface ne20
+      surface mg22
+      surface mg24
+      surface si28
+      surface s32
+      surface ar36
+      surface ca40
+      surface ti44
+      surface cr48
+      surface cr56
+      surface fe52
+      surface fe54
+      surface fe56
+      surface ni56
+
+   ! conditions near center
+
+      log_center_T ! temperature
+      log_center_Rho ! density
+      center_degeneracy ! the electron chemical potential in units of k*T
+      center_omega
+      center_gamma ! plasma interaction parameter
+      mass_conv_core
+        
+   ! mass fractions near center
+   
+      center h1
+      center he4
+      center c12
+      center n14
+      center o16
+      center ne20
+      center mg24
+      center si28
+ 
+   !asteroseismic properties
+      
+      delta_nu ! large frequency separation for p-modes (microHz)
+         ! 1e6/(seconds for sound to cross diameter of star)
+      delta_Pg ! g-mode period spacing for l=1 (seconds)
+         ! sqrt(2) pi^2/(integral of brunt_N/r dr)
+      nu_max ! estimate from scaling relation (microHz)
+         ! nu_max = nu_max_sun * M/Msun / ((R/Rsun)^3 (Teff/Teff_sun)^0.5)
+         ! with nu_max_sun = 3100 microHz, Teff_sun = 5777
+      acoustic_cutoff ! 0.5*g*sqrt(gamma1*rho/P) at surface
+   
+   ! misc
+      
+      max_conv_vel_div_csound
+      max_gradT_div_grada
+      gradT_excess_alpha !between 0 and 1; 0 means no MLT++, 1 means MLT++ fully on
+      min_Pgas_div_P !beta to check stability
+      max_L_rad_div_Ledd !lambda to check stability
+      e_thermal
+      num_retries ! total during the run
+      num_backups ! total during the run
+
+
+
