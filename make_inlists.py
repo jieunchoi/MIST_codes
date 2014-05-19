@@ -13,7 +13,7 @@ from make_replacements import make_replacements
 runname=sys.argv[1]
 
 work_dir = '/home/jchoi/pfs/mesawork/'
-code_dir = '/home/jchoi/pfs/mesawork/codes/'
+code_dir = '/home/jchoi/pfs/mesawork/MIST_codes/'
 inlist_dir = '/home/jchoi/pfs/mesawork/inlists/inlists_'+runname
 
 if __name__ == "__main__":
