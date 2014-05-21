@@ -1,14 +1,23 @@
 #!/usr/bin/env python 
 
+"""
+This calls all the necessary routines to submit a grid of specified name and metallicity.
+"""
+
 import os
 import sys
 import shutil
 from make_pbsfiles import make_pbsfiles 
 
-project_dir = "MIST_v0.4"
+runname = sys.argv[1]
+Z = sys.argv[2]
+
+#Z = 0.016
+#r = "MIST_v0.4"
+
 work_dir = "/home/jchoi/pfs/mesawork/"
 clean_work_dir = '/home/jchoi/pfs/clean_work_dir/'
-dirname = os.path.join(work_dir, project_dir)
+dirname = os.path.join(work_dir, runname)
 codedir = os.path.join(work_dir, "codes")
 pbsbasefile = 'serial.pbs'
 
@@ -20,8 +29,8 @@ if __name__ == "__main__":
     except OSError:
         print "The directory already exists"
 
-    os.system("./make_inlists.py " + project_dir)
-    orig_inlistdir = os.path.join(work_dir, 'inlists/inlists_'+project_dir)
+    os.system("./make_inlists.py " + runname + " " + Z)
+    orig_inlistdir = os.path.join(work_dir, 'inlists/inlists_'+runname)
     inlist_list = os.listdir(orig_inlistdir)
     inlist_list.sort()
 

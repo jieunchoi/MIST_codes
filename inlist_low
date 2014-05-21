@@ -37,11 +37,11 @@
 !CHANGE SOLAR ABUNDANCES
 
       set_uniform_initial_composition = .true.
-      initial_h1 = 0.71785675078296
-      initial_h2 = 0.0
-      initial_he3 = 0.00002673104291
-      initial_he4 = 0.26728369805127
-      !for initial Z = 0.01483282012286
+      initial_h1 = <<H1>>
+      initial_h2 = <<H2>>
+      initial_he3 = <<He3>>
+      initial_he4 = <<He4>>
+      !for initial Z = <<Z>>
 
       initial_zfracs = 6 ! AGSS09_zfracs = 6
 

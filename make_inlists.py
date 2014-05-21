@@ -8,9 +8,11 @@ Future capability will include abundances as well.
 import sys
 import numpy as np
 import os
+import calc_xyz
 from make_replacements import make_replacements
 
 runname=sys.argv[1]
+Z = sys.argv[2]
 
 work_dir = '/home/jchoi/pfs/mesawork/'
 code_dir = '/home/jchoi/pfs/mesawork/codes/'
@@ -31,7 +33,7 @@ if __name__ == "__main__":
 
     bctablegrid = np.hstack((["grey_and_kap"]*(np.size(verylow)+np.size(low_diffBC)+np.size(inter)+np.size(high))))
     bclabelgrid = np.hstack((['']*(np.size(verylow)+np.size(low_diffBC)+np.size(inter)+np.size(high))))
-
+    
 #    bctablegrid = np.hstack((["tau_100_tables"]*np.size(verylow), ["tau_100_tables"]*np.size(low_diffBC),\
 #["photosphere_tables"]*np.size(low_diffBC),["photosphere_tables"]*(np.size(inter)+np.size(high))))
 #    bclabelgrid = np.hstack((['']*np.size(verylow), ['_tau100']*np.size(low_diffBC),\
@@ -46,31 +48,55 @@ if __name__ == "__main__":
     low_diffBC_index = bcindex[i1:i2]
     inter_index = bcindex[i2:i3]
     high_index = bcindex[i3:i4]
+    
+    # abundances
+    h1h2he3he4z = calc_xyz.calc_xyz(Z)
 
     mapfunc = lambda var: np.str(int(var)) if var == int(var) else np.str(var)
+    
     # list of [replacement string, values]s
     verylow_replist = [\
         ["<<MASS>>", map(mapfunc, bigmassgrid[verylow])],\
             ["<<BC_LABEL>>", list(bclabelgrid[verylow_index])],\
             ["<<BC_TABLE>>", list(bctablegrid[verylow_index])],\
+            ["<<H1>>", [h1h2he3he4z[0]]*np.size(verylow)],\
+            ["<<H2>>", [h1h2he3he4z[1]]*np.size(verylow)],\
+            ["<<He3>>", [h1h2he3he4z[2]]*np.size(verylow)],\
+            ["<<He4>>", [h1h2he3he4z[3]]*np.size(verylow)],\
+            ["<<Z>>", [h1h2he3he4z[4]]*np.size(verylow)],\
         ]
 
     lowbc_replist = [\
         ["<<MASS>>", map(mapfunc, bigmassgrid[low_diffBC])]*2],\
             ["<<BC_LABEL>>", list(bclabelgrid[low_diffBC_index])],\
             ["<<BC_TABLE>>", list(bctablegrid[low_diffBC_index])],\
+            ["<<H1>>", [h1h2he3he4z[0]]*np.size(low_diffBC)],\
+            ["<<H2>>", [h1h2he3he4z[1]]*np.size(low_diffBC)],\
+            ["<<He3>>", [h1h2he3he4z[2]]*np.size(low_diffBC)],\
+            ["<<He4>>", [h1h2he3he4z[3]]*np.size(low_diffBC)],\
+            ["<<Z>>", [h1h2he3he4z[4]]*np.size(low_diffBC)],\
         ] 
 
     inter_replist = [\
         ["<<MASS>>", map(mapfunc, bigmassgrid[inter])],\
             ["<<BC_LABEL>>", list(bclabelgrid[inter_index])],\
             ["<<BC_TABLE>>", list(bctablegrid[inter_index])],\
+            ["<<H1>>", [h1h2he3he4z[0]]*np.size(inter)],\
+            ["<<H2>>", [h1h2he3he4z[1]]*np.size(inter)],\
+            ["<<He3>>", [h1h2he3he4z[2]]*np.size(inter)],\
+            ["<<He4>>", [h1h2he3he4z[3]]*np.size(inter)],\
+            ["<<Z>>", [h1h2he3he4z[4]]*np.size(inter)],\
         ]
 
     high_replist = [\
         ["<<MASS>>", map(mapfunc, bigmassgrid[high])],\
             ["<<BC_LABEL>>", list(bclabelgrid[high_index])],\
             ["<<BC_TABLE>>", list(bctablegrid[high_index])],\
+            ["<<H1>>", [h1h2he3he4z[0]]*np.size(high)],\
+            ["<<H2>>", [h1h2he3he4z[1]]*np.size(high)],\
+            ["<<He3>>", [h1h2he3he4z[2]]*np.size(high)],\
+            ["<<He4>>", [h1h2he3he4z[3]]*np.size(high)],\
+            ["<<Z>>", [h1h2he3he4z[4]]*np.size(high)],\
         ]
 
     make_replacements(verylow_replist, direc=os.path.join(inlist_dir), file_base=os.path.join(code_dir+'inlist_low'), name_str='<<MASS>>M<<BC_LABEL>>.inlist', clear_direc=True)
