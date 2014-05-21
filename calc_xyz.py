@@ -32,7 +32,7 @@ def calc_xyz(znew, feh=False):
     znew = znew
     
     h1h2he3he4z_float = [h1, h2, he3, he4, znew]
-    h1h2he3he4z = [str(abun) for abun in h1h2he3he4z]
+    h1h2he3he4z = [str(abun) for abun in h1h2he3he4z_float]
     
     return h1h2he3he4z
     
