@@ -31,7 +31,8 @@ def calc_xyz(znew, feh=False):
     he4 = ynew/(1.0+he3he4_rat)
     znew = znew
     
-    h1h2he3he4z = [h1, h2, he3, he4, znew]
+    h1h2he3he4z_float = [h1, h2, he3, he4, znew]
+    h1h2he3he4z = [str(abun) for abun in h1h2he3he4z]
     
     return h1h2he3he4z
     
