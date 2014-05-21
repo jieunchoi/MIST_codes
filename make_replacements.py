@@ -35,20 +35,20 @@ def make_replacements(replist, direc='inlists', file_base='inlist_project_base',
 	infile = open(file_base, 'r')
 	file_base_contents = infile.read()
 	infile.close()
-	
-	for val_vec in perms:
-		file_mod = file_base_contents
-		inlist_file = name_str
-		for i in xrange(numkey):
-			file_mod = file_mod.replace(keys[i], str(val_vec[i]))
-			if keys[i] == "<<MASS>>":
+    
+    for val_vec in perms:
+        file_mod = file_base_contents
+        inlist_file = name_str
+        for i in xrange(numkey):
+            file_mod = file_mod.replace(keys[i], str(val_vec[i]))
+            if keys[i] == "<<MASS>>":
                 inlist_file = inlist_file.replace(keys[i], reformat_massname.reformat_massname(val_vec[i]))
             else:
                 inlist_file = inlist_file.replace(keys[i], val_vec[i])
-		
-		inlist_file = os.path.join(direc, inlist_file)
-
-		outfile = open(inlist_file, 'w')
-		outfile.write(file_mod)
-		outfile.close()
+        
+        inlist_file = os.path.join(direc, inlist_file)
+        
+        outfile = open(inlist_file, 'w')
+        outfile.write(file_mod)
+        outfile.close()
 	
