@@ -13,7 +13,7 @@ runname = sys.argv[1]
 Z = sys.argv[2]
 
 work_dir = "/home/jchoi/pfs/mesawork/"
-clean_work_dir = '/home/jchoi/pfs/clean_work_dir/'
+cleanwork_dir = '/home/jchoi/pfs/cleanworkdir/'
 dirname = os.path.join(work_dir, runname)
 codedir = os.path.join(work_dir, "codes")
 pbsbasefile = 'serial.pbs'
@@ -50,7 +50,7 @@ if __name__ == "__main__":
         pathtoinlistdir = os.path.join(dirname, inlistdir)
 
         try:
-            shutil.copytree(clean_work_dir, pathtoinlistdir)
+            shutil.copytree(cleanwork_dir, pathtoinlistdir)
             
         except OSError:
             pass
