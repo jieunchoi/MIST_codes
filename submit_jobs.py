@@ -12,9 +12,6 @@ from make_pbsfiles import make_pbsfiles
 runname = sys.argv[1]
 Z = sys.argv[2]
 
-#Z = 0.016
-#r = "MIST_v0.4"
-
 work_dir = "/home/jchoi/pfs/mesawork/"
 clean_work_dir = '/home/jchoi/pfs/clean_work_dir/'
 dirname = os.path.join(work_dir, runname)
