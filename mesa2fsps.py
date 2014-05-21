@@ -12,7 +12,7 @@ import sys
 import shutil
 
 make_isoch_dir = "/home/jchoi/pfs/make_isoch"
-code_dir = "/home/jchoi/pfs/mesawork/codes"
+code_dir = "/home/jchoi/pfs/mesawork/MIST_codes"
 
 if __name__ == "__main__":
     
