@@ -17,6 +17,7 @@ def make_replacements(replist, direc='inlists', file_base='inlist_project_base',
 		
 	if not os.path.isdir(direc):
 		os.mkdir(direc)
+
 	elif clear_direc and not os.path.abspath(direc) == os.path.abspath('.'):
 		print "Removing existing files in " + direc
 		for file in os.listdir(direc):

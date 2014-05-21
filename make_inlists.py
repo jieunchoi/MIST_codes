@@ -50,7 +50,7 @@ if __name__ == "__main__":
     high_index = bcindex[i3:i4]
     
     # abundances
-    h1h2he3he4z = calc_xyz.calc_xyz(Z)
+    h1h2he3he4z = calc_xyz.calc_xyz(float(Z))
 
     mapfunc = lambda var: np.str(int(var)) if var == int(var) else np.str(var)
     
@@ -67,7 +67,7 @@ if __name__ == "__main__":
         ]
 
     lowbc_replist = [\
-        ["<<MASS>>", map(mapfunc, bigmassgrid[low_diffBC])]*2],\
+        ["<<MASS>>", map(mapfunc, bigmassgrid[low_diffBC])],\
             ["<<BC_LABEL>>", list(bclabelgrid[low_diffBC_index])],\
             ["<<BC_TABLE>>", list(bctablegrid[low_diffBC_index])],\
             ["<<H1>>", [h1h2he3he4z[0]]*np.size(low_diffBC)],\

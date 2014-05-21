@@ -28,6 +28,16 @@ if __name__ == "__main__":
         os.mkdir(dirname)
     except OSError:
         print "The directory already exists"
+        del_or_no = raw_input(dirname +' already exists. Delete? (1 or 0): ')
+        if del_or_no == '1':
+            print 'Deleting the directory...'
+            shutil.rmtree(dirname)
+        elif del_or_no == '0':
+            print 'Okay never mind.'
+            sys.exit(0)
+        else:
+            print 'Invalid choice.'
+            sys.exit(0)
 
     os.system("./make_inlists.py " + runname + " " + Z)
     orig_inlistdir = os.path.join(work_dir, 'inlists/inlists_'+runname)
@@ -57,6 +67,6 @@ if __name__ == "__main__":
         #cd into the individual directory and qsub
         os.chdir(pathtoinlistdir)
         print "qsub " + pbsfile
-        os.system("qsub "+pbsfile)
+#        os.system("qsub "+pbsfile)
         os.chdir(codedir)
     
