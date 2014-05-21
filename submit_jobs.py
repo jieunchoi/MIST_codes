@@ -29,6 +29,7 @@ if __name__ == "__main__":
         if del_or_no == '1':
             print 'Deleting the directory...'
             shutil.rmtree(dirname)
+            os.mkdir(dirname)
         elif del_or_no == '0':
             print 'Okay never mind.'
             sys.exit(0)
