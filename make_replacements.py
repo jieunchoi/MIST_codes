@@ -11,24 +11,29 @@ import reformat_massname
 
 def make_replacements(replist, direc='inlists', file_base='inlist_project_base', \
 	name_str='', clear_direc=False):
-	
-	if not os.path.isfile(file_base):
+    
+    if not os.path.isfile(file_base):
 		raise Exception("Base file does not exist!")
-		
-	if not os.path.isdir(direc):
-		os.mkdir(direc)
+        
+    if not os.path.isdir(direc):
+        os.mkdir(direc)
+    
+    elif clear_direc and not os.path.abspath(direc) == os.path.abspath('.'):
+        print "Removing existing files in " + direc
+        for file in os.listdir(direc):
+            os.remove(os.path.join(direc, file))
+    
+    keys = [replist[i][0] for i in xrange(len(replist))]
+    vals = [replist[i][1] for i in xrange(len(replist))]
 
-	elif clear_direc and not os.path.abspath(direc) == os.path.abspath('.'):
-		print "Removing existing files in " + direc
-		for file in os.listdir(direc):
-			os.remove(os.path.join(direc, file))
-
-	keys = [ replist[i][0] for i in xrange(len(replist)) ]
-	vals = [ replist[i][1] for i in xrange(len(replist)) ]
-	
-	perms = zip(vals[0], vals[1], vals[2])
-	#perms = list(itertools.product(*vals))
-
+    numkey = np.shape(vals)[0]
+    nummass = np.shape(vals)[1]
+    perms = []
+    
+    for i in range(nummass):
+        combo = tuple(vals[j][i] for j in range(numkey))
+        perms.append(combo)
+    
 	infile = open(file_base, 'r')
 	file_base_contents = infile.read()
 	infile.close()
