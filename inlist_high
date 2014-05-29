@@ -140,7 +140,7 @@
 
       mesh_delta_coeff = 0.5  ! leave at 0.5 until after c burn, default is 1
       varcontrol_target = 2d-4 ! default is  1d-4
-
+	  
       max_allowed_nz = 20000 ! maximum number of grid points allowed
 
       max_iter_for_resid_tol1 = 3
@@ -154,8 +154,11 @@
 	  !limit on magnitude of relative change at any grid point
 	  delta_lgP_limit = -1
       delta_lgL_He_limit = -1
-      delta_lgTeff_limit = 0.5  
-      delta_lgL_limit = 0.5
+      delta_lgTeff_limit = 0.005
+      delta_lgTeff_hard_limit = 0.01
+	  delta_lgL_limit_L_min = -100 ! only apply this limit when L >= this limit (in Lsun units)
+      delta_lgL_limit = 0.02 
+      delta_lgL_hard_limit = 0.05
       delta_lgRho_cntr_limit = 0.02  
 
       mesh_dlog_pp_dlogP_extra = 0.4
