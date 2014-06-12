@@ -174,7 +174,7 @@ def do_organize(dirname):
     os.system("tar -zcvf " + dirname + ".tar.gz " + dirname)
     os.system("mv " + dirname + "* " + work_dir)
     
-do_organize(sys.argv[1])
+#do_organize(sys.argv[1])
 
 
 

@@ -65,6 +65,6 @@ if __name__ == "__main__":
         #cd into the individual directory and qsub
         os.chdir(pathtoinlistdir)
         print "qsub " + pbsfile
-#        os.system("qsub "+pbsfile)
+        os.system("qsub "+pbsfile)
         os.chdir(codedir)
     

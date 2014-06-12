@@ -34,6 +34,7 @@ if __name__ == "__main__":
 
     bctablegrid = np.hstack((["simple_photosphere"]*(np.size(verylow)+np.size(low_diffBC)+np.size(inter)+np.size(high))))
     bclabelgrid = np.hstack((['']*(np.size(verylow)+np.size(low_diffBC)+np.size(inter)+np.size(high))))
+#    bclabelgrid = np.hstack((['']*(np.size(verylow))+['_tau100']*np.size(low_diffBC)+['']*(np.size(inter)+np.size(high))))
     
 #    bctablegrid = np.hstack((["tau_100_tables"]*np.size(verylow), ["tau_100_tables"]*np.size(low_diffBC),\
 #["photosphere_tables"]*np.size(low_diffBC),["photosphere_tables"]*(np.size(inter)+np.size(high))))
@@ -42,7 +43,7 @@ if __name__ == "__main__":
 
     bcindex = np.arange(0, np.size(bctablegrid))
     i1 = np.size(verylow)
-    i2 = i1+np.size(low_diffBC) #*2
+    i2 = i1+np.size(low_diffBC)
     i3 = i2+np.size(inter)
     i4 = i3+np.size(high)
     verylow_index = bcindex[:i1]
