@@ -32,18 +32,14 @@ if __name__ == "__main__":
     inter = np.where((bigmassgrid > 0.6) & (bigmassgrid < 10.0))
     high = np.where(bigmassgrid >= 10.0)
 
-    bctablegrid = np.hstack((["simple_photosphere"]*(np.size(verylow)+np.size(low_diffBC)+np.size(inter)+np.size(high))))
-    bclabelgrid = np.hstack((['']*(np.size(verylow)+np.size(low_diffBC)+np.size(inter)+np.size(high))))
-#    bclabelgrid = np.hstack((['']*(np.size(verylow))+['_tau100']*np.size(low_diffBC)+['']*(np.size(inter)+np.size(high))))
-    
-#    bctablegrid = np.hstack((["tau_100_tables"]*np.size(verylow), ["tau_100_tables"]*np.size(low_diffBC),\
-#["photosphere_tables"]*np.size(low_diffBC),["photosphere_tables"]*(np.size(inter)+np.size(high))))
-#    bclabelgrid = np.hstack((['']*np.size(verylow), ['_tau100']*np.size(low_diffBC),\
-#['_PT']*np.size(low_diffBC), ['']*(np.size(inter)+np.size(high))))
+    bctablegrid = np.hstack((["tau_100_tables"]*np.size(verylow), ["tau_100_tables"]*np.size(low_diffBC),\
+["photosphere_tables"]*np.size(low_diffBC),["photosphere_tables"]*(np.size(inter)+np.size(high))))
+    bclabelgrid = np.hstack((['']*np.size(verylow), ['_tau100']*np.size(low_diffBC),\
+['_PT']*np.size(low_diffBC), ['']*(np.size(inter)+np.size(high))))
 
     bcindex = np.arange(0, np.size(bctablegrid))
     i1 = np.size(verylow)
-    i2 = i1+np.size(low_diffBC)
+    i2 = i1+np.size(low_diffBC)*2.0
     i3 = i2+np.size(inter)
     i4 = i3+np.size(high)
     verylow_index = bcindex[:i1]
@@ -72,11 +68,11 @@ if __name__ == "__main__":
         ["<<MASS>>", map(mapfunc, bigmassgrid[low_diffBC])],\
             ["<<BC_LABEL>>", list(bclabelgrid[low_diffBC_index])],\
             ["<<BC_TABLE>>", list(bctablegrid[low_diffBC_index])],\
-            ["<<H1>>", [h1h2he3he4z[0]]*np.size(low_diffBC)],\
-            ["<<H2>>", [h1h2he3he4z[1]]*np.size(low_diffBC)],\
-            ["<<He3>>", [h1h2he3he4z[2]]*np.size(low_diffBC)],\
-            ["<<He4>>", [h1h2he3he4z[3]]*np.size(low_diffBC)],\
-            ["<<Z>>", [h1h2he3he4z[4]]*np.size(low_diffBC)],\
+            ["<<H1>>", [h1h2he3he4z[0]]*np.size(low_diffBC)*2],\
+            ["<<H2>>", [h1h2he3he4z[1]]*np.size(low_diffBC)*2],\
+            ["<<He3>>", [h1h2he3he4z[2]]*np.size(low_diffBC)*2],\
+            ["<<He4>>", [h1h2he3he4z[3]]*np.size(low_diffBC)*2],\
+            ["<<Z>>", [h1h2he3he4z[4]]*np.size(low_diffBC)*2],\
         ] 
 
     inter_replist = [\

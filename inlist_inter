@@ -53,7 +53,7 @@
 
 &controls
 
-	report_why_dt_limits = .false.
+	  report_why_dt_limits = .false.
       initial_mass = <<MASS>>
 
 !OUTPUT OPTIONS
@@ -73,8 +73,9 @@
 
 !PHYSICS
 
-      which_atm_option = '<<BC_TABLE>>'
-
+      which_atm_option = 'simple_photosphere'
+	  extras_cpar(2) = '<<BC_TABLE>>'
+	  
       use_Ledoux_criterion = .true.
       alpha_semiconvection = 0.01
       thermo_haline_coeff = 666.66 !(2/3 of 1000 as found by Charbonnel 2007)

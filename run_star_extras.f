@@ -256,13 +256,15 @@
 
 			 !evolve 100 steps then change to approx21_extras net
              if (s% model_number == 100) then
-             	write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
+				
+				write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
 				write(*,*) 'changing net to ', s% job% extras_cpar(1)
-                                write(*,*) 'switching from simple photosphere to tau100 tables'
+                write(*,*) 'switching from simple photosphere to ', s% job% extras_cpar(2)
 				write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
 
                 call star_change_to_new_net(id, .true., s% job% extras_cpar(1), ierr)
-                s% which_atm_option = 'photosphere_tables'
+                s% which_atm_option = s% job% extras_cpar(2)
+				
 			 endif
 	      end function extras_finish_step
       
