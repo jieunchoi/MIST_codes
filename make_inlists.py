@@ -39,7 +39,7 @@ if __name__ == "__main__":
 
     bcindex = np.arange(0, np.size(bctablegrid))
     i1 = np.size(verylow)
-    i2 = i1+np.size(low_diffBC)*2.0
+    i2 = i1+np.size(low_diffBC)*2
     i3 = i2+np.size(inter)
     i4 = i3+np.size(high)
     verylow_index = bcindex[:i1]
@@ -65,7 +65,7 @@ if __name__ == "__main__":
         ]
 
     lowbc_replist = [\
-        ["<<MASS>>", map(mapfunc, bigmassgrid[low_diffBC])],\
+        ["<<MASS>>", map(mapfunc, bigmassgrid[low_diffBC])*2],\
             ["<<BC_LABEL>>", list(bclabelgrid[low_diffBC_index])],\
             ["<<BC_TABLE>>", list(bctablegrid[low_diffBC_index])],\
             ["<<H1>>", [h1h2he3he4z[0]]*np.size(low_diffBC)*2],\
