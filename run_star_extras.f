@@ -258,8 +258,11 @@
              if (s% model_number == 100) then
              	write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
 				write(*,*) 'changing net to ', s% job% extras_cpar(1)
+                                write(*,*) 'switching from simple photosphere to tau100 tables'
 				write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
+
                 call star_change_to_new_net(id, .true., s% job% extras_cpar(1), ierr)
+                s% which_atm_option = 'photosphere_tables'
 			 endif
 	      end function extras_finish_step
       
