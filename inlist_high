@@ -18,13 +18,16 @@
       extras_rpar(3) = 1.2 !full off
       extras_rpar(4) = 1.8 !full on
 
-!OPACITY, NETWORK, RATE
+!OPACITY, NETWORK, RATE, etc.
 
 	  !run the first 100 models with basic then switch to a new network
       change_net = .true.
       new_net_name = 'basic.net'
 	  extras_lcpar = 1
 	  extras_cpar(1) = 'approx21_extras.net'
+	  
+	  !first 100 models are run with simple_photosphere then switched to the following
+	  extras_cpar(2) = '<<BC_TABLE>>'
 
       kappa_file_prefix = 'a09'
       kappa_lowT_prefix = 'lowT_fa05_a09p'
@@ -74,8 +77,8 @@
          
 !PHYSICS
 
+	  !only for the first 100 model steps
       which_atm_option = 'simple_photosphere'
-	  extras_cpar(2) = '<<BC_TABLE>>'
 	  	 
       use_Ledoux_criterion = .true.
       alpha_semiconvection = 0.01
