@@ -184,7 +184,7 @@
 			 
 			 !stopping criterion for C burning
 			 if ((s% center_h1 < 1d-4) .and. (s% center_he4 < 1d-4) .and. (s% center_c12 < 1d-4)) then
-			   	 termination_code_str(t_xtra1) = 'central C12 mass fraction below 1e-4'
+			   	 termination_code_str(t_xtra1) = 'central_C12_mass_fraction_limit'
                  s% termination_code = t_xtra1
 			   	 extras_check_model = terminate
 			 end if
