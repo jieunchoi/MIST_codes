@@ -86,7 +86,7 @@ def gen_summary(rawdirname):
             runtime = 'exceeded walltime'
             
         #populate the stat_summary dictionary
-        stat_summary[mass] = "{:<10}".format(status) + "{:<90}".format(reason) + "{:<20}".format(runtime)
+        stat_summary[mass] = "{:<20}".format(status) + "{:<70}".format(reason) + "{:<20}".format(runtime)
 
     keys = stat_summary.keys()
     #sort by mass in ascending order
@@ -95,7 +95,7 @@ def gen_summary(rawdirname):
     #write the file out
     summary_filename = "tracks_summary.txt"
     f = csv.writer(open(summary_filename, 'w'), delimiter='\t')
-    f.writerow(["{:<20}".format('#Mass'), "{:<10}".format('Status'), "{:<90}".format('Reason'), 'Runtime'])
+    f.writerow(["{:<20}".format('#Mass'), "{:<20}".format('Status'), "{:<70}".format('Reason'), "{:<20}".format('Runtime']))
     f.writerow(['','',''])
     
     for key in keys:
