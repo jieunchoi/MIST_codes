@@ -35,9 +35,9 @@ def gen_summary(rawdirname):
         status = ''
         #check which format it is. originally assumed a '/*M_dir/*M.e*' format
         if 'M_dir' in file:
-            mass = "{:<20}".format(file.split("/")[-2].rstrip('M_dir/'))
+            mass = file.split("/")[-2].rstrip('M_dir/')
         else:
-            mass = "{:<20}".format(file.split("/")[-2].split('M_')[0] + '_' + file.split("/")[-2].split('M_')[1].rstrip('_dir'))
+            mass = file.split("/")[-2].split('M_')[0] + '_' + file.split("/")[-2].split('M_')[1].rstrip('_dir')
 
         with open(file, 'r') as errfile:
             errcontent = errfile.readlines()
@@ -51,26 +51,26 @@ def gen_summary(rawdirname):
         if (len(errcontent) > 1):
             if '=>> PBS: job killed: walltime' in errcontent[1]:
                 status = 'FAILED'
-                reason = "job killed, hit a walltime limit"
+                reason = '"job killed, hit a walltime limit"'
             else:
                 status = 'FAILED'
-                reason = "Unknown error, please check"
+                reason = '"Unknown error, please check"'
         else:
             for line in outcontent[-30:]:
                 if 'termination code' in line:
                     termination_reason = line.split('termination code: ')[1].split('\n')[0]
                     break
                 if 'failed in do_relax_num_steps' in line:
-                    termination_reason = 'failed during preMS'
+                    termination_reason = '"failed during preMS"'
                     break
             for line in outcontent[-50:]:  
                 if (' stopping because of convergence problems' in line) or \
                            ('terminated evolution: convergence problems' in line):
                     status = 'FAILED'
-                    reason = termination_reason
+                    reason = '"'+termination_reason+'"'
                 if (line == outcontent[-1]) & (status == ''):
                     status = 'OK'
-                    reason = termination_reason
+                    reason = '"'+termination_reason+'"'
         
         #get the runtime
         dates = subprocess.Popen('grep [0-9][0-9]:[0-9][0-9]:[0-9][0-9] ' + listoutfiles[index], shell=True, stdout=subprocess.PIPE)
@@ -83,7 +83,7 @@ def gen_summary(rawdirname):
             runtime = str(datetime.timedelta(seconds=datetime.timedelta.total_seconds(end-start)))
         #if it only returns starttime
         except:
-            runtime = 'exceeded walltime'
+            runtime = '"exceeded walltime"'
             
         #populate the stat_summary dictionary
         stat_summary[mass] = "{:<15}".format(status) + "{:<50}".format(reason) + "{:<20}".format(runtime)
@@ -95,11 +95,11 @@ def gen_summary(rawdirname):
     #write the file out
     summary_filename = "tracks_summary.txt"
     f = csv.writer(open(summary_filename, 'w'), delimiter='\t')
-    f.writerow(["{:<20}".format('#Mass'), "{:<15}".format('Status'), "{:<50}".format('Reason'), "{:<20}".format('Runtime')])
+    f.writerow(["{:<15}".format('#Mass'), "{:<15}".format('Status'), "{:<50}".format('Reason'), "{:<20}".format('Runtime')])
     f.writerow(['','',''])
     
     for key in keys:
-        f.writerow([key, stat_summary[key]])
+        f.writerow(["{:<15}".format(key), stat_summary[key]])
         
 def sort_histfiles(rawdirname):
 
