@@ -51,26 +51,26 @@ def gen_summary(rawdirname):
         if (len(errcontent) > 1):
             if '=>> PBS: job killed: walltime' in errcontent[1]:
                 status = 'FAILED'
-                reason = "'job killed, hit a walltime limit'"
+                reason = 'job killed, hit a walltime limit'
             else:
                 status = 'FAILED'
-                reason = "'Unknown error, please check'"
+                reason = 'Unknown error, please check'
         else:
             for line in outcontent[-30:]:
                 if 'termination code' in line:
-                    termination_reason = "'"+line.split('termination code: ')[1].split('\n')[0]+"'"
+                    termination_reason = line.split('termination code: ')[1].split('\n')[0]
                     break
                 if 'failed in do_relax_num_steps' in line:
-                    termination_reason = "'failed during preMS'"
+                    termination_reason = 'failed during preMS'
                     break
             for line in outcontent[-50:]:  
                 if (' stopping because of convergence problems' in line) or \
                            ('terminated evolution: convergence problems' in line):
                     status = 'FAILED'
-                    reason = "'"+termination_reason+"'"
+                    reason = termination_reason
                 if (line == outcontent[-1]) & (status == ''):
                     status = 'OK'
-                    reason = "'"+termination_reason+"'"
+                    reason = termination_reason
         
         #get the runtime
         dates = subprocess.Popen('grep [0-9][0-9]:[0-9][0-9]:[0-9][0-9] ' + listoutfiles[index], shell=True, stdout=subprocess.PIPE)
@@ -96,10 +96,10 @@ def gen_summary(rawdirname):
     summary_filename = "tracks_summary.txt"
     f = csv.writer(open(summary_filename, 'w'), delimiter='\t')
     f.writerow(["{:<15}".format('#Mass'), "{:<15}".format('Status'), "{:<50}".format('Reason'), "{:<20}".format('Runtime')])
-    f.writerow(['','',''])
+    f.writerow(['','','',''])
     
     for key in keys:
-        f.writerow(["{:<15}".format(key)s, stat_summary[key]])
+        f.writerow(["{:<15}".format(key), stat_summary[key]])
         
 def sort_histfiles(rawdirname):
 
