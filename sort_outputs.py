@@ -51,10 +51,10 @@ def gen_summary(rawdirname):
         if (len(errcontent) > 1):
             if '=>> PBS: job killed: walltime' in errcontent[1]:
                 status = 'FAILED'
-                reason = 'job killed, hit a walltime limit'
+                reason = r'job killed, hit a walltime limit'
             else:
                 status = 'FAILED'
-                reason = 'Unknown error, please check'
+                reason = r'Unknown error, please check'
         else:
             for line in outcontent[-30:]:
                 if 'termination code' in line:
@@ -67,10 +67,10 @@ def gen_summary(rawdirname):
                 if (' stopping because of convergence problems' in line) or \
                            ('terminated evolution: convergence problems' in line):
                     status = 'FAILED'
-                    reason = termination_reason
+                    reason = "'"+termination_reason+"'"
                 if (line == outcontent[-1]) & (status == ''):
                     status = 'OK'
-                    reason = termination_reason
+                    reason = "'"+termination_reason+"'"
         
         #get the runtime
         dates = subprocess.Popen('grep [0-9][0-9]:[0-9][0-9]:[0-9][0-9] ' + listoutfiles[index], shell=True, stdout=subprocess.PIPE)
@@ -83,7 +83,7 @@ def gen_summary(rawdirname):
             runtime = str(datetime.timedelta(seconds=datetime.timedelta.total_seconds(end-start)))
         #if it only returns starttime
         except:
-            runtime = "'exceeded walltime'"
+            runtime = r'exceeded walltime'
             
         #populate the stat_summary dictionary
         stat_summary[mass] = "{:<15}".format(status) + "{:<50}".format(reason) + "{:<20}".format(runtime)
