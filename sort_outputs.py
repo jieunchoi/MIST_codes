@@ -51,10 +51,10 @@ def gen_summary(rawdirname):
         if (len(errcontent) > 1):
             if '=>> PBS: job killed: walltime' in errcontent[1]:
                 status = 'FAILED'
-                reason = r'job killed, hit a walltime limit'
+                reason = "'job killed, hit a walltime limit'"
             else:
                 status = 'FAILED'
-                reason = r'Unknown error, please check'
+                reason = "'Unknown error, please check'"
         else:
             for line in outcontent[-30:]:
                 if 'termination code' in line:
@@ -83,7 +83,7 @@ def gen_summary(rawdirname):
             runtime = str(datetime.timedelta(seconds=datetime.timedelta.total_seconds(end-start)))
         #if it only returns starttime
         except:
-            runtime = r'exceeded walltime'
+            runtime = "'exceeded walltime'"
             
         #populate the stat_summary dictionary
         stat_summary[mass] = "{:<15}".format(status) + "{:<50}".format(reason) + "{:<20}".format(runtime)
@@ -95,7 +95,7 @@ def gen_summary(rawdirname):
     #write the file out
     summary_filename = "tracks_summary.txt"
     f = csv.writer(open(summary_filename, 'w'), delimiter='\t')
-    f.writerow(["{:<15}".format('#Mass'), "{:<15}".format('Status'), "{:<50}".format('Reason'), "{:<20}".format('Runtime')])
+    f.writerow(["{:<15}".format('#Mass'), "{:<15}".format('Status'), "{:<40}".format('Reason'), "{:<20}".format('Runtime')])
     f.writerow(['','','',''])
     
     for key in keys:
