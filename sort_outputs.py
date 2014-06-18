@@ -51,26 +51,26 @@ def gen_summary(rawdirname):
         if (len(errcontent) > 1):
             if '=>> PBS: job killed: walltime' in errcontent[1]:
                 status = 'FAILED'
-                reason = "'job killed, hit a walltime limit'"
+                reason = 'walltime_limit'
             else:
                 status = 'FAILED'
-                reason = "'Unknown error, please check'"
+                reason = 'nnknown_error'
         else:
             for line in outcontent[-30:]:
                 if 'termination code' in line:
                     termination_reason = line.split('termination code: ')[1].split('\n')[0]
                     break
                 if 'failed in do_relax_num_steps' in line:
-                    termination_reason = 'failed during preMS'
+                    termination_reason = 'failed_during_preMS'
                     break
             for line in outcontent[-50:]:  
                 if (' stopping because of convergence problems' in line) or \
                            ('terminated evolution: convergence problems' in line):
                     status = 'FAILED'
-                    reason = "'"+termination_reason+"'"
+                    reason = termination_reason.replace(' ', '_')
                 if (line == outcontent[-1]) & (status == ''):
                     status = 'OK'
-                    reason = "'"+termination_reason+"'"
+                    reason = termination_reason.replace(' ', '_')
         
         #get the runtime
         dates = subprocess.Popen('grep [0-9][0-9]:[0-9][0-9]:[0-9][0-9] ' + listoutfiles[index], shell=True, stdout=subprocess.PIPE)
@@ -83,7 +83,7 @@ def gen_summary(rawdirname):
             runtime = str(datetime.timedelta(seconds=datetime.timedelta.total_seconds(end-start)))
         #if it only returns starttime
         except:
-            runtime = "'exceeded walltime'"
+            runtime = 'exceeded_walltime'
             
         #populate the stat_summary dictionary
         stat_summary[mass] = "{:10}".format(status) + "{:50}".format(reason) + "{:25}".format(runtime)
