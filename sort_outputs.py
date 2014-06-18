@@ -95,7 +95,7 @@ def gen_summary(rawdirname):
     #write the file out
     summary_filename = "tracks_summary.txt"
     f = csv.writer(open(summary_filename, 'w'), delimiter='\t')
-    f.writerow(["{:<15}".format('#Mass'), "{:<15}".format('Status'), "{:<40}".format('Reason'), "{:<20}".format('Runtime')])
+    f.writerow(["{:<15}".format('#Mass'), "{:<15}".format('Status'), "{:<41}".format('Reason'), "{:<20}".format('Runtime')])
     f.writerow(['','','',''])
     
     for key in keys:
