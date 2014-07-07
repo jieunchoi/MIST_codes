@@ -10,7 +10,7 @@ import re
 import os
 import sys
 
-make_isoch_dir = "/home/jchoi/pfs/make_isoch"
+make_isoch_dir = "/home/jchoi/pfs/iso"
 code_dir = "/home/jchoi/pfs/mesawork/MIST_codes"
 
 if __name__ == "__main__":
@@ -47,7 +47,7 @@ if __name__ == "__main__":
     hdr = ["#data directory\n", tracks_dir+"\n", "# read history_columns\n", os.path.join(make_isoch_dir, "my_history_columns.list")+"\n", \
                "# specify tracks\n", str(len(tracks_list))+"\n"]
 
-    footer = ["#specify isochrones\n", runname+".iso\n", "min_max\n", "107\n", "5.0\n", "10.3\n"]
+    footer = ["#specify isochrones\n", runname+".iso\n", "min_max\n", "51\n", "5.0\n", "10.3\n", "single\n"]
 
     print make_isoch_dir+"/"+inputfilename
     with open(inputfilename, "w") as newinputfile:
