@@ -119,7 +119,7 @@ def sort_histfiles(rawdirname):
             unformat_mass_string = histfile.split('LOGS/')[1].split('M_history.data')[0]
             newhistfilename = histfile.split('LOGS')[0]+'LOGS/'+reformat_massname.reformat_massname(unformat_mass_string)+'M.track'
         else:
-            unformat_mass_string = histfile.split('LOGS/')[1].split('M_history.data')[0]
+            unformat_mass_string = histfile.split('LOGS/')[1].split('_history.data')[0].split('M_')[0]
             bc_name = histfile.split('LOGS/')[1].split('M_')[1].split('_history.data')[0]
             newhistfilename = histfile.split('LOGS')[0]+'LOGS/'+reformat_massname.reformat_massname(unformat_mass_string)+'M_' + bc_name + '.track'
         os.system("cp " + histfile + " " + newhistfilename)
