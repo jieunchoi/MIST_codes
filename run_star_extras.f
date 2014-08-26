@@ -58,7 +58,7 @@
 	            call unpack_extra_info(s)
 	         end if
 			 
-			 !set Zbase for Type 2 Opacities automatically to the Z for the star
+			 !set OPACITIES: Zbase for Type 2 Opacities automatically to the Z for the star
 			 s% Zbase = 1.0 - (s% job% initial_h1 + s% job% initial_h2 + &
 			 s% job% initial_he3 + s% job% initial_he4)
 			 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
@@ -102,7 +102,7 @@
 			 write(*,*) 'new omega_div_omega_crit, fraction', s% job% new_omega_div_omega_crit, frac2
 			 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
 			 
-			 !for massive stars, turn up varcontrol gradually to help them evolve
+			 !set VARCONTROL: for massive stars, turn up varcontrol gradually to help them evolve
 			 vct60 = 2e-4
 			 vct100 = 1e-3
 			 
@@ -118,7 +118,7 @@
 				 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
 			 end if
 			 
-			 !set the core boundaries
+			 !set CORE BOUNDARIES: use lower fractions than the default
 			 s% he_core_boundary_h1_fraction = 1d-4
 			 s% c_core_boundary_he4_fraction = 1d-4
 			 s% o_core_boundary_c12_fraction = 1d-4
@@ -133,40 +133,20 @@
 			 real(dp), parameter :: huge_dt_limit = 3.15d16 ! ~1 Gyr
 	         extras_check_model = keep_going
 			 
-			 !increase varcontrol when the model hits the AGB phase
+			 !increase VARCONTROL: increase varcontrol when the model hits the AGB phase
 			 if ((s% initial_mass < 10) .and. (s% center_h1 < 1d-4) .and. (s% center_he4 < 1d-4)) then
+				 if (s% varcontrol_target < 1d-3) then !only print the first time
+					 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
+					 write(*,*) 'increasing varcontrol to', s% varcontrol_target
+					 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
+				 end if
 				 s% varcontrol_target = 1d-3
-				 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
-	 			 write(*,*) 'increasing varcontrol to', s% varcontrol_target
-	 			 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
 			 end if
-             
-             !check for the first thermal pulse
-            !if (s% center_he4 < 1d-4 .and. & 
-            ! any(s% burn_he_conv_region(1:s% num_conv_boundaries)) & 
-            ! .and. s% he_core_mass - s% c_core_mass <= &
-            ! s% TP_he_shell_max) then
-			! 
-			! 	orig_eta = s% Blocker_wind_eta
- 			! 	target_eta = 0.55
-            ! 	s% varcontrol_target = 5d-3
-			! 
-            ! 	if (orig_eta < s% Blocker_wind_eta) then !only print the first time
-            ! 		write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
-			!		write(*,*) 'reducing varcontrol to', s% varcontrol_target, '  and increasing eta to a target value of ', target_eta
-			!	    write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
-            !	end if
-			! 
-			!	if (s% Blocker_wind_eta < target_eta) then
-			!	  s% Blocker_wind_eta = s% Blocker_wind_eta + 0.05
-			!	  write(*,*) 'eta is at a value of ', s% Blocker_wind_eta
-			!	end if
-			! end if 
-			 
-			 !cap the mass loss at 1e-3 M/yr
+             			 
+			 !set MAX MDOT: cap the mass loss at 1e-3 M/yr
 			 s% star_mdot = max(-1e-3, s% star_mdot)
 
-             !turn off burning post-AGB
+             !suppress LATE BURNING:turn off burning post-AGB
 			 envelope_mass_fraction = (s% star_mass - s% c_core_mass)/(s% star_mass)
 			 L_He = s% power_he_burn*Lsun
 			 L_tot = s% photosphere_L*Lsun
@@ -182,14 +162,14 @@
 				 end if
 			 end if
 			 
-			 !stopping criterion for C burning
+			 !define STOPPING CRITERION: stopping criterion for C burning, massive stars only.
 			 if ((s% center_h1 < 1d-4) .and. (s% center_he4 < 1d-4) .and. (s% center_c12 < 1d-4)) then
-			   	 termination_code_str(t_xtra1) = 'central_C12_mass_fraction_limit'
+			   	 termination_code_str(t_xtra1) = 'central C12 mass fraction below 1e-4'
                  s% termination_code = t_xtra1
 			   	 extras_check_model = terminate
 			 end if
 			 
-		     !to determine whether or not diffusion should happen 
+		     !check DIFFUSION: to determine whether or not diffusion should happen 
 	 	     if(s% do_element_diffusion) then !only check if diffusion is on
 	             if(abs(s% mass_conv_core - s% star_mass) < 1d-2) then ! => fully convective
 	 	            s% diffusion_dt_limit = huge_dt_limit
@@ -200,7 +180,7 @@
 	 	         endif
 	 	     endif
 		  
-			 !turn off diffusion post MS   
+			 !turn off DIFFUSION: diffusion isn't super important post-MS   
              min_center_h1_for_diff = 1d-4
              if (s% do_element_diffusion .and. s% center_h1 < min_center_h1_for_diff) then
 				 if (s% do_element_diffusion) then !only print the first time
@@ -254,7 +234,7 @@
 	         extras_finish_step = keep_going
 	         call store_extra_info(s)
 
-			 !evolve 100 steps then change to approx21_extras net
+			 !set NET: evolve 100 steps then change to approx21_extras net
              if (s% model_number == 100) then
 				
 				write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
