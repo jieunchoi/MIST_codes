@@ -24,13 +24,16 @@ if __name__ == "__main__":
     bigmassgrid = np.unique(np.hstack((np.array([0.08]), massgrid(0.1,0.3,0.05), \
                                            massgrid(0.3,0.4,0.01), massgrid(0.4,2.0,0.05),\
                                            massgrid(2.0,5.0,0.2), massgrid(5,12,0.5), massgrid(12,20,1.0),\
-                                              massgrid(20,40,2), massgrid(40,60,5), massgrid(60,150,10.0))
+                                              massgrid(20,40,2), massgrid(40,150,5))
                                         ))
 
     verylow = np.where(bigmassgrid <= 0.25)
     low_diffBC = np.where((bigmassgrid >= 0.3) & (bigmassgrid <= 0.6))
     inter = np.where((bigmassgrid > 0.6) & (bigmassgrid < 10.0))
     high = np.where(bigmassgrid >= 10.0)
+
+#    bctablegrid = np.hstack((["tau_100_tables"]*np.size(verylow), ["tau_100_tables"]*np.size(low_diffBC),\
+#["photosphere_tables"]*np.size(low_diffBC),["simple_photosphere"]*(np.size(inter)+np.size(high)))) 
 
     bctablegrid = np.hstack((["tau_100_tables"]*np.size(verylow), ["tau_100_tables"]*np.size(low_diffBC),\
 ["photosphere_tables"]*np.size(low_diffBC),["photosphere_tables"]*(np.size(inter)+np.size(high))))
