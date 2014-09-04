@@ -30,7 +30,7 @@ def gen_summary(rawdirname):
     stat_summary = {}
 
     for index, file in enumerate(listerrfiles):
-        
+
         #declare status and also reset each iteration
         status = ''
         #check which format it is. originally assumed a '/*M_dir/*M.e*' format
@@ -54,7 +54,7 @@ def gen_summary(rawdirname):
                 reason = 'walltime_limit'
             else:
                 status = 'FAILED'
-                reason = 'nnknown_error'
+                reason = 'unknown_error'
         else:
             for line in outcontent[-30:]:
                 if 'termination code' in line:
@@ -78,11 +78,18 @@ def gen_summary(rawdirname):
             startdate, enddate = dates.stdout
             startdatelist = startdate.rstrip('\n').split(' ')
             enddatelist = enddate.rstrip('\n').split(' ')
+            
+            #to take care of single-digit dates
+            if '' in startdatelist:
+                startdatelist.remove('')
+            if '' in enddatelist:
+                enddatelist.remove('')
+            
             start = datetime.timedelta(int(startdatelist[2]), int(startdatelist[3].split(':')[-1]), 0,0,int(startdatelist[3].split(':')[-2]), int(startdatelist[3].split(':')[-3]))
             end = datetime.timedelta(int(enddatelist[2]), int(enddatelist[3].split(':')[-1]), 0,0,int(enddatelist[3].split(':')[-2]), int(enddatelist[3].split(':')[-3]))
             runtime = str(datetime.timedelta(seconds=datetime.timedelta.total_seconds(end-start)))
         #if it only returns starttime
-        except:
+        except ValueError:
             runtime = 'exceeded_walltime'
             
         #populate the stat_summary dictionary
