@@ -71,7 +71,7 @@ if __name__ == "__main__":
     #print "*********************MOVING THE EEPS************************"
     #print "************************************************************"    
     ##move the eeps to the eeps directory
-    #eeps_directory = os.path.join(home_run_directory, "eeps")
+    eeps_directory = os.path.join(home_run_directory, "eeps")
     for data in glob.glob(eeps_directory + "/*.eep"):
         newname = data.replace(".track","")
     #    os.system("mv " + data + " " + newname)
