@@ -28,6 +28,8 @@ if __name__ == "__main__":
         os.system("rm " + os.path.join(make_isoch_dir, inputfilename))
 
     tracks_dir = os.path.join(os.path.join(code_dir, runname), "tracks")
+    eeps_dir = os.path.join(os.path.join(code_dir, runname), "eeps")
+    iso_dir = os.path.join(os.path.join(code_dir, runname), "isochrones")
 
     #get the list of tracks
     if mode == 'eeps':
@@ -44,8 +46,8 @@ if __name__ == "__main__":
         tracks_list = sorted(good_names_list+fake_names_list)
         
     #header and footer in the file
-    hdr = ["#data directory\n", tracks_dir+"\n", "# read history_columns\n", os.path.join(make_isoch_dir, "my_history_columns.list")+"\n", \
-               "# specify tracks\n", str(len(tracks_list))+"\n"]
+    hdr = ["#data directories: 1) history files, 2) eeps, 3) isochrones\n", tracks_dir+"\n", eeps_dir+"\n", iso_dir+"\n", \
+    "# read history_columns\n", os.path.join(make_isoch_dir, "my_history_columns.list")+"\n", "# specify tracks\n", str(len(tracks_list))+"\n"]
 
     footer = ["#specify isochrones\n", runname+".iso\n", "min_max\n", "51\n", "5.0\n", "10.3\n", "single\n"]
 
