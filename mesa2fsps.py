@@ -67,76 +67,21 @@ if __name__ == "__main__":
     tracks_directory = lines[1].replace("\n", "")
     home_run_directory = tracks_directory.split("/tracks")[0]
 
-    #print "************************************************************"
-    #print "*********************MOVING THE EEPS************************"
-    #print "************************************************************"    
-    ##move the eeps to the eeps directory
+    #move the eeps to the eeps directory
     eeps_directory = os.path.join(home_run_directory, "eeps")
     for data in glob.glob(eeps_directory + "/*.eep"):
         newname = data.replace(".track","")
-    #    os.system("mv " + data + " " + newname)
-    #    try:
-    #        shutil.move(newname, eeps_directory)
-    #    except shutil.Error:
-    #        del_or_no = raw_input(newname + " already exists in " + eeps_directory + \
-    #        ". Delete? (1 or 0):  ")
-    #        if del_or_no == '1':
-    #            print "Deleting the old file..."
-    #            os.remove(os.path.join(eeps_directory, newname.split("tracks/")[1]))
-    #            shutil.move(newname, eeps_directory)
-    #        elif del_or_no == '0':
-    #            print "Never mind."
-    #            pass
-    #        else:
-    #            print "Invalid input!"
-    #            pass
-            
-    #print "************************************************************"
-    #print "****************MOVING THE MIST ISOCHRONES******************"
-    #print "************************************************************"
-    ##move the MIST isochrone into the isochrones directory
-    #isoch_directory = os.path.join(home_run_directory, "isochrones")
-    #for data in glob.glob(tracks_directory + "/*.iso"):
-    #    try:
-    #        shutil.move(data, isoch_directory)
-    #    except shutil.Error:
-    #        del_or_no = raw_input(data+ " already exists in " + isoch_directory + \
-    #        ". Delete? (1 or 0):  ")
-    #        if del_or_no == '1':
-    #            print "Deleting the old file..."
-    #            os.remove(os.path.join(isoch_directory, file.split("tracks/")[1]))
-    #            shutil.move(data, isoch_directory)
-    #        elif del_or_no == '0':
-    #            print "Never mind."
-    #            pass
-    #        else:
-    #            print "Invalid input!"
-    #            pass
             
     print "************************************************************"
     print "****************MAKING THE FSPS ISOCHRONES******************"
     print "************************************************************"
     #run the mist2fsps routine
+    isoch_directory = os.path.join(home_run_directory, "isochrones")
     isoch_output = glob.glob(isoch_directory + "/*.iso")
     fsps_iso_filename = mist2fsps.write_fsps_iso(isoch_output[0])
 
     shutil.move(os.path.join(make_isoch_dir, fsps_iso_filename), isoch_directory)
 
-    #try:
-    #    shutil.move(os.path.join(make_isoch_dir, fsps_iso_filename), isoch_directory)
-    #except shutil.Error:
-    #    del_or_no = raw_input(fsps_iso_filename + " already exists in " + isoch_directory + \
-    #    ". Delete? (1 or 0):  ")
-    #    if del_or_no == '1':
-    #        print "Deleting the old file..."
-    #        os.remove(os.path.join(isoch_directory, fsps_iso_filename))
-    #        shutil.move(os.path.join(make_isoch_dir, fsps_iso_filename), isoch_directory)
-    #    elif del_or_no == '0':
-    #        print "Never mind."
-    #        pass
-    #    else:
-    #        print "Invalid input!"
-    #        pass
 
     
     
