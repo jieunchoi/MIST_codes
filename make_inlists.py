@@ -32,11 +32,8 @@ if __name__ == "__main__":
     inter = np.where((bigmassgrid > 0.6) & (bigmassgrid < 10.0))
     high = np.where(bigmassgrid >= 10.0)
 
-#    bctablegrid = np.hstack((["tau_100_tables"]*np.size(verylow), ["tau_100_tables"]*np.size(low_diffBC),\
-#["photosphere_tables"]*np.size(low_diffBC),["simple_photosphere"]*(np.size(inter)+np.size(high)))) 
-
     bctablegrid = np.hstack((["tau_100_tables"]*np.size(verylow), ["tau_100_tables"]*np.size(low_diffBC),\
-["photosphere_tables"]*np.size(low_diffBC),["photosphere_tables"]*(np.size(inter)+np.size(high))))
+["photosphere_tables"]*(np.size(low_diffBC)+np.size(inter)),["simple_photosphere"]*np.size(high)))
     bclabelgrid = np.hstack((['']*np.size(verylow), ['_tau100']*np.size(low_diffBC),\
 ['_PT']*np.size(low_diffBC), ['']*(np.size(inter)+np.size(high))))
 
