@@ -12,11 +12,11 @@ from make_pbsfiles import make_pbsfiles
 runname = sys.argv[1]
 Z = sys.argv[2]
 
-work_dir = "/home/jchoi/pfs/mesawork/"
-cleanwork_dir = '/home/jchoi/pfs/cleanworkdir/'
+work_dir = os.environ['MESAWORK_DIR']
+cleanwork_dir = os.path.join(work_dir,"cleanworkdir")
 dirname = os.path.join(work_dir, runname)
 codedir = os.path.join(work_dir, "codes")
-pbsbasefile = 'serial.pbs'
+runbasefile = 'SLURM_MISTgrid.sh'
 
 if __name__ == "__main__":
 
@@ -64,7 +64,7 @@ if __name__ == "__main__":
 
         #cd into the individual directory and qsub
         os.chdir(pathtoinlistdir)
-        print "qsub " + pbsfile
-        os.system("qsub "+pbsfile)
+        print "sbatch " + pbsfile
+        os.system("sbatch "+pbsfile)
         os.chdir(codedir)
     

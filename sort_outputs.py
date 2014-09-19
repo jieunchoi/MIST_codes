@@ -19,7 +19,7 @@ import reformat_massname
 import subprocess
 import datetime
 
-work_dir = '/home/jchoi/pfs/mesawork/'
+work_dir = os.environ['MESAWORK_DIR']
 
 def gen_summary(rawdirname):
     

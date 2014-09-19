@@ -14,9 +14,9 @@ from make_replacements import make_replacements
 runname=sys.argv[1]
 Z = sys.argv[2]
 
-work_dir = '/home/jchoi/pfs/mesawork/'
-code_dir = '/home/jchoi/pfs/mesawork/MIST_codes/'
-inlist_dir = '/home/jchoi/pfs/mesawork/inlists/inlists_'+runname
+work_dir = os.environ['MESAWORK_DIR']
+code_dir = os.environ['MIST_CODE_DIR']
+inlist_dir = work_dir+'/inlists/inlists_'+runname
 
 if __name__ == "__main__":
     

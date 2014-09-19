@@ -11,8 +11,8 @@ import os
 import sys
 import shutil
 
-make_isoch_dir = "/home/jchoi/pfs/iso"
-code_dir = "/home/jchoi/pfs/mesawork/MIST_codes"
+make_isoch_dir = os.environ['ISO_DIR']
+code_dir = os.environ['MIST_CODE_DIR']
 
 if __name__ == "__main__":
     
