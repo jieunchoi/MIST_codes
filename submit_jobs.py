@@ -13,9 +13,9 @@ runname = sys.argv[1]
 Z = sys.argv[2]
 
 work_dir = os.environ['MESAWORK_DIR']
-cleanwork_dir = os.path.join(work_dir,"cleanworkdir")
+cleanwork_dir = os.path.join(work_dir, "cleanworkdir")
 dirname = os.path.join(work_dir, runname)
-codedir = os.path.join(work_dir, "codes")
+codedir = os.environ['MIST_CODE_DIR']
 runbasefile = 'SLURM_MISTgrid.sh'
 
 if __name__ == "__main__":
@@ -51,7 +51,9 @@ if __name__ == "__main__":
 
         try:
             shutil.copytree(cleanwork_dir, pathtoinlistdir)
-            
+            #also copy over the most recent my_history_columns.list and run_star_extras.f
+            shutil.copy(os.path.join(codedir, 'my_history_columns.list'), os.path.join(cleanwork_dir, 'my_history_columns.list'))
+            shutil.copy(os.path.join(codedir, 'run_star_extras.f'), os.path.join(cleanwork_dir, 'src/run_star_extras.f'))
         except OSError:
             pass
 

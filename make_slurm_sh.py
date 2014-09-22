@@ -5,7 +5,7 @@ This generates the Odyssey cluster SLURM file for each model.
 import os
 import numpy as np
 
-def make_pbsfiles(inlistname, inlistdir, runbasefile):
+def make_slurm_sh(inlistname, inlistdir, runbasefile):
 
     runname = inlistname.strip(".inlist")
     massval = int(runname.split('M')[0])/100.0
@@ -26,4 +26,4 @@ def make_pbsfiles(inlistname, inlistdir, runbasefile):
     outfile.write(replaced_contents)
     outfile.close()
 
-    return pbsfile
+    return runfile
