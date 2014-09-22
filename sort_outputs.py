@@ -49,9 +49,9 @@ def gen_summary(rawdirname):
 
         #check for error messages
         if (len(errcontent) > 1):
-            if '=>> PBS: job killed: walltime' in errcontent[1]:
+            if 'DUE TO TIME LIMIT ***' in errcontent[1]:
                 status = 'FAILED'
-                reason = 'walltime_limit'
+                reason = 'need_more_time'
             else:
                 status = 'FAILED'
                 reason = 'unknown_error'
@@ -90,7 +90,7 @@ def gen_summary(rawdirname):
             runtime = str(datetime.timedelta(seconds=datetime.timedelta.total_seconds(end-start)))
         #if it only returns starttime
         except ValueError:
-            runtime = 'exceeded_walltime'
+            runtime = 'exceeded_req_time'
             
         #populate the stat_summary dictionary
         stat_summary[mass] = "{:10}".format(status) + "{:50}".format(reason) + "{:25}".format(runtime)

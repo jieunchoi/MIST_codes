@@ -162,13 +162,20 @@
 				 end if
 			 end if
 			 
-			 !define STOPPING CRITERION: stopping criterion for C burning, massive stars only.
+			 !define STOPPING CRITERION: stopping criterion for C burning, massive stars.
 			 if ((s% center_h1 < 1d-4) .and. (s% center_he4 < 1d-4) .and. (s% center_c12 < 1d-4)) then
 			   	 termination_code_str(t_xtra1) = 'central C12 mass fraction below 1e-4'
                  s% termination_code = t_xtra1
 			   	 extras_check_model = terminate
 			 end if
 			 
+			 !define STOPPING CRITERION: stopping criterion for TAMS, low mass stars.
+			 if ((s% center_h1 < 1d-4) .and. (s% initial_mass < 0.6)) then
+				 termination_code(t_xtra2) = 'central H1 mass fraction below 1e-4'
+				 s% termination_code = t_xtra2
+			   	 extras_check_model = terminate
+			 end if
+			 			 
 		     !check DIFFUSION: to determine whether or not diffusion should happen 
 	 	     if(s% do_element_diffusion) then !only check if diffusion is on
 	             if(abs(s% mass_conv_core - s% star_mass) < 1d-2) then ! => fully convective

@@ -26,10 +26,10 @@ if __name__ == "__main__":
                                            massgrid(2.0,5.0,0.2), massgrid(5,12,0.5), massgrid(12,20,1.0),\
                                               massgrid(20,40,2), massgrid(40,150,5))
                                         ))
-
+                                        
     verylow = np.where(bigmassgrid <= 0.25)
-    low_diffBC = np.where((bigmassgrid >= 0.3) & (bigmassgrid <= 0.6))
-    inter = np.where((bigmassgrid > 0.6) & (bigmassgrid < 10.0))
+    low_diffBC = np.where((bigmassgrid >= 0.3) & (bigmassgrid < 0.6))
+    inter = np.where((bigmassgrid >= 0.6) & (bigmassgrid < 10.0))
     high = np.where(bigmassgrid >= 10.0)
 
     bctablegrid = np.hstack((["tau_100_tables"]*np.size(verylow), ["tau_100_tables"]*np.size(low_diffBC),\
@@ -52,7 +52,7 @@ if __name__ == "__main__":
 
     mapfunc = lambda var: np.str(int(var)) if var == int(var) else np.str(var)
     
-    # list of [replacement string, values]s
+    # list of [replacement string, values]
     verylow_replist = [\
         ["<<MASS>>", map(mapfunc, bigmassgrid[verylow])],\
             ["<<BC_LABEL>>", list(bclabelgrid[verylow_index])],\
@@ -97,7 +97,7 @@ if __name__ == "__main__":
             ["<<Z>>", [h1h2he3he4z[4]]*np.size(high)],\
         ]
 
-    make_replacements(verylow_replist, direc=os.path.join(inlist_dir), file_base=os.path.join(code_dir+'inlist_low'), name_str='<<MASS>>M<<BC_LABEL>>.inlist', clear_direc=True)
-    make_replacements(lowbc_replist, direc=os.path.join(inlist_dir), file_base=os.path.join(code_dir+'inlist_inter'), name_str='<<MASS>>M<<BC_LABEL>>.inlist')
-    make_replacements(inter_replist, direc=os.path.join(inlist_dir), file_base=os.path.join(code_dir+'inlist_inter'), name_str='<<MASS>>M<<BC_LABEL>>.inlist')
+    make_replacements(verylow_replist, direc=os.path.join(inlist_dir), file_base=os.path.join(code_dir+'inlist_lowinter'), name_str='<<MASS>>M<<BC_LABEL>>.inlist', clear_direc=True)
+    make_replacements(lowbc_replist, direc=os.path.join(inlist_dir), file_base=os.path.join(code_dir+'inlist_lowinter'), name_str='<<MASS>>M<<BC_LABEL>>.inlist')
+    make_replacements(inter_replist, direc=os.path.join(inlist_dir), file_base=os.path.join(code_dir+'inlist_lowinter'), name_str='<<MASS>>M<<BC_LABEL>>.inlist')
     make_replacements(high_replist, direc=os.path.join(inlist_dir), file_base=os.path.join(code_dir+'inlist_high'), name_str='<<MASS>>M<<BC_LABEL>>.inlist')
