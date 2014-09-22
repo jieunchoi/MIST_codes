@@ -7,7 +7,7 @@ This calls all the necessary routines to submit a grid of specified name and met
 import os
 import sys
 import shutil
-from make_pbsfiles import make_pbsfiles 
+from make_slurm_sh import make_slurm_sh 
 
 runname = sys.argv[1]
 Z = sys.argv[2]
@@ -59,12 +59,12 @@ if __name__ == "__main__":
         shutil.copy(os.path.join(orig_inlistdir,inlistname), os.path.join(pathtoinlistdir, 'inlist_project'))
 
         #create and move the pbs file into the correct directory
-        pbsfile = make_pbsfiles(inlistname, pathtoinlistdir, pbsbasefile)
-        shutil.move(pbsfile, pathtoinlistdir)
+        slurmfile = make_slurm_sh(inlistname, pathtoinlistdir, runbasefile)
+        shutil.move(slurmfile, pathtoinlistdir)
 
         #cd into the individual directory and qsub
         os.chdir(pathtoinlistdir)
-        print "sbatch " + pbsfile
-        os.system("sbatch "+pbsfile)
+        print "sbatch " + slurmfile
+#        os.system("sbatch "+slurmfile)
         os.chdir(codedir)
     

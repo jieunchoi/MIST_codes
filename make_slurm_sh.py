@@ -17,9 +17,9 @@ def make_pbsfiles(inlistname, inlistdir, runbasefile):
     replaced_contents = infile_contents.replace('<<RUNNAME>>', runname)
     replaced_contents = replaced_contents.replace('<<DIRNAME>>', inlistdir)
     if ((massval > 10) | ((massval > 4) & (massval < 7))):
-        replaced_contents = replaced_contents.replace('<<WALLTIME>>', '1440')
+        replaced_contents = replaced_contents.replace('<<WALLTIME>>', '24:00:00')
     else:
-        replaced_contents = replaced_contents.replace('<<WALLTIME>>', '2160')
+        replaced_contents = replaced_contents.replace('<<WALLTIME>>', '36:00:00')
     runfile = runname+'_run.sh'
 
     outfile = open(runfile, 'w+')
