@@ -1,42 +1,40 @@
-#!/usr/bin/env python 
-
 """
-This generates EEP files from MESA history files, then
-generates MIST and FSPS isochrones.
+
+A wrapper for various routines to generate eeps and isochrones
+from MESA history files and write MIST and FSPS isochrones.
+
+Args:
+    runname: the name of the grid
+    
+Returns:
+    None
+    
 """
 
 import glob
-import mist2fsps
 import os
 import sys
 import shutil
+import mist2fsps
+from make_blend_input_file import make_blend_input_file
+from make_iso_input_file import make_iso_input_file
 
 make_isoch_dir = os.environ['ISO_DIR']
 code_dir = os.environ['MIST_CODE_DIR']
 
-if __name__ == "__main__":
+def mesa2fsps(runname):
     
-    inputfile = sys.argv[1]
-    runname = inputfile.split("input.")[1]
+    inputfile = "input."+runname
 
-    print "************************************************************"
-    print "***************MAKING NEW INPUT FILE FOR EEPS***************"
-    print "************************************************************"
-    #input file for the isochrones code to make eeps
-    os.system("./make_mist_input_file.py " + runname + " eeps")
+    #Make the input file for the isochrones code to make eeps
+    make_iso_input_file(runname, "eeps")
     
-    print "************************************************************"
-    print "********************MAKING EEPS FILES***********************"
-    print "************************************************************"
-    #get to the isochrone directory and run the codes
+    #cd into the isochrone directory and run the codes
     os.chdir(make_isoch_dir)
     os.system("more " + inputfile)
     os.system("./make_eeps " + inputfile)
     
-    print "************************************************************"
-    print "******************BLEND THE LOW MASS TRACKS*****************"
-    print "************************************************************"
-    #loop through the low masses
+    #Loop through the low masses and blend the tracks
     initial_eeps_list_fullname = glob.glob(os.path.join(code_dir, runname+"/tracks/*.eep"))
     initial_eeps_list = [x.split('tracks/')[1] for x in initial_eeps_list_fullname]
     blend_ind = ['M_' in x for x in initial_eeps_list]
@@ -44,45 +42,35 @@ if __name__ == "__main__":
     blend_list.sort()
     for i, filename in enumerate(blend_list[::2]):
         os.chdir(code_dir)
-        os.system("./make_blend_input_file.py " + runname + " " + filename +  " " + blend_list[i*2+1])
+        make_blend_input_file.make_blend_input_file(runname, filename, blend_list[i*2+1])
         os.chdir(make_isoch_dir)
         os.system("./blend_eeps input.blend_"+ runname)
         
-    print "************************************************************"
-    print "***************MAKING NEW INPUT FILE FOR ISO***************"
-    print "************************************************************"
-    #input file for the isochrones code to make isochrones, just rewrite the old
+    #Make the input file for the isochrones code to make isochrones
     os.chdir(code_dir)
-    os.system("./make_mist_input_file.py " + runname + " iso")
+    make_iso_input_file(runname, "iso")
     
-    print "************************************************************"
-    print "********************MAKING ISOCHRONES***********************"
-    print "************************************************************"
+    #Run the isochrone code
     os.chdir(make_isoch_dir)
     os.system("./make_iso " + inputfile)
     
-    #get the address to the home directory for the run
+    #Get the path to the home directory for the run (runname)
     with open(inputfile) as f:
         lines=f.readlines()
     tracks_directory = lines[1].replace("\n", "")
     home_run_directory = tracks_directory.split("/tracks")[0]
 
-    #move the eeps to the eeps directory
+    #Move the eeps to the eeps directory and rename them
     eeps_directory = os.path.join(home_run_directory, "eeps")
     for data in glob.glob(eeps_directory + "/*.eep"):
         newname = data.replace(".track","")
             
-    print "************************************************************"
-    print "****************MAKING THE FSPS ISOCHRONES******************"
-    print "************************************************************"
-    #run the mist2fsps routine
+    #Make the FSPS isochrones
     isoch_directory = os.path.join(home_run_directory, "isochrones")
     isoch_output = glob.glob(isoch_directory + "/*.iso")
     fsps_iso_filename = mist2fsps.write_fsps_iso(isoch_output[0])
 
     shutil.move(os.path.join(make_isoch_dir, fsps_iso_filename), isoch_directory)
-
-
     
     
     

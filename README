@@ -1,1 +1,12 @@
 This directory contains all of the python codes required to submit a grid of MESA models to the Odyssey computing cluster at Harvard.
+
+Requires:
+MESA (http://mesa.sourceforge.net/)
+iso (https://github.com/dotbot2000/iso)
+
+Need to have the following environment variables set:
+    MESAWORK_DIR = copy of the star/work directory from MESA
+    ISO_DIR = path to the iso directory
+    MIST_CODE_DIR= path to this MIST_code directory
+	
+	

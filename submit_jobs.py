@@ -1,26 +1,38 @@
 #!/usr/bin/env python 
 
 """
-This calls all the necessary routines to submit a grid of specified name and metallicity.
+
+Calls all of the necessary routines to submit a grid of specified name and metallicity.
+
+Args:
+    runname: the name of the grid
+    Z: the mass fraction in metals
+    
+Example:
+    To run a Z=0.015 grid called MIST_v0.1
+    >>> ./submit_jobs MIST_v0.1 0.015
+
 """
 
 import os
 import sys
 import shutil
-from make_slurm_sh import make_slurm_sh 
+from make_slurm_sh import make_slurm_sh
+from make_inlist_inputs import make_inlist_inputs
 
 runname = sys.argv[1]
 Z = sys.argv[2]
 
 work_dir = os.environ['MESAWORK_DIR']
-cleanwork_dir = os.path.join(work_dir, "cleanworkdir")
+code_dir = os.environ['MIST_CODE_DIR']
 dirname = os.path.join(work_dir, runname)
-codedir = os.environ['MIST_CODE_DIR']
+cleanwork_dir = os.path.join(work_dir, "cleanworkdir")
+inlist_dir = os.path.join(workdir, '/inlists/inlists_'+runname)
 runbasefile = 'SLURM_MISTgrid.sh'
 
 if __name__ == "__main__":
 
-    #create a working directory
+    #Create a working directory
     try:
         os.mkdir(dirname)
     except OSError:
@@ -31,42 +43,52 @@ if __name__ == "__main__":
             shutil.rmtree(dirname)
             os.mkdir(dirname)
         elif del_or_no == '0':
-            print 'Okay never mind.'
+            print 'Do not delete.'
             sys.exit(0)
         else:
             print 'Invalid choice.'
             sys.exit(0)
 
-    os.system("./make_inlists.py " + runname + " " + Z)
+    #Generate inlists using template inlist files
+    new_inlist_name = '<<MASS>>M<<BC_LABEL>>.inlist'
+    make_replacements(make_inlist_inputs(runname, Z, 'VeryLow'), new_inlist_name,\
+        direc=inlist_dir, file_base=os.path.join(code_dir,'inlist_lowinter'), clear_direc=True)
+    make_replacements(make_inlist_inputs(runname, Z, 'LowDiffBC'), new_inlist_name,\
+        direc=inlist_dir, file_base=os.path.join(code_dir,'inlist_lowinter'))
+    make_replacements(make_inlist_inputs(runname, Z, 'Intermediate'), new_inlist_name,\
+        direc=inlist_dir, file_base=os.path.join(code_dir,'inlist_lowinter'))
+    make_replacements(make_inlist_inputs(runname, Z, 'High'), new_inlist_name,\
+        direc=inlist_dir, file_base=os.path.join(code_dir,'inlist_high'))
+        
     orig_inlistdir = os.path.join(work_dir, 'inlists/inlists_'+runname)
     inlist_list = os.listdir(orig_inlistdir)
     inlist_list.sort()
 
     for inlistname in inlist_list:
-        #make individual directories for each model
+        #Make individual directories for each mass
         inlistdir = inlistname.replace('.inlist', '_dir')
 
-        #define an absolute path to the inlist directory within this working directory (ie. /home/jchoi/pfs/mesawork/V00_Z0.02_abSOLAR/10M_dir)
+        #Define an absolute path to this directory.
         pathtoinlistdir = os.path.join(dirname, inlistdir)
 
+        #Copy over the contents of the template directory and copy over the most recent my_history_columns.list and run_star_extras.f
         try:
             shutil.copytree(cleanwork_dir, pathtoinlistdir)
-            #also copy over the most recent my_history_columns.list and run_star_extras.f
-            shutil.copy(os.path.join(codedir, 'my_history_columns.list'), os.path.join(cleanwork_dir, 'my_history_columns.list'))
-            shutil.copy(os.path.join(codedir, 'run_star_extras.f'), os.path.join(cleanwork_dir, 'src/run_star_extras.f'))
+            shutil.copy(os.path.join(code_dir, 'my_history_columns.list'), os.path.join(cleanwork_dir, 'my_history_columns.list'))
+            shutil.copy(os.path.join(code_dir, 'run_star_extras.f'), os.path.join(cleanwork_dir, 'src/run_star_extras.f'))
         except OSError:
             pass
 
-        #take the inlists from the directory "inlists" and copy them to the individual directories & rename as inlist_project
+        #Populate each directory with appropriate inlists and rename as inlist_project
         shutil.copy(os.path.join(orig_inlistdir,inlistname), os.path.join(pathtoinlistdir, 'inlist_project'))
 
-        #create and move the pbs file into the correct directory
+        #Create and move the SLURM file to the correct directory
         slurmfile = make_slurm_sh(inlistname, pathtoinlistdir, runbasefile)
         shutil.move(slurmfile, pathtoinlistdir)
 
-        #cd into the individual directory and qsub
+        #cd into the individual directory and submit the job
         os.chdir(pathtoinlistdir)
         print "sbatch " + slurmfile
 #        os.system("sbatch "+slurmfile)
-        os.chdir(codedir)
+        os.chdir(code_dir)
     
