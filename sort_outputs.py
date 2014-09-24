@@ -71,7 +71,7 @@ def gen_summary(rawdirname):
         termination_reason = ''
 
         #Check for error messages
-        if (len(errcontent) > 1):
+        if (len(errcontent) >= 1):
             if 'DUE TO TIME LIMIT ***' in errcontent[1]:
                 status = 'FAILED'
                 reason = 'need_more_time'
