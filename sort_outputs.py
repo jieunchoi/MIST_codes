@@ -56,7 +56,7 @@ def gen_summary(rawdirname):
         #Declare status and also initialize each iteration
         status = ''
 
-        #Extract the mass of the model.
+        #Extract the mass of the model
         if 'M_dir' in file:
             mass = file.split("/")[-2].rstrip('M_dir/')
         else:
