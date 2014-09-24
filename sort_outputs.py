@@ -44,8 +44,8 @@ def gen_summary(rawdirname):
     """
     
     #Outputs from the cluster
-    listerrfiles = glob.glob(work_dir+rawdirname+'/*/*.e')
-    listoutfiles = glob.glob(work_dir+rawdirname+'/*/*.o')
+    listerrfiles = glob.glob(os.path.join(os.path.join(work_dir, rawdirname), '/*/*.e'))
+    listoutfiles = glob.glob(os.path.join(os.path.join(work_dir, rawdirname), '/*/*.o'))
 
     #Dictionary to store the information about the MESA run
     stat_summary = {}
