@@ -80,7 +80,7 @@
 	         end if
 
 	         s% overshoot_f_above_burn_h = frac * s% overshoot_f_above_burn_h
-	         write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
+			 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
 			 write(*,*) 'core convective overshoot fraction: ', frac
 			 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
 
@@ -142,11 +142,10 @@
 				 end if
 				 s% varcontrol_target = 1d-3
 			 end if
-             			 
 			 !set MAX MDOT: cap the mass loss at 1e-3 M/yr
 			 s% star_mdot = max(-1e-3, s% star_mdot)
-
-             !suppress LATE BURNING:turn off burning post-AGB
+			 
+			 !suppress LATE BURNING:turn off burning post-AGB
 			 envelope_mass_fraction = (s% star_mass - s% c_core_mass)/(s% star_mass)
 			 L_He = s% power_he_burn*Lsun
 			 L_tot = s% photosphere_L*Lsun
@@ -154,7 +153,7 @@
 				 if (((envelope_mass_fraction < 0.15) .and. (L_He/L_tot < 0.05)) .or. &
 					 ((s% center_h1 < 1d-4) .and. (s% center_he4 < 1d-4) .and. (s% Teff > 10**4.5) .and. (s% L_phot > 4))) then
 					 if (s% category_factors(3) > 0) then !only print the first time
-                         write(*,*) '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
+						 write(*,*) '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
 						 write(*,*) 'now at post AGB phase, turning off all burning except for H'
 						 write(*,*) '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
 					 end if
@@ -165,7 +164,7 @@
 			 !define STOPPING CRITERION: stopping criterion for C burning, massive stars.
 			 if ((s% center_h1 < 1d-4) .and. (s% center_he4 < 1d-4) .and. (s% center_c12 < 1d-4)) then
 			   	 termination_code_str(t_xtra1) = 'central C12 mass fraction below 1e-4'
-                 s% termination_code = t_xtra1
+				 s% termination_code = t_xtra1
 			   	 extras_check_model = terminate
 			 end if
 			 
@@ -175,8 +174,8 @@
 				 s% termination_code = t_xtra2
 			   	 extras_check_model = terminate
 			 end if
-			 			 
-		     !check DIFFUSION: to determine whether or not diffusion should happen 
+			 
+			 !check DIFFUSION: to determine whether or not diffusion should happen 
 	 	     if(s% do_element_diffusion) then !only check if diffusion is on
 	             if(abs(s% mass_conv_core - s% star_mass) < 1d-2) then ! => fully convective
 	 	            s% diffusion_dt_limit = huge_dt_limit
@@ -186,16 +185,16 @@
 	 	            s% diffusion_dt_limit = original_diffusion_dt_limit
 	 	         endif
 	 	     endif
-		  
-			 !turn off DIFFUSION: diffusion isn't super important post-MS   
-             min_center_h1_for_diff = 1d-4
-             if (s% do_element_diffusion .and. s% center_h1 < min_center_h1_for_diff) then
+			 
+			 !turn off DIFFUSION: diffusion isn't super important post-MS
+			 min_center_h1_for_diff = 1d-4
+			 if (s% do_element_diffusion .and. s% center_h1 < min_center_h1_for_diff) then
 				 if (s% do_element_diffusion) then !only print the first time
-				 	write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
-					write(*,*) 'turning off diffusion'
-					write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'  
+					 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
+					 write(*,*) 'turning off diffusion'
+					 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'  
 				 end if
-                 s% do_element_diffusion = .false.
+				 s% do_element_diffusion = .false.
              endif
 			  
 	      end function extras_check_model
