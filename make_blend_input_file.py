@@ -19,6 +19,7 @@ Example:
 
 import os
 import sys
+import numpy as np
 
 make_isoch_dir = os.environ['ISO_DIR']
 code_dir = os.environ['MIST_CODE_DIR']
@@ -32,7 +33,10 @@ def make_blend_input_file(runname, file1, file2):
     inputfilename = "input.blend_"+runname
     
     #The blending mass range goes from 0.3 to 0.6, inclusive, +0.01 is there for transition purposes
-    blendfrac_PT = min(((float(mass) - 0.3)/(0.6-0.3))+0.01, 1.0)
+    min_blend = 0.3
+    max_blend = 0.6
+    frac = (mass - min_blend)/(max_blend - min_blend)
+    blendfrac_PT = 0.5*(1.0 - np.cos(math.pi*frac))
     blendfrac_tau100 = 1.0 - blendfrac_PT
     
     #Write out the contents of the file
