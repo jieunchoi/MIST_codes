@@ -71,11 +71,11 @@ def make_inlist_inputs(runname, Z, startype):
     
     #Create abundance lists
     h1h2he3he4z = calc_xyz.calc_xyz(float(Z))
-    H1list = [h1h2he3he4z[0]]*np.size(massindex)]
-    H2list = [h1h2he3he4z[1]]*np.size(massindex)]
-    He3list = [h1h2he3he4z[2]]*np.size(massindex)]
-    He4list = [h1h2he3he4z[3]]*np.size(massindex)]
-    Zlist = [h1h2he3he4z[4]]*np.size(massindex)]
+    H1list = [h1h2he3he4z[0]]*np.size(massindex)
+    H2list = [h1h2he3he4z[1]]*np.size(massindex)
+    He3list = [h1h2he3he4z[2]]*np.size(massindex)
+    He4list = [h1h2he3he4z[3]]*np.size(massindex)
+    Zlist = [h1h2he3he4z[4]]*np.size(massindex)
         
     #Make list of [replacement string, values]
     replist = [\
