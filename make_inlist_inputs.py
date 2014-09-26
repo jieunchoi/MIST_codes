@@ -43,7 +43,7 @@ def make_inlist_inputs(runname, Z, startype):
         massindex = np.where((bigmassgrid >= 0.3) & (bigmassgrid < 0.6)) 
         bctype1 = 'tau_100_tables'
         bclabel1 = '_tau100'
-        bctype2 = 'phosophere_tables'
+        bctype2 = 'photosphere_tables'
         bclabel2 = '_PT'
     elif (startype == 'Intermediate'):
         massindex = np.where((bigmassgrid >= 0.6) & (bigmassgrid < 10.0))
@@ -64,7 +64,7 @@ def make_inlist_inputs(runname, Z, startype):
     #Create BC lists, but LowDiffBC is a special case
     if (startype == 'LowDiffBC'):
         bctablelist = list([bctype1]*np.size(massindex))+list([bctype2]*np.size(massindex))
-        bclabellist = list([bctype1]*np.size(massindex))+list([bctype2]*np.size(massindex))
+        bclabellist = list([bclabel1]*np.size(massindex))+list([bclabel2]*np.size(massindex))
     else:
         bctablelist = list([bctype]*np.size(massindex))
         bclabellist = list([bclabel]*np.size(massindex))
@@ -82,11 +82,11 @@ def make_inlist_inputs(runname, Z, startype):
             ["<<MASS>>", masslist],\
             ["<<BC_LABEL>>", bclabellist],\
             ["<<BC_TABLE>>", bctablelist],\
-            ["<<H1>>", H1list,\
-            ["<<H2>>", H2list,\
-            ["<<He3>>", He3list,\
-            ["<<He4>>", He4list,\
-            ["<<Z>>", Zlist,\
+            ["<<H1>>", H1list],\
+            ["<<H2>>", H2list],\
+            ["<<He3>>", He3list],\
+            ["<<He4>>", He4list],\
+            ["<<Z>>", Zlist],\
         ]
     
     #Special case for LowDiffBC
@@ -95,11 +95,11 @@ def make_inlist_inputs(runname, Z, startype):
                 ["<<MASS>>", masslist*2],\
                 ["<<BC_LABEL>>", bclabellist],\
                 ["<<BC_TABLE>>", bctablelist],\
-                ["<<H1>>", H1list*2,\
-                ["<<H2>>", H2list*2,\
-                ["<<He3>>", He3list*2,\
-                ["<<He4>>", He4list*2,\
-                ["<<Z>>", Zlist*2,\
+                ["<<H1>>", H1list*2],\
+                ["<<H2>>", H2list*2],\
+                ["<<He3>>", He3list*2],\
+                ["<<He4>>", He4list*2],\
+                ["<<Z>>", Zlist*2],\
             ]
 
     return replist
