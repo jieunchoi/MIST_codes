@@ -28,12 +28,11 @@ import numpy as np
 import os
 from reformat_massname import reformat_massname
 
-def make_replacements(replist, name_str, direc='inlists', file_base='inlist_project_template', \
-	, clear_direc=False):
+def make_replacements(replist, name_str, direc='inlists', file_base='inlist_project_template', clear_direc=False):
     
     #Make sure that the template inlist exists
     if not os.path.isfile(file_base):
-		raise Exception("Template inlist file does not exist!")
+        raise Exception("Template inlist file does not exist!")
     
     #Make sure that the inlist directory exists
     if not os.path.isdir(direc):
@@ -58,10 +57,10 @@ def make_replacements(replist, name_str, direc='inlists', file_base='inlist_proj
         combo = tuple(vals[j][i] for j in range(numkey))
         perms.append(combo)
     
-	#Read in the template file
+    #Read in the template file
     infile = open(file_base, 'r')
-	file_base_contents = infile.read()
-	infile.close()
+    file_base_contents = infile.read()
+    infile.close()
     
     #Replace the keys with values and save to a new inlist
     for val_vec in perms:

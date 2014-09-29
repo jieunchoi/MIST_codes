@@ -19,6 +19,7 @@ import sys
 import shutil
 from make_slurm_sh import make_slurm_sh
 from make_inlist_inputs import make_inlist_inputs
+from make_replacements import make_replacements
 
 runname = sys.argv[1]
 Z = sys.argv[2]
@@ -27,7 +28,7 @@ work_dir = os.environ['MESAWORK_DIR']
 code_dir = os.environ['MIST_CODE_DIR']
 dirname = os.path.join(work_dir, runname)
 cleanwork_dir = os.path.join(work_dir, "cleanworkdir")
-inlist_dir = os.path.join(workdir, '/inlists/inlists_'+runname)
+inlist_dir = os.path.join(work_dir, 'inlists/inlists_'+runname)
 runbasefile = 'SLURM_MISTgrid.sh'
 
 if __name__ == "__main__":
@@ -89,6 +90,6 @@ if __name__ == "__main__":
         #cd into the individual directory and submit the job
         os.chdir(pathtoinlistdir)
         print "sbatch " + slurmfile
-#        os.system("sbatch "+slurmfile)
+        os.system("sbatch "+slurmfile)
         os.chdir(code_dir)
     
