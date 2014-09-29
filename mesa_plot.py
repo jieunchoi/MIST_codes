@@ -6,7 +6,7 @@ class Starfile:
     
     """
     
-    Reads in and plots MESA history and profile columns.
+    Reads in and plots MISTeep files.
     
     """
     
@@ -14,10 +14,11 @@ class Starfile:
         
         self.filename = filename
         print 'Reading in: ' + self.filename
-        self.datafile = np.genfromtxt(self.filename, skip_header=5, names=True)
+
+        self.datafile = np.genfromtxt(self.filename, skip_header=4, names=True)
 
         f = open(self.filename, 'r')
-        unformatted_header_list = f.readlines()[5]
+        unformatted_header_list = f.readlines()[4]
         f.close()
         header_list = '  |  '.join(unformatted_header_list.split())
         self.hdr_list = header_list
@@ -42,7 +43,7 @@ class Starfile:
         return all_xvar
 
     def plot_vars(self, xvar, yvar, pltnum = 1, leglabel='', legendloc=1, xtitle='', ytitle='', filetit='', linestyle='-', linewidth=1.5, colorname='', x_inv=0, y_inv=0, saveplot=0):
-#        rc('text', usetex=True)
+        
         font = {'family' : 'serif',
                 'weight' : 'normal',
                 'size'   : 18}
@@ -57,13 +58,13 @@ class Starfile:
         ax = fig.add_subplot(111)
                 
         if colorname != '' and linestyle == '-':
-            ax.plot(x, y, color=colorname, label=leglabel, linewidth=linewidth, rasterized=True)
+            ax.plot(x, y, color=colorname, label=leglabel, linewidth=linewidth)
         elif colorname != '' and linestyle != '-':
-            ax.plot(x, y, color=colorname, linestyle=linestyle, label=leglabel, linewidth=linewidth, rasterized=True)
+            ax.plot(x, y, color=colorname, linestyle=linestyle, label=leglabel, linewidth=linewidth)
         elif colorname == '' and linestyle == '-':
-            ax.plot(x, y, label=leglabel, linewidth=linewidth, rasterized=True)
+            ax.plot(x, y, label=leglabel, linewidth=linewidth)
         elif colorname == '' and linestyle != '-':
-            ax.plot(x, y, linestyle=linestyle, label=leglabel, linewidth=linewidth, rasterized=True)
+            ax.plot(x, y, linestyle=linestyle, label=leglabel, linewidth=linewidth)
 
         if (np.min(x) <= 0 and np.min(y) >= 0):
             x_axmin, x_axmax, y_axmin, y_axmax = min(x)*1.1, max(x)*1.1, min(y)*0.9, max(y)*1.1
@@ -82,9 +83,7 @@ class Starfile:
             ax.axis([x_axmin, x_axmax, y_axmax, y_axmin])
         else:
             ax.axis([x_axmin, x_axmax, y_axmin, y_axmax])
-        
-        #plt.draw()
-        
+                
         if saveplot == 1:
             fig.savefig(filetit)
         
@@ -93,11 +92,9 @@ class Starfile:
     def plot_HR(self, leglabel='', colorname='', linestyle='-', pltnum=111, logg=False):
         
         if logg == False:
-            #logTeff, logL = self.plot_vars('log_Teff','log_L', pltnum=pltnum, colorname=colorname, linestyle=linestyle, leglabel=leglabel, legendloc=3, xtitle=r'$\log(T_{\rm eff})\;[\rm K]$', ytitle=r'$\log(L/L_{\odot}$)', x_inv=1)
-            logTeff, logL = self.plot_vars('log_Teff','log_L', pltnum=pltnum, colorname=colorname, linestyle=linestyle, leglabel=leglabel, legendloc=3, xtitle=r'log(Teff) [K]', ytitle=r'log(L/Lsun)', x_inv=1)
+            logTeff, logL = self.plot_vars('log_Teff','log_L', pltnum=pltnum, colorname=colorname, linestyle=linestyle, leglabel=leglabel, legendloc=3, xtitle='log(Teff) [K]', ytitle='log(L/Lsun)', x_inv=1)
             return logTeff, logL
         else:
-            #logTeff, logg = self.plot_vars('log_Teff','log_g', pltnum=pltnum, colorname=colorname, linestyle=linestyle, leglabel=leglabel, legendloc=3, xtitle=r'$\log(T_{\rm eff})\;[\rm K]$', ytitle=r'$\log(g)\;[\rm g\;cm^{-3}]$', x_inv=1, y_inv=1)
-            logTeff, logg = self.plot_vars('log_Teff','log_g', pltnum=pltnum, colorname=colorname, linestyle=linestyle, leglabel=leglabel, legendloc=3, xtitle=r'log(Teff) [K]$', ytitle=r'log(g) [g/cc]', x_inv=1, y_inv=1)
+            logTeff, logg = self.plot_vars('log_Teff','log_g', pltnum=pltnum, colorname=colorname, linestyle=linestyle, leglabel=leglabel, legendloc=3, xtitle='log(Teff) [K]', ytitle='log(g) [g/cc]', x_inv=1, y_inv=1)
             return logTeff, logg
         
