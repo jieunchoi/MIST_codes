@@ -156,7 +156,6 @@ def sort_histfiles(rawdirname):
 
     #Make the track directory in the new reduced MESA run directory
     new_parentdirname = rawdirname.split("_raw")[0]
-    os.system("cd " + new_parentdirname)
     histfiles_dirname = os.path.join(os.path.join(work_dir, new_parentdirname), "tracks")
     os.mkdir(histfiles_dirname)
 
