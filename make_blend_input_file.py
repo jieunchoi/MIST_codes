@@ -23,11 +23,12 @@ import numpy as np
 
 make_isoch_dir = os.environ['ISO_DIR']
 code_dir = os.environ['MIST_CODE_DIR']
+work_dir = os.environ['MESAWORK_DIR']
 
 def make_blend_input_file(runname, file1, file2):
 
     #Generate the name of the input file for the blending code
-    tracks_dir = os.path.join(os.path.join(code_dir,runname), "tracks")
+    tracks_dir = os.path.join(os.path.join(work_dir,runname), "tracks")
     mass = file1.split('M_')[0]
     blendedfile = mass+'M.track.eep'
     inputfilename = "input.blend_"+runname

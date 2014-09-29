@@ -19,10 +19,14 @@ import mist2fsps
 from make_blend_input_file import make_blend_input_file
 from make_iso_input_file import make_iso_input_file
 
+work_dir = os.environ['MESAWORK_DIR']
 make_isoch_dir = os.environ['ISO_DIR']
 code_dir = os.environ['MIST_CODE_DIR']
 
 def mesa2fsps(runname):
+    
+    #Path to the new organzed directory
+    newdirname = os.path.join(work_dir,runname)
     
     inputfile = "input."+runname
 
@@ -31,18 +35,17 @@ def mesa2fsps(runname):
     
     #cd into the isochrone directory and run the codes
     os.chdir(make_isoch_dir)
-    os.system("more " + inputfile)
     os.system("./make_eeps " + inputfile)
     
     #Loop through the low masses and blend the tracks
-    initial_eeps_list_fullname = glob.glob(os.path.join(code_dir, runname+"/tracks/*.eep"))
+    initial_eeps_list_fullname = glob.glob(os.path.join(work_dir, runname+"/tracks/*.eep"))
     initial_eeps_list = [x.split('tracks/')[1] for x in initial_eeps_list_fullname]
     blend_ind = ['M_' in x for x in initial_eeps_list]
     blend_list = [x for x, y in zip(initial_eeps_list, blend_ind) if y]
     blend_list.sort()
     for i, filename in enumerate(blend_list[::2]):
         os.chdir(code_dir)
-        make_blend_input_file.make_blend_input_file(runname, filename, blend_list[i*2+1])
+        make_blend_input_file(runname, filename, blend_list[i*2+1])
         os.chdir(make_isoch_dir)
         os.system("./blend_eeps input.blend_"+ runname)
         

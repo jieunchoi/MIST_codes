@@ -220,13 +220,14 @@ def do_organize(runname):
     os.system("mv " + os.path.join(work_dir,runname) + " " + os.path.join(work_dir,rawdirname))
     
     #The XXX directory will contain the organized, reduced information
-    os.mkdir(runname)
+    newdirname = os.path.join(work_dir,runname)
+    os.mkdir(newdirname)
     
     #Make the eeps directory that will be filled in later
-    os.mkdir(os.path.join(runname, "eeps"))
+    os.mkdir(os.path.join(newdirname, "eeps"))
     
     #Make the isochrones directory that will be filled in later
-    os.mkdir(os.path.join(runname, "isochrones"))
+    os.mkdir(os.path.join(newdirname, "isochrones"))
 
     print "************************************************************"
     print "****************SORTING THE HISTORY FILES*******************"
@@ -236,7 +237,7 @@ def do_organize(runname):
     print "************************************************************"
     print "****************PLOTTING THE HISTORY FILES******************"
     print "************************************************************"
-    os.mkdir(os.path.join(runname, "plots"))
+    os.mkdir(os.path.join(newdirname, "plots"))
     mesa_plot_grid.mesa_plot_grid(runnname)
     mesa_plot_grid.mesa_plot_combine(runname)
     
@@ -246,7 +247,7 @@ def do_organize(runname):
     gen_summary(rawdirname)
     
     #Move the summary file to the tracks directory
-    os.system("mv tracks_summary.txt " + os.path.join(runname, "tracks"))
+    os.system("mv tracks_summary.txt " + os.path.join(newdirname, "tracks"))
     
     print "************************************************************"
     print "****************SORTING THE INLIST FILES********************"
@@ -261,8 +262,8 @@ def do_organize(runname):
     print "************************************************************"
     print "****************COMPRESSING THE DIRECTORY*******************"
     print "************************************************************"
-    os.system("tar -zcvf " + runname + ".tar.gz " + runname)
-    os.system("mv " + runname + "* " + work_dir)
+    os.system("tar -zcvf " + newdirname + ".tar.gz " + newdirname)
+    #os.system("mv " + runname + "* " + work_dir)
 
 
 
