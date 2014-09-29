@@ -266,8 +266,9 @@ def do_organize(runname):
     print "************************************************************"
     print "****************COMPRESSING THE DIRECTORY*******************"
     print "************************************************************"
-    os.system("tar -zcvf " + newdirname + ".tar.gz " + newdirname)
-    #os.system("mv " + runname + "* " + work_dir)
+    os.chdir(work_dir)
+    #When decompressed, this .tar.gz opens a MIST_vXX/feh_XXX_afe_XXX directory
+    os.system("tar -zcvf " + '_'.join(runname.split('/')) + ".tar.gz " + runname)
 
 if __name__ == "__main__":
     
