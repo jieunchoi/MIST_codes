@@ -7,7 +7,7 @@ into a nice directory structure.
 
 The directory structure is as follows:
     top level directory --> MIST_vXX/FIDUCIAL/feh_pX.X_afe_pX.X/
-    four subdirectories --> tracks/    eeps/    inlists/    isochrones/
+    five subdirectories --> tracks/    eeps/    inlists/    isochrones/    plots/
 
 Args:
     runname: the name of the grid
@@ -21,6 +21,7 @@ import csv
 import reformat_massname
 import subprocess
 import datetime
+import mesa_plot_grid
 
 work_dir = os.environ['MESAWORK_DIR']
 
@@ -38,7 +39,7 @@ def gen_summary(rawdirname):
     Args:
         rawdirname: the name of the grid with the suffix '_raw'
     
-    Outputs:
+    Returns:
         None
 
     """
@@ -150,7 +151,7 @@ def sort_histfiles(rawdirname):
     Args:
         rawdirname: the name of the grid with the suffix '_raw'
     
-    Outputs:
+    Returns:
         None
 
     """
@@ -185,7 +186,7 @@ def save_inlists(rawdirname):
     Args:
         rawdirname: the name of the grid with the suffix '_raw'
     
-    Outputs:
+    Returns:
         None
 
     """
@@ -209,7 +210,7 @@ def do_organize(runname):
     Args:
         runname: the name of the grid
     
-    Outputs:
+    Returns:
         None
 
     """
@@ -231,6 +232,13 @@ def do_organize(runname):
     print "****************SORTING THE HISTORY FILES*******************"
     print "************************************************************"
     sort_histfiles(rawdirname)
+    
+    print "************************************************************"
+    print "****************PLOTTING THE HISTORY FILES******************"
+    print "************************************************************"
+    os.mkdir(os.path.join(runname, "plots"))
+    mesa_plot_grid.mesa_plot_grid(runnname)
+    mesa_plot_grid.mesa_plot_combine(runname)
     
     print "************************************************************"
     print "****************GENERATING A SUMMARY FILE*******************"
