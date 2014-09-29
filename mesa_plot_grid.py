@@ -15,7 +15,7 @@ def plot_HRD(gridname, logg=False):
     
     """
     
-    Generates .png files of individual tracks.
+    Generates .pdf files of individual tracks.
     
     Args:
         gridname: the name of the grid
@@ -27,7 +27,8 @@ def plot_HRD(gridname, logg=False):
         None
         
     """
-    
+    #Assumes gridname has the form MIST_vXX/feh_XXX_afe_XXX
+    lowest_dir = gridname.split('/')[-1]
     grid_dir = os.path.join(work_dir, gridname)
     filelist = glob.glob(os.path.join(grid_dir, 'tracks/*.track'))
     for file in filelist:
@@ -41,7 +42,7 @@ def plot_HRD(gridname, logg=False):
                 plt.axis([5.5, 3.0, -2, 5.5])
             else:
                 plt.axis([5.5, 3.0, 3, 7])
-            figname = os.path.join(grid_dir, 'plots/'+gridname+'_'+file.split('tracks/')[1].split('M')[0] +'M'+ file.split('tracks/')[1].split('M')[1].split('.track')[0]+'.png')
+            figname = os.path.join(grid_dir, 'plots/'+lowest_dir+'_'+file.split('tracks/')[1].split('M')[0] +'M'+ file.split('tracks/')[1].split('M')[1].split('.track')[0]+'_ind.pdf')
 
         elif logg == True:
             star.plot_HR(logg=True)
@@ -51,36 +52,37 @@ def plot_HRD(gridname, logg=False):
                 plt.axis([5.5, 3.0, 9, -2])
             else:
                 plt.axis([5.5, 3.0, 7, -3])
-            figname = os.path.join(grid_dir, 'plots/'+gridname+'_'+file.split('tracks/')[1].split('M')[0] +'M'+ file.split('tracks/')[1].split('M')[1].split('.track')[0]+'_logg.png')
+            figname = os.path.join(grid_dir, 'plots/'+lowest_dir+'_'+file.split('tracks/')[1].split('M')[0] +'M'+ file.split('tracks/')[1].split('M')[1].split('.track')[0]+'_logg_ind.pdf')
             
     	plt.title(str(starmass))
         plt.savefig(figname)
     	plt.clf()
 
-def mesa_plot_combine(gridname, logg=False, remove_png=True):
+def plot_combine(gridname, logg=False, remove_pdf=False):
     
     """
     
-    Combines the .png files from a MESA grid into a single .pdf file.
+    Combines the .pdf files from a MESA grid into a single .pdf file.
     
     Args:
         gridname: the name of the grid
 
     Keywords:
         logg: make the HR diagram in logg-logTeff space instead of logL-logTeff
-        remove_png: removes the .png files of individual tracks after the combined .pdf file is created
+        remove_pdf: removes the .pdf files of individual tracks after the combined .pdf file is created
 
     Returns:
         None
         
     """
     
+    lowest_dir = gridname.split('/')[-1]
     grid_dir = os.path.join(work_dir, gridname)
     if logg == False:
-        filelist = glob.glob(os.path.join(grid_dir, 'plots/'+gridname+'_[0-1]*.png'))
+        filelist = glob.glob(os.path.join(grid_dir, 'plots/'+lowest_dir+'_[0-1]*.pdf'))
         filelist = [x for x in filelist if 'logg' not in x]
     if logg == True:
-        filelist = glob.glob(os.path.join(grid_dir, 'plots/'+gridname+'_[0-1]*logg.png'))
+        filelist = glob.glob(os.path.join(grid_dir, 'plots/'+lowest_dir+'_[0-1]*logg.pdf'))
         
     command = 'convert '
     for file in filelist:
@@ -91,6 +93,6 @@ def mesa_plot_combine(gridname, logg=False, remove_png=True):
     if logg == True:
         command += gridname + '_alltracks_logg.pdf'
     
-    if remove_png == True:    
-        os.system("rm " + os.path.join(grid_dir, 'plots/'+gridname+'_[0-1]*.png'))
-    os.system(command)
+    if remove_pdf == True:    
+        os.system("rm " + os.path.join(grid_dir, 'plots/'+lowest_dir+'_[0-1]*ind.pdf'))
+#    os.system(command)

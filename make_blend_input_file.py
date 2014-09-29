@@ -17,6 +17,7 @@ Example:
     
 """
 
+import math
 import os
 import sys
 import numpy as np
@@ -27,23 +28,28 @@ work_dir = os.environ['MESAWORK_DIR']
 
 def make_blend_input_file(runname, file1, file2):
 
+    #Convert MIST_vXX_feh_XXX_afe_XXX back to MIST_vXX/feh_XXX_afe_XXX
+    runname_original = runname.split('_feh')[0]+'/feh'+runname.split('feh')[1]
+
     #Generate the name of the input file for the blending code
-    tracks_dir = os.path.join(os.path.join(work_dir,runname), "tracks")
-    mass = file1.split('M_')[0]
+    eeps_dir = os.path.join(os.path.join(work_dir, runname_original), "eeps")
+    mass = file1.split('M')[0]
+    float_mass = float(mass)/100.0
+
     blendedfile = mass+'M.track.eep'
     inputfilename = "input.blend_"+runname
     
     #The blending mass range goes from 0.3 to 0.6, inclusive, +0.01 is there for transition purposes
     min_blend = 0.3
     max_blend = 0.6
-    frac = (mass - min_blend)/(max_blend - min_blend)
+    frac = (float_mass - min_blend)/(max_blend - min_blend)
     blendfrac_PT = 0.5*(1.0 - np.cos(math.pi*frac))
     blendfrac_tau100 = 1.0 - blendfrac_PT
     
     #Write out the contents of the file
-    content = ["#data directory\n", tracks_dir+"\n", "#number of tracks to blend\n", "2\n", \
-    "#names of those tracks; if .eep doesn't exist, then will create them\n", file1+"\n", \
-    file2+"\n", "#blend fractions, must sum to 1.0\n", str(blendfrac_PT)+"\n", \
+    content = ["#data directory\n", eeps_dir+"\n", "#number of tracks to blend\n", "2\n", \
+    "#names of those tracks; if .eep doesn't exist, then will create them\n", file1.split('.eep')[0]+"\n", \
+    file2.split('.eep')[0]+"\n", "#blend fractions, must sum to 1.0\n", str(blendfrac_PT)+"\n", \
     str(blendfrac_tau100)+"\n", "#name of blended track\n", blendedfile]
 
     with open(inputfilename, "w") as newinputfile:

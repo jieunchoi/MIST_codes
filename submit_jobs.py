@@ -28,7 +28,7 @@ work_dir = os.environ['MESAWORK_DIR']
 code_dir = os.environ['MIST_CODE_DIR']
 dirname = os.path.join(work_dir, runname)
 cleanwork_dir = os.path.join(work_dir, "cleanworkdir")
-inlist_dir = os.path.join(work_dir, 'inlists/inlists_'+runname)
+orig_inlist_dir = os.path.join(work_dir, 'inlists/inlists_'+'_'.join(runname.split('/')))
 runbasefile = 'SLURM_MISTgrid.sh'
 
 if __name__ == "__main__":
@@ -61,8 +61,7 @@ if __name__ == "__main__":
     make_replacements(make_inlist_inputs(runname, Z, 'High'), new_inlist_name,\
         direc=inlist_dir, file_base=os.path.join(code_dir,'inlist_high'))
         
-    orig_inlistdir = os.path.join(work_dir, 'inlists/inlists_'+runname)
-    inlist_list = os.listdir(orig_inlistdir)
+    inlist_list = os.listdir(orig_inlist_dir)
     inlist_list.sort()
 
     for inlistname in inlist_list:
@@ -81,7 +80,7 @@ if __name__ == "__main__":
             pass
 
         #Populate each directory with appropriate inlists and rename as inlist_project
-        shutil.copy(os.path.join(orig_inlistdir,inlistname), os.path.join(pathtoinlistdir, 'inlist_project'))
+        shutil.copy(os.path.join(orig_inlist_dir,inlistname), os.path.join(pathtoinlistdir, 'inlist_project'))
 
         #Create and move the SLURM file to the correct directory
         slurmfile = make_slurm_sh(inlistname, pathtoinlistdir, runbasefile)

@@ -22,6 +22,7 @@ import reformat_massname
 import subprocess
 import datetime
 import mesa_plot_grid
+import mesa2fsps
 
 work_dir = os.environ['MESAWORK_DIR']
 
@@ -185,14 +186,23 @@ def save_inlists(rawdirname):
 
     """
     
+    #Get the list of inlist files
+    listofinlist = glob.glob(os.path.join(work_dir, os.path.join(rawdirname+'/*/inlist_project')))
+
     #Nake the inlist directory in the new reduced MESA run directory
     new_parentdirname = rawdirname.split("_raw")[0]
-    os.system("cd " + new_parentdirname)
-    inlistfiles_dirname = os.path.join(new_parentdirname, "inlists")
+    inlistfiles_dirname = os.path.join(os.path.join(work_dir, new_parentdirname), "inlists")
     os.mkdir(inlistfiles_dirname)
     
     #Copy the inlist files from the general inlist directory in MESAWORK_DIR to the newly created inlist directory
-    os.system("cp " + os.path.join(work_dir, "inlists/inlists_"+new_parentdirname+"/*") + " " + inlistfiles_dirname)
+    for inlistfile in listofinlist:
+        format_mass_string = inlistfile.split('/')[-2].split('M_')[0]
+        if 'M_dir' in inlistfile:
+            newinlistfilename = os.path.join(os.path.join(work_dir, new_parentdirname),'inlists/'+format_mass_string+'M.inlist')
+        else:
+            bc_name = inlistfile.split('raw/')[1].split('M_')[1].split('_')[0]
+            newinlistfilename = os.path.join(os.path.join(work_dir, new_parentdirname),'inlists/'+format_mass_string+'M_'+bc_name+'.inlist')
+        os.system("cp " + inlistfile + " " + newinlistfilename)
 
 def do_organize(runname):
     
@@ -232,8 +242,8 @@ def do_organize(runname):
     print "****************PLOTTING THE HISTORY FILES******************"
     print "************************************************************"
     os.mkdir(os.path.join(newdirname, "plots"))
-    mesa_plot_grid.mesa_plot_grid(runnname)
-    mesa_plot_grid.mesa_plot_combine(runname)
+    mesa_plot_grid.plot_HRD(runname)
+    mesa_plot_grid.plot_combine(runname)
     
     print "************************************************************"
     print "****************GENERATING A SUMMARY FILE*******************"
@@ -251,7 +261,7 @@ def do_organize(runname):
     print "************************************************************"
     print "**********************MAKE ISOCHRONES***********************"
     print "************************************************************"
-    mesa2fsp(runname)
+    mesa2fsps.mesa2fsps(runname)
     
     print "************************************************************"
     print "****************COMPRESSING THE DIRECTORY*******************"

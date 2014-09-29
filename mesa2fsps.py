@@ -27,27 +27,31 @@ def mesa2fsps(runname):
     
     #Path to the new organzed directory
     newdirname = os.path.join(work_dir,runname)
-    
-    inputfile = "input."+runname
+
+    runname_format = '_'.join(runname.split('/'))
+    inputfile = "input."+runname_format
 
     #Make the input file for the isochrones code to make eeps
     make_iso_input_file(runname, "eeps")
-    
+
+    #Copy the most recent copy of my_history_columns.list file to the iso directory
+    shutil.copy(os.path.join(code_dir, 'my_history_columns.list'), os.path.join(make_isoch_dir, 'my_history_columns.list'))
+
     #cd into the isochrone directory and run the codes
     os.chdir(make_isoch_dir)
     os.system("./make_eeps " + inputfile)
     
     #Loop through the low masses and blend the tracks
-    initial_eeps_list_fullname = glob.glob(os.path.join(work_dir, runname+"/tracks/*.eep"))
-    initial_eeps_list = [x.split('tracks/')[1] for x in initial_eeps_list_fullname]
+    initial_eeps_list_fullname = glob.glob(os.path.join(work_dir, runname+"/eeps/*.eep"))
+    initial_eeps_list = [x.split('eeps/')[1] for x in initial_eeps_list_fullname]
     blend_ind = ['M_' in x for x in initial_eeps_list]
     blend_list = [x for x, y in zip(initial_eeps_list, blend_ind) if y]
     blend_list.sort()
     for i, filename in enumerate(blend_list[::2]):
         os.chdir(code_dir)
-        make_blend_input_file(runname, filename, blend_list[i*2+1])
+        make_blend_input_file(runname_format, filename, blend_list[i*2+1])
         os.chdir(make_isoch_dir)
-        os.system("./blend_eeps input.blend_"+ runname)
+        os.system("./blend_eeps input.blend_"+ runname_format)
         
     #Make the input file for the isochrones code to make isochrones
     os.chdir(code_dir)
