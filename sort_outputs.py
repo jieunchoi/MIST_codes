@@ -25,11 +25,6 @@ import mesa_plot_grid
 
 work_dir = os.environ['MESAWORK_DIR']
 
-if __name__ == "__main__":
-    
-    runname = sys.argv[1]
-    do_organize(runname)
-
 def gen_summary(rawdirname):
     
     """
@@ -162,7 +157,7 @@ def sort_histfiles(rawdirname):
     #Make the track directory in the new reduced MESA run directory
     new_parentdirname = rawdirname.split("_raw")[0]
     os.system("cd " + new_parentdirname)
-    histfiles_dirname = os.path.join(new_parentdirname, "tracks")
+    histfiles_dirname = os.path.join(os.path.join(work_dir, new_parentdirname), "tracks")
     os.mkdir(histfiles_dirname)
 
     #Rename & copy the history files over
@@ -265,5 +260,8 @@ def do_organize(runname):
     os.system("tar -zcvf " + newdirname + ".tar.gz " + newdirname)
     #os.system("mv " + runname + "* " + work_dir)
 
-
+if __name__ == "__main__":
+    
+    runname = sys.argv[1]
+    do_organize(runname)
 
