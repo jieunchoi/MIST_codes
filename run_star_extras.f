@@ -151,7 +151,7 @@
 			 L_tot = s% photosphere_L*Lsun
 			 if (s% initial_mass < 10) then
 				 if (((envelope_mass_fraction < 0.15) .and. (L_He/L_tot < 0.05)) .or. &
-					 ((s% center_h1 < 1d-4) .and. (s% center_he4 < 1d-4) .and. (s% Teff > 10**4.5) .and. (s% L_phot > 4))) then
+					 ((s% center_h1 < 1d-4) .and. (s% center_he4 < 1d-4) .and. (s% Teff > 10**4.5) .and. (s% L_phot > 3.0))) then
 					 if (s% category_factors(3) > 0) then !only print the first time
 						 write(*,*) '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
 						 write(*,*) 'now at post AGB phase, turning off all burning except for H'
