@@ -58,7 +58,9 @@ if __name__ == "__main__":
         direc=inlist_dir, file_base=os.path.join(code_dir,'inlist_lowinter'))
     make_replacements(make_inlist_inputs(runname, Z, 'Intermediate'), new_inlist_name,\
         direc=inlist_dir, file_base=os.path.join(code_dir,'inlist_lowinter'))
-    make_replacements(make_inlist_inputs(runname, Z, 'High'), new_inlist_name,\
+    make_replacements(make_inlist_inputs(runname, Z, 'HighDiffBC'), new_inlist_name,\
+        direc=inlist_dir, file_base=os.path.join(code_dir,'inlist_high'))
+    make_replacements(make_inlist_inputs(runname, Z, 'VeryHigh'), new_inlist_name,\
         direc=inlist_dir, file_base=os.path.join(code_dir,'inlist_high'))
         
     inlist_list = os.listdir(orig_inlist_dir)

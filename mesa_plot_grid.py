@@ -35,7 +35,7 @@ def plot_HRD(gridname, logg=False):
         starmass = float(file.split('tracks/')[1].split('M')[0])/100.0
         star = mp.Starfile(file)
     	if logg == False:
-            star.plot_HR()
+            star.plot_HR(colorname='RoyalBlue')
             if starmass < 0.8:
                 plt.axis([5.5, 3.0, -6, 4])
             elif starmass < 10.0:
@@ -45,7 +45,7 @@ def plot_HRD(gridname, logg=False):
             figname = os.path.join(grid_dir, 'plots/'+lowest_dir+'_'+file.split('tracks/')[1].split('M')[0] +'M'+ file.split('tracks/')[1].split('M')[1].split('.track')[0]+'_ind.pdf')
 
         elif logg == True:
-            star.plot_HR(logg=True)
+            star.plot_HR(colorname='RoyalBlue', logg=True)
             if starmass < 0.8:
                 plt.axis([5.5, 3.0, 9, 0])
             elif starmass < 10.0:

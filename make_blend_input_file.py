@@ -39,18 +39,22 @@ def make_blend_input_file(runname, file1, file2):
     blendedfile = mass+'M.track.eep'
     inputfilename = "input.blend_"+runname
     
-    #The blending mass range goes from 0.3 to 0.6, inclusive, +0.01 is there for transition purposes
-    min_blend = 0.3
-    max_blend = 0.6
+    #The blending mass range goes from >=0.3 to <0.6 or >=8 to <15, +0.01 is there for transition purposes
+    if float_mass < 5.0:
+        min_blend = 0.3
+        max_blend = 0.55
+    elif float_mass >= 5.0:
+        min_blend = 10.0
+        max_blend = 15.0
     frac = (float_mass - min_blend)/(max_blend - min_blend)
-    blendfrac_PT = 0.5*(1.0 - np.cos(math.pi*frac))
-    blendfrac_tau100 = 1.0 - blendfrac_PT
+    blendfrac_BC1 = 0.5*(1.0 - np.cos(math.pi*frac))
+    blendfrac_BC2 = 1.0 - blendfrac_BC1
     
     #Write out the contents of the file
     content = ["#data directory\n", eeps_dir+"\n", "#number of tracks to blend\n", "2\n", \
     "#names of those tracks; if .eep doesn't exist, then will create them\n", file1.split('.eep')[0]+"\n", \
-    file2.split('.eep')[0]+"\n", "#blend fractions, must sum to 1.0\n", str(blendfrac_PT)+"\n", \
-    str(blendfrac_tau100)+"\n", "#name of blended track\n", blendedfile]
+    file2.split('.eep')[0]+"\n", "#blend fractions, must sum to 1.0\n", str(blendfrac_BC1)+"\n", \
+    str(blendfrac_BC2)+"\n", "#name of blended track\n", blendedfile]
 
     with open(inputfilename, "w") as newinputfile:
         for contentline in content:

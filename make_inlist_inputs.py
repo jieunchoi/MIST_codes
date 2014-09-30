@@ -49,8 +49,14 @@ def make_inlist_inputs(runname, Z, startype):
         massindex = np.where((bigmassgrid >= 0.6) & (bigmassgrid < 10.0))
         bctype = 'photosphere_tables'
         bclabel = ''
-    elif (startype == 'High'):
-        massindex = np.where(bigmassgrid >= 10.0)
+    elif (startype == 'HighDiffBC'):
+        massindex = np.where((bigmassgrid >= 10.0) & (bigmassgrid < 16.0)) 
+        bctype1 = 'photosphere_tables'
+        bclabel1 = '_PT'
+        bctype2 = 'simple_photosphere'
+        bclabel2 = '_SP'
+    elif (startype == 'VeryHigh'):
+        massindex = np.where(bigmassgrid >= 16.0)
         bctype = 'simple_photosphere'
         bclabel = ''
     else:
@@ -61,8 +67,8 @@ def make_inlist_inputs(runname, Z, startype):
     mapfunc = lambda var: np.str(int(var)) if var == int(var) else np.str(var)
     masslist = map(mapfunc, bigmassgrid[massindex])
         
-    #Create BC lists, but LowDiffBC is a special case
-    if (startype == 'LowDiffBC'):
+    #Create BC lists, but LowDiffBC & HighDiffBC are special cases
+    if ('Diff' in startype):
         bctablelist = list([bctype1]*np.size(massindex))+list([bctype2]*np.size(massindex))
         bclabellist = list([bclabel1]*np.size(massindex))+list([bclabel2]*np.size(massindex))
     else:
@@ -90,7 +96,7 @@ def make_inlist_inputs(runname, Z, startype):
         ]
     
     #Special case for LowDiffBC
-    if (startype == 'LowDiffBC'):
+    if ('Diff' in startype):
         replist = [\
                 ["<<MASS>>", masslist*2],\
                 ["<<BC_LABEL>>", bclabellist],\

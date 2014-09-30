@@ -41,7 +41,7 @@ def mesa2fsps(runname):
     os.chdir(make_isoch_dir)
     os.system("./make_eeps " + inputfile)
     
-    #Loop through the low masses and blend the tracks
+    #Loop through the low and high masses and blend the tracks
     initial_eeps_list_fullname = glob.glob(os.path.join(work_dir, runname+"/eeps/*.eep"))
     initial_eeps_list = [x.split('eeps/')[1] for x in initial_eeps_list_fullname]
     blend_ind = ['M_' in x for x in initial_eeps_list]
