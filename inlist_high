@@ -88,26 +88,25 @@
       mlt_option = 'Henyey'
 	  
       okay_to_reduce_gradT_excess = .true.
-      
-!      gradT_excess_f1 = 1d-4
-!      gradT_excess_f2 = 1d-2
-!      gradT_excess_age_fraction = 0.9d0
-
-!      gradT_excess_lambda1 = 10.0
-!      gradT_excess_beta1 = 0.4
-
-!      gradT_excess_lambda2 = 0.5
-!      gradT_excess_beta2 = 0.1
        
-      overshoot_f_above_nonburn = 0.01298
-      overshoot_f_below_nonburn = 0.01298
-      overshoot_f_above_burn_h  = 0.01298
-      overshoot_f_below_burn_h  = 0.01298
-      overshoot_f_above_burn_he = 0.01298
-      overshoot_f_below_burn_he = 0.01298
-      overshoot_f_above_burn_z  = 0.01298
-      overshoot_f_below_burn_z  = 0.01298
+      overshoot_f0_above_nonburn = 0.0
+      overshoot_f0_below_nonburn = 0.0
+      overshoot_f0_above_burn_h  = 0.0
+      overshoot_f0_below_burn_h  = 0.0
+      overshoot_f0_above_burn_he = 0.0
+      overshoot_f0_below_burn_he = 0.0
+      overshoot_f0_above_burn_z  = 0.0
+      overshoot_f0_below_burn_z  = 0.0
 
+      step_overshoot_f_above_nonburn = 0.2
+      step_overshoot_f_below_nonburn = 0.2
+      step_overshoot_f_above_burn_h = 0.2
+      step_overshoot_f_below_burn_h = 0.2
+      step_overshoot_f_above_burn_he = 0.2
+      step_overshoot_f_below_burn_he = 0.2
+      step_overshoot_f_above_burn_z = 0.2
+      step_overshoot_f_below_burn_z = 0.2
+		 
       !always have overshooting on in the inlist, core overshooting
       !will be restricted in run_star_extras.f
       mass_for_overshoot_full_on  = 0.0
@@ -137,6 +136,7 @@
 
       do_element_diffusion = .true.
       diffusion_dt_limit = 3.15e13
+	  diffusion_min_T_at_surface = 1d3 
 
       radiation_turbulence_coeff = 1.0
 		 		 
