@@ -4,7 +4,7 @@ Makes HR diagrams of tracks from MESA grids.
 
 """
 
-import mesa_plot as mp
+import mesa_plot_eeps as mp
 import glob
 import matplotlib.pyplot as plt
 import os
