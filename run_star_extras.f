@@ -131,33 +131,37 @@
 	         integer, intent(in) :: id, id_extra
              real(dp) :: envelope_mass_fraction, L_He, L_tot, orig_eta, target_eta, min_center_h1_for_diff
 			 real(dp), parameter :: huge_dt_limit = 3.15d16 ! ~1 Gyr
+			 real(dp), parameter :: new_varcontrol_target = 1d-2
 	         extras_check_model = keep_going
 			 
 			 !increase VARCONTROL: increase varcontrol when the model hits the AGB phase
 			 if ((s% initial_mass < 10) .and. (s% center_h1 < 1d-4) .and. (s% center_he4 < 1d-4)) then
-				 if (s% varcontrol_target < 1d-3) then !only print the first time
+				 if (s% varcontrol_target < new_varcontrol_target) then !only print the first time
 					 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
-					 write(*,*) 'increasing varcontrol to', s% varcontrol_target
+					 write(*,*) 'increasing varcontrol to', new_varcontrol_target
 					 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
+				 s% varcontrol_target = new_varcontrol_target
 				 end if
-				 s% varcontrol_target = 1d-3
 			 end if
-			 !set MAX MDOT: cap the mass loss at 1e-3 M/yr
-			 s% star_mdot = max(-1e-3, s% star_mdot)
 			 
-			 !suppress LATE BURNING:turn off burning post-AGB
-			 envelope_mass_fraction = (s% star_mass - s% c_core_mass)/(s% star_mass)
+			 !suppress LATE BURNING: turn off burning post-AGB			 
+			 envelope_mass_fraction = 1d0 - max(s% he_core_mass, s% c_core_mass, s% o_core_mass)/s% star_mass
+			 
 			 L_He = s% power_he_burn*Lsun
 			 L_tot = s% photosphere_L*Lsun
 			 if (s% initial_mass < 10) then
-				 if (((envelope_mass_fraction < 0.15) .and. (L_He/L_tot < 0.05)) .or. &
-					 ((s% center_h1 < 1d-4) .and. (s% center_he4 < 1d-4) .and. (s% Teff > 10**4.5) .and. (s% L_phot > 3.0))) then
+				 if ((envelope_mass_fraction < 0.1) .and. (s% center_h1 < 1d-4) .and. (s% center_he4 < 1d-4) .and. (s% L_phot > 3.0)) then
 					 if (s% category_factors(3) > 0) then !only print the first time
 						 write(*,*) '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
 						 write(*,*) 'now at post AGB phase, turning off all burning except for H'
 						 write(*,*) '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
 					 end if
 					 s% category_factors(3:) = 0.0
+					 
+	                 !reduce OPACITY BUMP: prevent stars from going over the Eddington limit
+					 !ln(T)=13.8 ~ log10(T)=6 which is below the Fe bump but
+	                 !still allows for the average opacity to vary with mass, Z, etc.
+	                 s% opacity_max = maxval(s% opacity, mask=s% lnT>14d0)
 				 end if
 			 end if
 			 
