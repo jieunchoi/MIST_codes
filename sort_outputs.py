@@ -239,13 +239,6 @@ def do_organize(runname):
     sort_histfiles(rawdirname)
     
     print "************************************************************"
-    print "****************PLOTTING THE HISTORY FILES******************"
-    print "************************************************************"
-    os.mkdir(os.path.join(newdirname, "plots"))
-    mesa_plot_grid.plot_HRD(runname)
-    mesa_plot_grid.plot_combine(runname)
-    
-    print "************************************************************"
     print "****************GENERATING A SUMMARY FILE*******************"
     print "************************************************************"
     gen_summary(rawdirname)
@@ -262,6 +255,13 @@ def do_organize(runname):
     print "**********************MAKE ISOCHRONES***********************"
     print "************************************************************"
     mesa2fsps.mesa2fsps(runname)
+    
+    print "************************************************************"
+    print "****************PLOTTING THE EEPS FILES******************"
+    print "************************************************************"
+    os.mkdir(os.path.join(newdirname, "plots"))
+    mesa_plot_grid.plot_HRD(runname)
+    mesa_plot_grid.plot_combine(runname)
     
     print "************************************************************"
     print "****************COMPRESSING THE DIRECTORY*******************"

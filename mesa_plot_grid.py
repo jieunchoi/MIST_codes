@@ -30,10 +30,10 @@ def plot_HRD(gridname, logg=False):
     #Assumes gridname has the form MIST_vXX/feh_XXX_afe_XXX
     lowest_dir = gridname.split('/')[-1]
     grid_dir = os.path.join(work_dir, gridname)
-    filelist = glob.glob(os.path.join(grid_dir, 'tracks/*.track'))
+    filelist = glob.glob(os.path.join(grid_dir, 'eeps/*M.track.eep'))
     for file in filelist:
-        starmass = float(file.split('tracks/')[1].split('M')[0])/100.0
-        star = mp.Starfile(file)
+        starmass = float(file.split('eeps/')[1].split('M')[0])/100.0
+        star = mp.EEPfile(file)
     	if logg == False:
             star.plot_HR(colorname='RoyalBlue')
             if starmass < 0.8:
@@ -42,7 +42,7 @@ def plot_HRD(gridname, logg=False):
                 plt.axis([5.5, 3.0, -2, 5.5])
             else:
                 plt.axis([5.5, 3.0, 3, 7])
-            figname = os.path.join(grid_dir, 'plots/'+lowest_dir+'_'+file.split('tracks/')[1].split('M')[0] +'M'+ file.split('tracks/')[1].split('M')[1].split('.track')[0]+'_ind.pdf')
+            figname = os.path.join(grid_dir, 'plots/'+lowest_dir+'_'+file.split('eeps/')[1].split('M')[0] +'M'+ file.split('eeps/')[1].split('M')[1].split('.track')[0]+'_ind.pdf')
 
         elif logg == True:
             star.plot_HR(colorname='RoyalBlue', logg=True)
@@ -52,7 +52,7 @@ def plot_HRD(gridname, logg=False):
                 plt.axis([5.5, 3.0, 9, -2])
             else:
                 plt.axis([5.5, 3.0, 7, -3])
-            figname = os.path.join(grid_dir, 'plots/'+lowest_dir+'_'+file.split('tracks/')[1].split('M')[0] +'M'+ file.split('tracks/')[1].split('M')[1].split('.track')[0]+'_logg_ind.pdf')
+            figname = os.path.join(grid_dir, 'plots/'+lowest_dir+'_'+file.split('eeps/')[1].split('M')[0] +'M'+ file.split('eeps/')[1].split('M')[1].split('.track')[0]+'_logg_ind.pdf')
             
     	plt.title(str(starmass))
         plt.savefig(figname)
