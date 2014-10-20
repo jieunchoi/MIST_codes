@@ -118,11 +118,6 @@
 				 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
 			 end if
 			 
-			 !set CORE BOUNDARIES: use lower fractions than the default
-			 s% he_core_boundary_h1_fraction = 1d-4
-			 s% c_core_boundary_he4_fraction = 1d-4
-			 s% o_core_boundary_c12_fraction = 1d-4
-
 	      end function extras_startup
       
 	      ! returns either keep_going, retry, backup, or terminate.
@@ -131,7 +126,7 @@
 	         integer, intent(in) :: id, id_extra
              real(dp) :: envelope_mass_fraction, L_He, L_tot, orig_eta, target_eta, min_center_h1_for_diff
 			 real(dp), parameter :: huge_dt_limit = 3.15d16 ! ~1 Gyr
-			 real(dp), parameter :: new_varcontrol_target = 1d-2
+			 real(dp), parameter :: new_varcontrol_target = 1d-3
 	         extras_check_model = keep_going
 			 
 			 !increase VARCONTROL: increase varcontrol when the model hits the AGB phase
@@ -161,7 +156,7 @@
 	                 !reduce OPACITY BUMP: prevent stars from going over the Eddington limit
 					 !ln(T)=13.8 ~ log10(T)=6 which is below the Fe bump but
 	                 !still allows for the average opacity to vary with mass, Z, etc.
-	                 s% opacity_max = maxval(s% opacity, mask=s% lnT>14d0)
+	                 s% opacity_max = maxval(s% opacity, mask=s% lnT>13.8)
 				 end if
 			 end if
 			 
