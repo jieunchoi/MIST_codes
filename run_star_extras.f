@@ -178,10 +178,13 @@
 	 	     if(s% do_element_diffusion) then !only check if diffusion is on
 	             if(abs(s% mass_conv_core - s% star_mass) < 1d-2) then ! => fully convective
 	 	            s% diffusion_dt_limit = huge_dt_limit
+					s% do_element_diffusion = .false.
 	 	         else if(s% star_age > 5d10) then !50 Gyr is really old
 	                s% diffusion_dt_limit = huge_dt_limit
+					s% do_element_diffusion = .true.
 	             else !otherwise we use the inlist value
 	 	            s% diffusion_dt_limit = original_diffusion_dt_limit
+					s% do_element_diffusion = .true.
 	 	         endif
 	 	     endif
 			 
