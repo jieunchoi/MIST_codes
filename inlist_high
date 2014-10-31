@@ -56,7 +56,7 @@
 
 &controls
 
-	report_why_dt_limits = .false.
+	  report_why_dt_limits = .false.
       initial_mass = <<MASS>>
 
 !OUTPUT OPTIONS
@@ -89,24 +89,15 @@
 	  
       okay_to_reduce_gradT_excess = .true.
        
-      overshoot_f0_above_nonburn = 0.0
-      overshoot_f0_below_nonburn = 0.0
-      overshoot_f0_above_burn_h  = 0.0
-      overshoot_f0_below_burn_h  = 0.0
-      overshoot_f0_above_burn_he = 0.0
-      overshoot_f0_below_burn_he = 0.0
-      overshoot_f0_above_burn_z  = 0.0
-      overshoot_f0_below_burn_z  = 0.0
-
-      step_overshoot_f_above_nonburn = 0.2
-      step_overshoot_f_below_nonburn = 0.2
-      step_overshoot_f_above_burn_h = 0.2
-      step_overshoot_f_below_burn_h = 0.2
-      step_overshoot_f_above_burn_he = 0.2
-      step_overshoot_f_below_burn_he = 0.2
-      step_overshoot_f_above_burn_z = 0.2
-      step_overshoot_f_below_burn_z = 0.2
-      step_overshoot_D0_coeff = 1.0
+      overshoot_f_above_nonburn = 0.01309
+      overshoot_f_below_nonburn = 0.01309
+      overshoot_f_above_burn_h  = 0.01309
+      overshoot_f_below_burn_h  = 0.01309
+      overshoot_f_above_burn_he = 0.01309
+      overshoot_f_below_burn_he = 0.01309
+      overshoot_f_above_burn_z  = 0.01309
+      overshoot_f_below_burn_z  = 0.01309
+      overshoot_below_noburn_factor = 10
 		 
       !always have overshooting on in the inlist, core overshooting
       !will be restricted in run_star_extras.f
@@ -150,8 +141,8 @@
 		 		 
 !MESH AND TIMESTEP PARAMETERS
 
-      mesh_delta_coeff = 0.5  ! leave at 0.5 until after c burn, default is 1
-      varcontrol_target = 2d-4 ! default is  1d-4
+      mesh_delta_coeff = 1.0
+      varcontrol_target = 1d-4 ! default is  1d-4
 	  
       max_allowed_nz = 20000 ! maximum number of grid points allowed
 

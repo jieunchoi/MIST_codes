@@ -103,7 +103,7 @@
 			 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
 			 
 			 !set VARCONTROL: for massive stars, turn up varcontrol gradually to help them evolve
-			 vct60 = 2e-4
+			 vct60 = 1e-4
 			 vct100 = 1e-3
 			 
 			 if (s% initial_mass > 60) then
