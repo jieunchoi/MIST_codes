@@ -25,7 +25,7 @@ from make_replacements import make_replacements
 runname = sys.argv[1]
 FeH = sys.argv[2]
 
-Z = calc_xyz.calc_xyz(FeH,feh=True)
+Z = calc_xyz.calc_xyz(float(FeH),feh=True)[-1]
 work_dir = os.environ['MESAWORK_DIR']
 code_dir = os.environ['MIST_CODE_DIR']
 dirname = os.path.join(work_dir, runname)
