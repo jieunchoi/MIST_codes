@@ -17,6 +17,7 @@ Example:
 import os
 import sys
 import shutil
+import calc_xyz
 from make_slurm_sh import make_slurm_sh
 from make_inlist_inputs import make_inlist_inputs
 from make_replacements import make_replacements
