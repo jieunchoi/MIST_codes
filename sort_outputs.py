@@ -114,10 +114,18 @@ def gen_summary(rawdirname):
             if '' in enddatelist:
                 enddatelist.remove('')
             
+            #If not start and finish in the same month:
+            if startdatelist[1] != enddatelist[1]:
+                if startdatelist[2] == '31':
+                    startdatelist[2] = '0'
+                elif startdatelist[2] == '30':
+                    if startdatelist[1] in ['Jan', 'Mar', 'May', 'Jul', 'Aug', 'Oct', 'Dec']:
+                        startdatelist[2] = '0'
+                        enddatelist[2] = '2'
             start = datetime.timedelta(int(startdatelist[2]), int(startdatelist[3].split(':')[-1]), 0,0,int(startdatelist[3].split(':')[-2]), int(startdatelist[3].split(':')[-3]))
             end = datetime.timedelta(int(enddatelist[2]), int(enddatelist[3].split(':')[-1]), 0,0,int(enddatelist[3].split(':')[-2]), int(enddatelist[3].split(':')[-3]))
             runtime = str(datetime.timedelta(seconds=datetime.timedelta.total_seconds(end-start)))
-        
+                
         #If there is no end date
         except ValueError:
             runtime = 'exceeded_req_time'
