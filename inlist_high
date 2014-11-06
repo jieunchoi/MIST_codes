@@ -107,7 +107,7 @@
       kap_Type2_full_on_X = 1d-6
 	  Zbase = 0.00 ! this is set to Z of the star in run_star_extras.fs
 	     
-      !rotational mixing	 
+      !rotational mixing if applicable	 
       D_SH_factor =  1.0
       D_SSI_factor = 1.0
       D_ES_factor =  1.0
@@ -138,8 +138,8 @@
 		 		 
 !MESH AND TIMESTEP PARAMETERS
 
-      mesh_delta_coeff = 1.0
-      varcontrol_target = 1d-4 ! default is  1d-4
+      mesh_delta_coeff = 0.5
+      varcontrol_target = 2d-4 ! default is  1d-4
 	  
       max_allowed_nz = 20000 ! maximum number of grid points allowed
 
