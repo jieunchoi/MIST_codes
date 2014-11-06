@@ -90,28 +90,35 @@
 			 
 	         if (s% star_mass < rot_full_off) then
 				 frac2 = 0
+				 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
+				 write(*,*) 'no rotation'
+				 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
 	         else if (s% star_mass >= rot_full_off .and. s% star_mass <= rot_full_on) then
-				 s% job% set_near_zams_omega_div_omega_crit_steps = 10
-				 s% job% new_omega_div_omega_crit = s% job% extras_rpar(5) !nominally 0.4
 				 frac2 = (s% star_mass - rot_full_off) / &
 	                    (rot_full_on - rot_full_off)
 	             frac2 = 0.5d0*(1 - cos(pi*frac2))
-			 else
 				 s% job% set_near_zams_omega_div_omega_crit_steps = 10
-				 s% job% new_omega_div_omega_crit = s% job% extras_rpar(5) !nominally 0.4
-			     frac2 = 1d0
+				 s% job% new_omega_div_omega_crit = s% job% extras_rpar(5) * frac2
+				 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
+				 write(*,*) 'new omega_div_omega_crit, fraction', s% job% new_omega_div_omega_crit, frac2
+				 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
+			 else
+				 frac2 = 1.0
+				 s% job% set_near_zams_omega_div_omega_crit_steps = 10
+				 s% job% new_omega_div_omega_crit = s% job% extras_rpar(5) * frac2 !nominally 0.4
+				 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
+				 write(*,*) 'new omega_div_omega_crit, fraction', s% job% new_omega_div_omega_crit, frac2
+				 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
 	         end if
-			 s% job% new_omega_div_omega_crit = s% job% new_omega_div_omega_crit * frac2
-			 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
-			 write(*,*) 'new omega_div_omega_crit, fraction', s% job% new_omega_div_omega_crit, frac2
-			 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
-			 
+
 			 !set VARCONTROL: for massive stars, turn up varcontrol gradually to help them evolve
 			 vct30 = 1e-4
 			 vct100 = 1e-3
 			 
-			 if (s% initial_mass > 30) then
-				 s% varcontrol_target = vct30 + (vct100-vct30)*(s% initial_mass-30.0)/(100.0-30.0)
+			 if (s% initial_mass > 30.0) then
+				 frac = (s% initial_mass-30.0)/(100.0-30.0)
+				 frac = 0.5d0*(1 - cos(pi*frac))
+				 s% varcontrol_target = vct30 + (vct100-vct30)*frac
 				 
 				 if (s% initial_mass > 100.0) then
 					 s% varcontrol_target = vct100
@@ -179,30 +186,30 @@
 			 end if
 			 
 			 !check DIFFUSION: to determine whether or not diffusion should happen 
-	 	     if(s% do_element_diffusion) then !only check if diffusion is on
-	             if(abs(s% mass_conv_core - s% star_mass) < 1d-2) then ! => fully convective
-	 	            s% diffusion_dt_limit = huge_dt_limit
-					s% do_element_diffusion = .false.
-	 	         else if(s% star_age > 5d10) then !50 Gyr is really old
-	                s% diffusion_dt_limit = huge_dt_limit
+             if(abs(s% mass_conv_core - s% star_mass) < 1d-2) then ! => fully convective
+ 	            s% diffusion_dt_limit = huge_dt_limit
+		 		s% do_element_diffusion = .false.
+			 else
+ 	        	s% diffusion_dt_limit = original_diffusion_dt_limit
+				s% do_element_diffusion = .true.
+			 end if
+				
+		 	!turn off DIFFUSION: diffusion isn't super important post-MS. also don't care about mega-old models
+			if (s% do_element_diffusion) then
+				min_center_h1_for_diff = 1d-4
+				if (s% center_h1 < min_center_h1_for_diff) then
+						write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
+						write(*,*) 'turning off diffusion'
+						write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'  
+						s% do_element_diffusion = .false.
+				end if
+			
+				if (s% star_age > 5d10) then !50 Gyr is really old
+					s% diffusion_dt_limit = huge_dt_limit
 					s% do_element_diffusion = .true.
-	             else !otherwise we use the inlist value
-	 	            s% diffusion_dt_limit = original_diffusion_dt_limit
-					s% do_element_diffusion = .true.
-	 	         endif
-	 	     endif
-			 
-			 !turn off DIFFUSION: diffusion isn't super important post-MS
-			 min_center_h1_for_diff = 1d-4
-			 if (s% do_element_diffusion .and. s% center_h1 < min_center_h1_for_diff) then
-				 if (s% do_element_diffusion) then !only print the first time
-					 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
-					 write(*,*) 'turning off diffusion'
-					 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'  
-				 end if
-				 s% do_element_diffusion = .false.
-             endif
-			  
+				end if
+			end if
+
 	      end function extras_check_model
 		                                                                                                                                                                      
 	      integer function how_many_extra_history_columns(s, id, id_extra)
