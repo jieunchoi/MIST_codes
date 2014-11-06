@@ -81,19 +81,19 @@
       alpha_semiconvection = 0.01
       thermo_haline_coeff = 666.66 !(2/3 of 1000 as found by Charbonnel 2007)
 		 
-      mixing_length_alpha = 1.8141d0
+      mixing_length_alpha = 1.84
       mlt_option = 'Henyey'
 	  
       okay_to_reduce_gradT_excess = .true.
        
-      overshoot_f_above_nonburn = 0.01309
-      overshoot_f_below_nonburn = 0.01309
-      overshoot_f_above_burn_h  = 0.01309
-      overshoot_f_below_burn_h  = 0.01309
-      overshoot_f_above_burn_he = 0.01309
-      overshoot_f_below_burn_he = 0.01309
-      overshoot_f_above_burn_z  = 0.01309
-      overshoot_f_below_burn_z  = 0.01309
+      overshoot_f_above_nonburn = 0.01831
+      overshoot_f_below_nonburn = 0.01831
+      overshoot_f_above_burn_h  = 0.01831
+      overshoot_f_below_burn_h  = 0.01831
+      overshoot_f_above_burn_he = 0.01831
+      overshoot_f_below_burn_he = 0.01831
+      overshoot_f_above_burn_z  = 0.01831
+      overshoot_f_below_burn_z  = 0.01831
       overshoot_below_noburn_factor = 10
 		 
       !always have overshooting on in the inlist, core overshooting
