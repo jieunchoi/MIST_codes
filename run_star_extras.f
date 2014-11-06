@@ -48,7 +48,7 @@
 	         integer, intent(in) :: id
 	         logical, intent(in) :: restart
 	         integer, intent(out) :: ierr
-		     real(dp) :: core_ov_full_on, core_ov_full_off, frac, rot_full_off, rot_full_on, frac2, vct60, vct100
+		     real(dp) :: core_ov_full_on, core_ov_full_off, frac, rot_full_off, rot_full_on, frac2, vct30, vct100
 			 
 	         ierr = 0
 	         extras_startup = 0
