@@ -105,13 +105,13 @@
 			 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
 			 
 			 !set VARCONTROL: for massive stars, turn up varcontrol gradually to help them evolve
-			 vct60 = 1e-4
+			 vct30 = 1e-4
 			 vct100 = 1e-3
 			 
-			 if (s% initial_mass > 60) then
-				 s% varcontrol_target = vct60 + (vct100-vct60)*(s% initial_mass-60)/(100-60)
+			 if (s% initial_mass > 30) then
+				 s% varcontrol_target = vct30 + (vct100-vct30)*(s% initial_mass-30.0)/(100.0-30.0)
 				 
-				 if (s% initial_mass > 100) then
+				 if (s% initial_mass > 100.0) then
 					 s% varcontrol_target = vct100
 				 end if
 				 
