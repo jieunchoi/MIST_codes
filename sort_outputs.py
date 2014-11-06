@@ -25,6 +25,7 @@ import mesa_plot_grid
 import mesa2fsps
 
 work_dir = os.environ['MESAWORK_DIR']
+storage_dir = os.environ['STORE_DIR']
 
 def gen_summary(rawdirname):
     
@@ -69,6 +70,8 @@ def gen_summary(rawdirname):
 
         #Check for error messages
         if (len(errcontent) > 0):
+            status = 'FAILED'
+            reason = 'unknown_error'
             for line in errcontent:
                 if 'DUE TO TIME LIMIT ***' in line:
                     status = 'FAILED'
@@ -77,10 +80,6 @@ def gen_summary(rawdirname):
                 elif 'exceeded memory limit' in line:
                     status = 'FAILED'
                     reason = 'memory_exceed'
-                    break
-                else:
-                    status = 'FAILED'
-                    reason = 'unknown_error'
                     break
         
         #Retrieve the stopping reasons
@@ -277,7 +276,14 @@ def do_organize(runname):
     os.chdir(work_dir)
     #When decompressed, this .tar.gz opens a MIST_vXX/feh_XXX_afe_XXX directory
     os.system("tar -zcvf " + '_'.join(runname.split('/')) + ".tar.gz " + runname)
-
+    
+    print "************************************************************"
+    print "****************MIGRATING FILES TO STORAGE******************"
+    print "************************************************************"
+    os.system("rm -rf " + runname)
+    os.system("mv " + rawdirname + " " + storage_dir)
+    os.system("mv " + '_'.join(runname.split('/')) + ".tar.gz " + storage_dir)
+    
 if __name__ == "__main__":
     
     runname = sys.argv[1]
