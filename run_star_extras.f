@@ -91,6 +91,8 @@
 	         if (s% star_mass < rot_full_off) then
 				 frac2 = 0
 	         else if (s% star_mass >= rot_full_off .and. s% star_mass <= rot_full_on) then
+				 s% job% set_near_zams_omega_div_omega_crit_steps = 10
+				 s% job% new_omega_div_omega_crit = s% job% extras_rpar(5) !nominally 0.4
 				 frac2 = (s% star_mass - rot_full_off) / &
 	                    (rot_full_on - rot_full_off)
 	             frac2 = 0.5d0*(1 - cos(pi*frac2))
