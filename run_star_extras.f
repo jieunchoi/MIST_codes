@@ -97,6 +97,8 @@
 	                    (rot_full_on - rot_full_off)
 	             frac2 = 0.5d0*(1 - cos(pi*frac2))
 			 else
+				 s% job% set_near_zams_omega_div_omega_crit_steps = 10
+				 s% job% new_omega_div_omega_crit = s% job% extras_rpar(5) !nominally 0.4
 			     frac2 = 1d0
 	         end if
 			 s% job% new_omega_div_omega_crit = s% job% new_omega_div_omega_crit * frac2
