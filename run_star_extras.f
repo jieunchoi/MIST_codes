@@ -25,6 +25,7 @@
       use star_lib
       use star_def
       use const_def
+	  use crlibm_lib
       ! use run_star_support
       
       implicit none
@@ -40,6 +41,7 @@
 	         ierr = 0
 			 
 			 original_diffusion_dt_limit = s% diffusion_dt_limit			          
+			 s% other_wind => VW_superwind
 	      end subroutine extras_controls
             
 	      integer function extras_startup(s, id, restart, ierr)
@@ -88,28 +90,35 @@
 			 rot_full_off = s% job% extras_rpar(3) !1.2
 			 rot_full_on = s% job% extras_rpar(4) !1.8
 			 
-	         if (s% star_mass < rot_full_off) then
-				 frac2 = 0
-				 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
-				 write(*,*) 'no rotation'
-				 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
-	         else if (s% star_mass >= rot_full_off .and. s% star_mass <= rot_full_on) then
-				 frac2 = (s% star_mass - rot_full_off) / &
-	                    (rot_full_on - rot_full_off)
-	             frac2 = 0.5d0*(1 - cos(pi*frac2))
-				 s% job% set_near_zams_omega_div_omega_crit_steps = 10
-				 s% job% new_omega_div_omega_crit = s% job% extras_rpar(5) * frac2
-				 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
-				 write(*,*) 'new omega_div_omega_crit, fraction', s% job% new_omega_div_omega_crit, frac2
-				 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
-			 else
-				 frac2 = 1.0
-				 s% job% set_near_zams_omega_div_omega_crit_steps = 10
-				 s% job% new_omega_div_omega_crit = s% job% extras_rpar(5) * frac2 !nominally 0.4
-				 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
-				 write(*,*) 'new omega_div_omega_crit, fraction', s% job% new_omega_div_omega_crit, frac2
-				 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
-	         end if
+			 if (s% job% extras_rpar(5) > 0.0) then
+	         	if (s% star_mass < rot_full_off) then
+			 		 frac2 = 0
+			 		 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
+			 		 write(*,*) 'no rotation'
+			 		 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
+	         	else if (s% star_mass >= rot_full_off .and. s% star_mass <= rot_full_on) then
+			 		 frac2 = (s% star_mass - rot_full_off) / &
+	         	           (rot_full_on - rot_full_off)
+	         	    frac2 = 0.5d0*(1 - cos(pi*frac2))
+			 		 s% job% set_near_zams_omega_div_omega_crit_steps = 10
+			 		 s% job% new_omega_div_omega_crit = s% job% extras_rpar(5) * frac2
+			 		 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
+			 		 write(*,*) 'new omega_div_omega_crit, fraction', s% job% new_omega_div_omega_crit, frac2
+			 		 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
+			 	else
+			 		 frac2 = 1.0
+			 		 s% job% set_near_zams_omega_div_omega_crit_steps = 10
+			 		 s% job% new_omega_div_omega_crit = s% job% extras_rpar(5) * frac2 !nominally 0.4
+			 		 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
+			 		 write(*,*) 'new omega_div_omega_crit, fraction', s% job% new_omega_div_omega_crit, frac2
+			 		 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
+	         	end if
+			else
+				write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
+				write(*,*) 'no rotation'
+				write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
+			end if
+				
 
 			 !set VARCONTROL: for massive stars, turn up varcontrol gradually to help them evolve
 			 vct30 = 1e-4
@@ -267,6 +276,28 @@
 			 endif
 	      end function extras_finish_step
       
+	      subroutine VW_superwind(id, Lsurf, Msurf, Rsurf, Tsurf, w, ierr)
+	         use star_def
+	         integer, intent(in) :: id
+	         real(dp), intent(in) :: Lsurf, Msurf, Rsurf, Tsurf ! surface values (cgs)
+	         ! NOTE: surface is outermost cell. not necessarily at photosphere.
+	         ! NOTE: don't assume that vars are set at this point.
+	         ! so if you want values other than those given as args,
+	         ! you should use values from s% xh(:,:) and s% xa(:,:) only.
+	         ! rather than things like s% Teff or s% lnT(:) which have not been set yet.
+	         real(dp), intent(out) :: w ! wind in units of Msun/year (value is >= 0)
+	         integer, intent(out) :: ierr
+			 real(dp) :: logP, P
+			 
+			 !Vassiliadis and Wood 1993 for superwind
+			 
+	         logP = -2.07 + 1.94*log10_cr(Rsurf/Rsun)-0.9*log10_cr(Msurf/Msun) !in days
+			 P = pow_cr(10d0, logP)
+			 w = pow_cr(10d0, -11.4+0.0125*(P - 100.0*(Msurf/Msun - 2.5)))
+			 
+	         ierr = 0
+	      end subroutine VW_superwind
+		  
 	      subroutine extras_after_evolve(s, id, id_extra, ierr)
 	         type (star_info), pointer :: s
 	         integer, intent(in) :: id, id_extra
