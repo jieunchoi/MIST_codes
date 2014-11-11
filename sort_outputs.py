@@ -68,37 +68,35 @@ def gen_summary(rawdirname):
         status = ''
         termination_reason = ''
 
-        #Check for error messages
-        if (len(errcontent) > 0):
-            status = 'FAILED'
-            reason = 'unknown_error'
-            for line in errcontent:
-                if 'DUE TO TIME LIMIT ***' in line:
-                    status = 'FAILED'
-                    reason = 'need_more_time'
-                    break
-                elif 'exceeded memory limit' in line:
-                    status = 'FAILED'
-                    reason = 'memory_exceed'
-                    break
-        
         #Retrieve the stopping reasons
-        else:
-            for line in outcontent[-30:]:
-                if 'termination code' in line:
-                    termination_reason = line.split('termination code: ')[1].split('\n')[0]
-                    break
-                if 'failed in do_relax_num_steps' in line:
-                    termination_reason = 'failed_during_preMS'
-                    break
-            for line in outcontent[-50:]:  
-                if (' stopping because of convergence problems' in line) or \
-                           ('terminated evolution: convergence problems' in line):
+        for line in outcontent[-30:]:
+            if 'termination code' in line:
+                termination_reason = line.split('termination code: ')[1].split('\n')[0]
+                reason = termination_reason.replace(' ', '_')
+                if reason == 'min_timestep_limit':
                     status = 'FAILED'
-                    reason = termination_reason.replace(' ', '_')
-                if (line == outcontent[-1]) & (status == ''):
+                else:
                     status = 'OK'
-                    reason = termination_reason.replace(' ', '_')
+            if 'failed in do_relax_num_steps' in line:
+                termination_reason = 'failed_during_preMS'
+                reason = termination_reason.replace(' ', '_')
+                status = 'FAILED'
+        
+        if status != 'OK':
+            if (len(errcontent) > 0):
+                reason = 'unknown_error'
+                for line in errcontent:
+                    if 'DUE TO TIME LIMIT ***' in line:
+                        status = 'FAILED'
+                        reason = 'need_more_time'
+                        break
+                    elif 'exceeded memory limit' in line:
+                        status = 'FAILED'
+                        reason = 'memory_exceeded'
+                        break
+                    elif 'Socket timed out on send/recv operation' in line:
+                        status = 'FAILED'
+                        reason = 'socket_timed_out'
         
         #Retrieve the run time information
         dates = subprocess.Popen('grep [0-9][0-9]:[0-9][0-9]:[0-9][0-9] ' + listoutfiles[index], shell=True, stdout=subprocess.PIPE)
@@ -282,7 +280,7 @@ def do_organize(runname):
     print "************************************************************"
     os.system("rm -rf " + runname)
     os.system("mv " + rawdirname + " " + storage_dir)
-    os.system("mv " + '_'.join(runname.split('/')) + ".tar.gz " + storage_dir)
+    os.system("mv " + '_'.join(runname.split('/')) + ".tar.gz " + os.path.join(storage_dir, runname.split('/')[0]))
     
 if __name__ == "__main__":
     
