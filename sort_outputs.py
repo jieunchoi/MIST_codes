@@ -279,7 +279,7 @@ def do_organize(runname):
     print "****************MIGRATING FILES TO STORAGE******************"
     print "************************************************************"
     os.system("rm -rf " + runname)
-    os.system("mv " + rawdirname + " " + storage_dir)
+    os.system("mv " + rawdirname + " " + os.path.join(storage_dir, runname.split('/')[0]))
     os.system("mv " + '_'.join(runname.split('/')) + ".tar.gz " + os.path.join(storage_dir, runname.split('/')[0]))
     
 if __name__ == "__main__":
