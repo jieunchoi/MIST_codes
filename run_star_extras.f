@@ -121,7 +121,7 @@
 				
 
 			 !set VARCONTROL: for massive stars, turn up varcontrol gradually to help them evolve
-			 vct30 = 1e-4
+			 vct30 = 2e-4
 			 vct100 = 1e-3
 			 
 			 if (s% initial_mass > 30.0) then
@@ -176,7 +176,7 @@
 	                 !reduce OPACITY BUMP: prevent stars from going over the Eddington limit
 					 !ln(T)=13.8 ~ log10(T)=6 which is below the Fe bump but
 	                 !still allows for the average opacity to vary with mass, Z, etc.
-	                 s% opacity_max = maxval(s% opacity, mask=s% lnT>13.8)
+	                 !s% opacity_max = maxval(s% opacity, mask=s% lnT>13.8)
 				 end if
 			 end if
 			 
@@ -194,7 +194,8 @@
 			   	 extras_check_model = terminate
 			 end if
 			 
-			 !check DIFFUSION: to determine whether or not diffusion should happen 
+			 !check DIFFUSION: to determine whether or not diffusion should happen
+			 !no diffusion for fully convective, post-MS, and mega-old models 
              if(abs(s% mass_conv_core - s% star_mass) < 1d-2) then ! => fully convective
  	            s% diffusion_dt_limit = huge_dt_limit
 		 		s% do_element_diffusion = .false.
@@ -202,23 +203,15 @@
  	        	s% diffusion_dt_limit = original_diffusion_dt_limit
 				s% do_element_diffusion = .true.
 			 end if
+			 if (s% star_age > 5d10) then !50 Gyr is really old
+				s% diffusion_dt_limit = huge_dt_limit
+				s% do_element_diffusion = .true.
+			 end if
+			 min_center_h1_for_diff = 1d-4
+     		 if (s% center_h1 < min_center_h1_for_diff) then
+				s% do_element_diffusion = .false.
+			 end if
 				
-		 	!turn off DIFFUSION: diffusion isn't super important post-MS. also don't care about mega-old models
-			if (s% do_element_diffusion) then
-				min_center_h1_for_diff = 1d-4
-				if (s% center_h1 < min_center_h1_for_diff) then
-						write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
-						write(*,*) 'turning off diffusion'
-						write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'  
-						s% do_element_diffusion = .false.
-				end if
-			
-				if (s% star_age > 5d10) then !50 Gyr is really old
-					s% diffusion_dt_limit = huge_dt_limit
-					s% do_element_diffusion = .true.
-				end if
-			end if
-
 	      end function extras_check_model
 		                                                                                                                                                                      
 	      integer function how_many_extra_history_columns(s, id, id_extra)
