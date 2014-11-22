@@ -84,18 +84,16 @@ def gen_summary(rawdirname):
         
         if status != 'OK':
             if (len(errcontent) > 0):
+                status = 'FAILED'
                 reason = 'unknown_error'
                 for line in errcontent:
                     if 'DUE TO TIME LIMIT ***' in line:
-                        status = 'FAILED'
                         reason = 'need_more_time'
                         break
                     elif 'exceeded memory limit' in line:
-                        status = 'FAILED'
                         reason = 'memory_exceeded'
                         break
                     elif 'Socket timed out on send/recv operation' in line:
-                        status = 'FAILED'
                         reason = 'socket_timed_out'
         
         #Retrieve the run time information
@@ -279,7 +277,7 @@ def do_organize(runname):
     print "****************MIGRATING FILES TO STORAGE******************"
     print "************************************************************"
     os.system("rm -rf " + runname)
-    os.system("mv " + rawdirname + " " + storage_dir)
+    os.system("mv " + rawdirname + " " + os.path.join(storage_dir, runname.split('/')[0]))
     os.system("mv " + '_'.join(runname.split('/')) + ".tar.gz " + os.path.join(storage_dir, runname.split('/')[0]))
     
 if __name__ == "__main__":
