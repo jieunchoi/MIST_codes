@@ -89,19 +89,18 @@ class MESA_Isochrones:
         small=1.0e-5
         min_log_age-=small
         max_log_age+=small
-        fs=18
         if int(fig_num) >= 0:
-            plt.figure(num=int(fig_num),figsize=(8,8))
+            plt.figure(num=int(fig_num),figsize=(12,10))
         else:
-            plt.figure(num=None,figsize=(8,8))
-        plt.xlabel(r'$\log(\mathrm{T_{eff}})$',fontsize=fs)
-        plt.ylabel(r'$\log(\mathrm{L/L_{\odot}})$',fontsize=fs)
-        plt.xticks(fontsize=fs)
-        plt.yticks(fontsize=fs)
+            plt.figure(num=None,figsize=(12,10))
+        plt.xlabel('log(Teff) [K]', fontsize=20)
+        plt.ylabel('log(L/Lsun)', fontsize=20)
         for i, iso in enumerate(self.data):
             if min_log_age <= self.ages[i] <= max_log_age:
-                plt.plot(iso['log_Teff'],iso['log_L'],label='log(Age)={:5.2f}'.format(self.ages[i]))
-        if show_legend: plt.legend(loc='lower left')
+                plt.plot(iso['log_Teff'],iso['log_L'],label='log(Age)={:5.2f}'.format(self.ages[i]), color='FireBrick', linewidth=1.5)
+        if show_legend:
+            leg = plt.legend(loc='lower left')
+            leg.draw_frame(False)
         plt.gca().invert_xaxis()
         plt.show()
 
@@ -136,7 +135,7 @@ class MESA_Isochrones:
         small=1.0e-5
         min_log_age-=small
         max_log_age+=small
-        fs=18
+        fs=20
         if int(fig_num) >= 0:
             plt.figure(num=int(fig_num),figsize=(8,8))
         else:
