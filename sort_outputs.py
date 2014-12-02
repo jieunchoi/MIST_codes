@@ -267,6 +267,12 @@ def do_organize(runname):
     mesa_plot_grid.plot_combine(runname)
     
     print "************************************************************"
+    print "****************PLOTTING THE ISOCHRONES******************"
+    print "************************************************************"
+#    mesa_plot_grid.plot_HRD(runname)
+#    mesa_plot_grid.plot_combine(runname)
+    
+    print "************************************************************"
     print "****************COMPRESSING THE DIRECTORY*******************"
     print "************************************************************"
     os.chdir(work_dir)

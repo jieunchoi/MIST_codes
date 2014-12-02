@@ -11,6 +11,8 @@ Returns:
     
 """
 
+######### NEED TO ADD OBSERVED CMDS ##########
+
 import glob
 import os
 import sys
