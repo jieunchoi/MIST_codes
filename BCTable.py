@@ -42,7 +42,7 @@ class BCTable:
         logL=np.array(logL,ndmin=1)
         formats=[np.float64 for name in self.names]
         BCs=self.table_interp(Teff,logg)
-        mags=np.empty(shape(Teff),{'names':self.names,'formats':formats})
+        mags=np.empty(np.shape(Teff),{'names':self.names,'formats':formats})
         for i in range(len(Teff)):
             mags[i]=self.SolBol - 2.5*np.expand_dims(logL[i],1) - BCs[i]
         return mags
