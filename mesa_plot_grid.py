@@ -84,15 +84,17 @@ def plot_combine(gridname, logg=False, remove_pdf=False):
     if logg == True:
         filelist = glob.glob(os.path.join(grid_dir, 'plots/'+lowest_dir+'_[0-1]*logg.pdf'))
         
-    command = 'convert '
-    for file in filelist:
-        command += file + ' '
+    command = 'gs -dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -sOutputFile='+os.path.join(grid_dir, 'plots/')
     
     if logg == False:
-        command += gridname + '_alltracks.pdf'
+        command += '_'.join(gridname.split('/')) + '_alltracks.pdf '
     if logg == True:
-        command += gridname + '_alltracks_logg.pdf'
-    
+        command += '_'.join(gridname.split('/')) + '_alltracks_logg.pdf '
+ 
+    for file in filelist:
+        command += file + ' '
+            
     if remove_pdf == True:    
         os.system("rm " + os.path.join(grid_dir, 'plots/'+lowest_dir+'_[0-1]*ind.pdf'))
-#    os.system(command)
+
+    os.system(command)
