@@ -264,13 +264,13 @@ def do_organize(runname):
     print "************************************************************"
     os.mkdir(os.path.join(newdirname, "plots"))
     mesa_plot_grid.plot_HRD(runname)
-    mesa_plot_grid.plot_combine(runname)
+    mesa_plot_grid.plot_combine(runname, iso=False)
     
     print "************************************************************"
-    print "****************PLOTTING THE ISOCHRONES******************"
+    print "******************PLOTTING THE ISOCHRONES*******************"
     print "************************************************************"
-#    mesa_plot_grid.plot_HRD(runname)
-#    mesa_plot_grid.plot_combine(runname)
+    mesa_plot_grid.plot_iso(runname)
+    mesa_plot_grid.plot_combine(runname, iso=True)
     
     print "************************************************************"
     print "****************COMPRESSING THE DIRECTORY*******************"
