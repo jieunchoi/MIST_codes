@@ -48,7 +48,7 @@ class MESA_Isochrones:
             names = tuple([name.strip() for name in names])
             #adjust column number for python
             formats=tuple([np.int32]+[np.float64 for i in range(num_cols-1)])
-            iso=zeros((num_eeps),{'names':names,'formats':formats})
+            iso=np.zeros((num_eeps),{'names':names,'formats':formats})
             #read through EEPs for each isochrone
             for eep in range(num_eeps):
                 x=f.readline().split()
