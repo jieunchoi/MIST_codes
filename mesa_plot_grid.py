@@ -9,6 +9,7 @@ import glob
 import matplotlib.pyplot as plt
 import os
 import Isochrones
+import numpy as np
 
 work_dir = os.environ['MESAWORK_DIR']
 
