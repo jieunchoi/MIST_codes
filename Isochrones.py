@@ -1,6 +1,5 @@
 from __future__ import print_function
 from fortranformat import FortranRecordReader as fread
-from BCTable import BCTable
 import matplotlib.pyplot as plt
 import numpy as np
 
