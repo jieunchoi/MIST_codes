@@ -101,7 +101,6 @@ class MESA_Isochrones:
             leg = plt.legend(loc='lower left')
             leg.draw_frame(False)
         plt.gca().invert_xaxis()
-        plt.show()
 
     #plot a color-magnitude diagram
     def plot_CMD(self,mag1,mag2,mag3,min_log_age=-99.0,max_log_age=99.0,show_legend=False,fig_num=-1):
@@ -122,7 +121,6 @@ class MESA_Isochrones:
                     plt.plot(iso[mag1]-iso[mag2],iso[mag3],label='log(Age)={:5.2f}'.format(self.ages[i]))
             if show_legend: plt.legend(loc='lower left')
             plt.gca().invert_yaxis()
-            plt.show()
         else:
             print('supplied mags not in BCTable.')
             print('Supplied:')
@@ -147,7 +145,6 @@ class MESA_Isochrones:
             if min_log_age <= self.ages[i] <= max_log_age:
                 plt.plot(iso['log_center_T'],iso['log_center_Rho']) #,label='log(Age)={:i}'.format((i+5)))
         if show_legend: plt.legend(loc='lower right')
-        plt.show()
 
     def check_monotonic(self):
         for d in self.data:
