@@ -68,20 +68,20 @@
 			 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
 
 			!set CONVECTIVE OVERSHOOT: extra param are set in inlist: star_job
-			 core_ov_full_off = s% job% extras_rpar(1) !1.1
-			 core_ov_full_on = s% job% extras_rpar(2) !1.7
-			 
-	         if (s% star_mass < core_ov_full_off) then
-				 frac = 0
-	         else if (s% star_mass >= core_ov_full_off .and. s% star_mass <= core_ov_full_on) then
-				 frac = (s% star_mass - core_ov_full_off) / &
-	                    (core_ov_full_on - core_ov_full_off)
-	             frac = 0.5d0*(1 - cos(pi*frac))
-			 else
-			     frac = 1d0
-	         end if
+			 !core_ov_full_off = s% job% extras_rpar(1) !1.1
+			 !core_ov_full_on = s% job% extras_rpar(2) !1.7
+			 !
+	         !if (s% star_mass < core_ov_full_off) then
+			 !	 frac = 0
+	         !else if (s% star_mass >= core_ov_full_off .and. s% star_mass <= core_ov_full_on) then
+			 !	 frac = (s% star_mass - core_ov_full_off) / &
+	         !           (core_ov_full_on - core_ov_full_off)
+	         !    frac = 0.5d0*(1 - cos(pi*frac))
+			 !else
+			 !    frac = 1d0
+	         !end if
 
-                 frac = 1d0
+             frac = 1d0
 	         s% overshoot_f_above_burn_h = frac * s% overshoot_f_above_burn_h
 			 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
 			 write(*,*) 'core convective overshoot fraction: ', frac
@@ -123,7 +123,7 @@
 
 			 !set VARCONTROL: for massive stars, turn up varcontrol gradually to help them evolve
 			 vct30 = 2e-4
-			 vct100 = 3e-3!1e-3
+			 vct100 = 3e-3
 			 
 			 if (s% initial_mass > 30.0) then
 				 frac = (s% initial_mass-30.0)/(100.0-30.0)
@@ -173,11 +173,6 @@
 						 write(*,*) '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
 					 end if
 					 s% category_factors(3:) = 0.0
-					 
-	                 !reduce OPACITY BUMP: prevent stars from going over the Eddington limit
-					 !ln(T)=13.8 ~ log10(T)=6 which is below the Fe bump but
-	                 !still allows for the average opacity to vary with mass, Z, etc.
-	                 !s% opacity_max = maxval(s% opacity, mask=s% lnT>13.8)
 				 end if
 			 end if
 			 

@@ -88,7 +88,7 @@
        
       overshoot_f_above_nonburn = 0.01831
       overshoot_f_below_nonburn = 0.01831
-      overshoot_f_above_burn_h  = 0.01831
+      overshoot_f_above_burn_h  = 0.02000
       overshoot_f_below_burn_h  = 0.01831
       overshoot_f_above_burn_he = 0.01831
       overshoot_f_below_burn_he = 0.01831
