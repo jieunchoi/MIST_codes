@@ -30,7 +30,7 @@ def make_slurm_sh(inlistname, inlistdir, runbasefile):
     #Find the mass of the model to assign appropriate runtime
     massval = int(runname.split('M')[0])/100.0
     if (massval <= 0.6):
-        replaced_contents = replaced_contents.replace('<<RUNTIME>>', '1:00:00')
+        replaced_contents = replaced_contents.replace('<<RUNTIME>>', '5:00:00')
     else:
         replaced_contents = replaced_contents.replace('<<RUNTIME>>', '36:00:00')
     runfile = runname+'_run.sh'
