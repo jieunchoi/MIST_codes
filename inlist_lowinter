@@ -14,7 +14,7 @@
       !parameters to be used for mass on/off for overshoot & rotation
       extras_lrpar = 5
       extras_rpar(1) = 1.1 !full off
-      extras_rpar(2) = 1.7 !full on
+      extras_rpar(2) = 1.4 !7 !full on
       extras_rpar(3) = 1.2 !full off
       extras_rpar(4) = 1.8 !full on
 	  extras_rpar(5) = 0.4 !omega_div_omega_crit
@@ -70,7 +70,7 @@
 !WHEN TO STOP
 
 	  !in run_star_extras, it's set to H1 depletion in the core for low mass stars
-      gamma_center_limit = 1d2
+	  gamma_center_limit = 1d2
 
 !PHYSICS
 
@@ -88,7 +88,7 @@
 	      
       overshoot_f_above_nonburn = 0.01831
       overshoot_f_below_nonburn = 0.01831
-      overshoot_f_above_burn_h  = 0.01831
+      overshoot_f_above_burn_h  = 0.01831 !0.020 !0.01831
       overshoot_f_below_burn_h  = 0.01831
       overshoot_f_above_burn_he = 0.01831
       overshoot_f_below_burn_he = 0.01831

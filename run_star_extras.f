@@ -81,6 +81,7 @@
 			     frac = 1d0
 	         end if
 
+                 frac = 1d0
 	         s% overshoot_f_above_burn_h = frac * s% overshoot_f_above_burn_h
 			 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
 			 write(*,*) 'core convective overshoot fraction: ', frac
@@ -122,7 +123,7 @@
 
 			 !set VARCONTROL: for massive stars, turn up varcontrol gradually to help them evolve
 			 vct30 = 2e-4
-			 vct100 = 1e-3
+			 vct100 = 3e-3!1e-3
 			 
 			 if (s% initial_mass > 30.0) then
 				 frac = (s% initial_mass-30.0)/(100.0-30.0)
