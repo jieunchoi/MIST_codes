@@ -120,6 +120,12 @@ def gen_summary(rawdirname):
             start = datetime.timedelta(int(startdatelist[2]), int(startdatelist[3].split(':')[-1]), 0,0,int(startdatelist[3].split(':')[-2]), int(startdatelist[3].split(':')[-3]))
             end = datetime.timedelta(int(enddatelist[2]), int(enddatelist[3].split(':')[-1]), 0,0,int(enddatelist[3].split(':')[-2]), int(enddatelist[3].split(':')[-3]))
             runtime = str(datetime.timedelta(seconds=datetime.timedelta.total_seconds(end-start)))
+            
+            #For >24hr runtimes
+            if 'day' in runtime:
+                hms = runtime.split()[-1]
+                d2h = int(runtime.split()[0])*24
+                runtime = str(d2h+int(hms.split(':')[0]))+':'+hms.split(':')[1]+':'+hms.split(':')[2]
                 
         #If there is no end date
         except ValueError:
