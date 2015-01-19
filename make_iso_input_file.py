@@ -22,7 +22,7 @@ import sys
 
 make_isoch_dir = os.environ['ISO_DIR']
 code_dir = os.environ['MIST_CODE_DIR']
-work_dir = os.environ['MESAWORK_DIR']
+mistgrid_dir = os.environ['MIST_GRID_DIR']
 
 def make_iso_input_file(runname, mode):
     
@@ -38,9 +38,9 @@ def make_iso_input_file(runname, mode):
         os.system("rm " + os.path.join(make_isoch_dir, inputfilename))
 
     #Define some paths
-    tracks_dir = os.path.join(os.path.join(work_dir, runname), "tracks")
-    eeps_dir = os.path.join(os.path.join(work_dir, runname), "eeps")
-    iso_dir = os.path.join(os.path.join(work_dir, runname), "isochrones")
+    tracks_dir = os.path.join(os.path.join(mistgrid_dir, runname), "tracks")
+    eeps_dir = os.path.join(os.path.join(mistgrid_dir, runname), "eeps")
+    iso_dir = os.path.join(os.path.join(mistgrid_dir, runname), "isochrones")
 
     #Get the list of tracks
     if mode == 'eeps':

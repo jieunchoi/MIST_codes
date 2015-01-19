@@ -11,7 +11,7 @@ import os
 import Isochrones
 import numpy as np
 
-work_dir = os.environ['MESAWORK_DIR']
+mistgrid_dir = os.environ['MIST_GRID_DIR']
 
 def plot_HRD(gridname, logg=False):
     
@@ -31,7 +31,7 @@ def plot_HRD(gridname, logg=False):
     """
     #Assumes gridname has the form MIST_vXX/feh_XXX_afe_XXX
     lowest_dir = gridname.split('/')[-1]
-    grid_dir = os.path.join(work_dir, gridname)
+    grid_dir = os.path.join(mistgrid_dir, gridname)
     filelist = glob.glob(os.path.join(grid_dir, 'eeps/*M.track.eep'))
     for file in filelist:
         starmass = float(file.split('eeps/')[1].split('M')[0])/100.0
@@ -86,7 +86,7 @@ def plot_iso(gridname):
         
     """
     #Assumes gridname has the form MIST_vXX/feh_XXX_afe_XXX
-    grid_dir = os.path.join(work_dir, gridname)
+    grid_dir = os.path.join(mistgrid_dir, gridname)
     lowest_dir = gridname.split('/')[-1]
     iso_dir = glob.glob(os.path.join(grid_dir, 'isochrones/MIST*iso'))[0]
     isochrone = Isochrones.MESA_Isochrones(iso_dir)
@@ -127,7 +127,7 @@ def plot_combine(gridname, logg=False, iso=False, remove_pdf=False):
     """
     
     lowest_dir = gridname.split('/')[-1]
-    grid_dir = os.path.join(work_dir, gridname)
+    grid_dir = os.path.join(mistgrid_dir, gridname)
     command = 'gs -dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -sOutputFile='+os.path.join(grid_dir, 'plots/')
     if not iso:
         if logg == False:

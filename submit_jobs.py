@@ -27,8 +27,9 @@ FeH = sys.argv[2]
 
 Z = calc_xyz.calc_xyz(float(FeH),feh=True)[-1]
 work_dir = os.environ['MESAWORK_DIR']
+mistgrid_dir = os.environ['MIST_GRID_DIR']
 code_dir = os.environ['MIST_CODE_DIR']
-dirname = os.path.join(work_dir, runname)
+dirname = os.path.join(mistgrid_dir, runname)
 cleanwork_dir = os.path.join(work_dir, "cleanworkdir")
 orig_inlist_dir = os.path.join(work_dir, 'inlists/inlists_'+'_'.join(runname.split('/')))
 runbasefile = 'SLURM_MISTgrid.sh'

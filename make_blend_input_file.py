@@ -24,7 +24,7 @@ import numpy as np
 
 make_isoch_dir = os.environ['ISO_DIR']
 code_dir = os.environ['MIST_CODE_DIR']
-work_dir = os.environ['MESAWORK_DIR']
+mistgrid_dir = os.environ['MIST_GRID_DIR']
 
 def make_blend_input_file(runname, file1, file2):
 
@@ -32,7 +32,7 @@ def make_blend_input_file(runname, file1, file2):
     runname_original = runname.split('_feh')[0]+'/feh'+runname.split('feh')[1]
 
     #Generate the name of the input file for the blending code
-    eeps_dir = os.path.join(os.path.join(work_dir, runname_original), "eeps")
+    eeps_dir = os.path.join(os.path.join(mistgrid_dir, runname_original), "eeps")
     mass = file1.split('M')[0]
     float_mass = float(mass)/100.0
 

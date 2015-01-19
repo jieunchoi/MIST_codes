@@ -24,7 +24,7 @@ import datetime
 import mesa_plot_grid
 import mesa2fsps
 
-work_dir = os.environ['MESAWORK_DIR']
+mistgrid_dir = os.environ['MIST_GRID_DIR']
 storage_dir = os.environ['STORE_DIR']
 
 def gen_summary(rawdirname):
@@ -42,8 +42,8 @@ def gen_summary(rawdirname):
     """
     
     #Outputs from the cluster
-    listerrfiles = glob.glob(os.path.join(work_dir, rawdirname) + '/*/*.e')
-    listoutfiles = glob.glob(os.path.join(work_dir, rawdirname) + '/*/*.o')
+    listerrfiles = glob.glob(os.path.join(mistgrid_dir, rawdirname) + '/*/*.e')
+    listoutfiles = glob.glob(os.path.join(mistgrid_dir, rawdirname) + '/*/*.o')
     
     #Dictionary to store the information about the MESA run
     stat_summary = {}
@@ -164,11 +164,11 @@ def sort_histfiles(rawdirname):
     """
 
     #Get the list of history files (tracks)
-    listofhist = glob.glob(os.path.join(work_dir, os.path.join(rawdirname+'/*/LOGS/*.data')))
+    listofhist = glob.glob(os.path.join(mistgrid_dir, os.path.join(rawdirname+'/*/LOGS/*.data')))
 
     #Make the track directory in the new reduced MESA run directory
     new_parentdirname = rawdirname.split("_raw")[0]
-    histfiles_dirname = os.path.join(os.path.join(work_dir, new_parentdirname), "tracks")
+    histfiles_dirname = os.path.join(os.path.join(mistgrid_dir, new_parentdirname), "tracks")
     os.mkdir(histfiles_dirname)
 
     #Rename & copy the history files over
@@ -198,21 +198,21 @@ def save_inlists(rawdirname):
     """
     
     #Get the list of inlist files
-    listofinlist = glob.glob(os.path.join(work_dir, os.path.join(rawdirname+'/*/inlist_project')))
+    listofinlist = glob.glob(os.path.join(mistgrid_dir, os.path.join(rawdirname+'/*/inlist_project')))
 
     #Nake the inlist directory in the new reduced MESA run directory
     new_parentdirname = rawdirname.split("_raw")[0]
-    inlistfiles_dirname = os.path.join(os.path.join(work_dir, new_parentdirname), "inlists")
+    inlistfiles_dirname = os.path.join(os.path.join(mistgrid_dir, new_parentdirname), "inlists")
     os.mkdir(inlistfiles_dirname)
     
     #Copy the inlist files from the general inlist directory in MESAWORK_DIR to the newly created inlist directory
     for inlistfile in listofinlist:
         format_mass_string = inlistfile.split('/')[-2].split('M_')[0]
         if 'M_dir' in inlistfile:
-            newinlistfilename = os.path.join(os.path.join(work_dir, new_parentdirname),'inlists/'+format_mass_string+'M.inlist')
+            newinlistfilename = os.path.join(os.path.join(mistgrid_dir, new_parentdirname),'inlists/'+format_mass_string+'M.inlist')
         else:
             bc_name = inlistfile.split('raw/')[1].split('M_')[1].split('_')[0]
-            newinlistfilename = os.path.join(os.path.join(work_dir, new_parentdirname),'inlists/'+format_mass_string+'M_'+bc_name+'.inlist')
+            newinlistfilename = os.path.join(os.path.join(mistgrid_dir, new_parentdirname),'inlists/'+format_mass_string+'M_'+bc_name+'.inlist')
         os.system("cp " + inlistfile + " " + newinlistfilename)
 
 def do_organize(runname):
@@ -232,10 +232,10 @@ def do_organize(runname):
     
     #Rename the run directory XXX as XXX_raw
     rawdirname = runname+"_raw"
-    os.system("mv " + os.path.join(work_dir,runname) + " " + os.path.join(work_dir,rawdirname))
+    os.system("mv " + os.path.join(mistgrid_dir,runname) + " " + os.path.join(mistgrid_dir,rawdirname))
     
     #The XXX directory will contain the organized, reduced information
-    newdirname = os.path.join(work_dir,runname)
+    newdirname = os.path.join(mistgrid_dir,runname)
     os.mkdir(newdirname)
     
     #Make the eeps directory that will be filled in later
@@ -283,7 +283,7 @@ def do_organize(runname):
     print "************************************************************"
     print "****************COMPRESSING THE DIRECTORY*******************"
     print "************************************************************"
-    os.chdir(work_dir)
+    os.chdir(mistgrid_dir)
     #When decompressed, this .tar.gz opens a MIST_vXX/feh_XXX_afe_XXX directory
     os.system("tar -zcvf " + '_'.join(runname.split('/')) + ".tar.gz " + runname)
     
