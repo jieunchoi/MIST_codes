@@ -201,7 +201,7 @@
 			 end if
 			 if (s% star_age > 5d10) then !50 Gyr is really old
 				s% diffusion_dt_limit = huge_dt_limit
-				s% do_element_diffusion = .true.
+				s% do_element_diffusion = .false.
 			 end if
 			 min_center_h1_for_diff = 1d-4
      		 if (s% center_h1 < min_center_h1_for_diff) then
