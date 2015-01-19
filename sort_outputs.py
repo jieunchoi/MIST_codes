@@ -67,6 +67,7 @@ def gen_summary(rawdirname):
 
         status = ''
         termination_reason = ''
+        reason = ''
 
         #Retrieve the stopping reasons
         for line in outcontent[-30:]:
@@ -83,6 +84,7 @@ def gen_summary(rawdirname):
                 status = 'FAILED'
         
         if status != 'OK':
+            reason = 'unknown'
             if (len(errcontent) > 0):
                 status = 'FAILED'
                 reason = 'unknown_error'
