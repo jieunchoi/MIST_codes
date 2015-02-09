@@ -1,4 +1,4 @@
-B1;2c! the first few lines of the log file contain parameter values as of the start of the run
+! the first few lines of the log file contain parameter values as of the start of the run
 ! for completeness, those items are described here:
    
    ! initial_mass -- star mass at start of run (Msun units)
