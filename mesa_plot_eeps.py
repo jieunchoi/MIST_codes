@@ -32,8 +32,9 @@ class EEPfile:
                     x = self.datafile[xvar]
                     break
                 except (TypeError, NameError, ValueError):
-                    print "Ooops! That wasn't a valid column entry. Try again from the following: "
+                    print xvar, " wasn't a valid column entry. Try again from the following: \n"
                     print self.hdr_list
+                    print '\n'
                     xvar = raw_input('var: ')
             all_xvar.append(x)
         

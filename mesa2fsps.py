@@ -11,8 +11,6 @@ Returns:
     
 """
 
-######### NEED TO ADD OBSERVED CMDS ##########
-
 import glob
 import os
 import sys
@@ -29,16 +27,16 @@ def mesa2fsps(runname):
     
     #Path to the new organzed directory
     newdirname = os.path.join(mistgrid_dir,runname)
-
+    
     runname_format = '_'.join(runname.split('/'))
     inputfile = "input."+runname_format
-
+    
     #Make the input file for the isochrones code to make eeps
     make_iso_input_file(runname, "eeps")
-
+    
     #Copy the most recent copy of my_history_columns.list file to the iso directory
     shutil.copy(os.path.join(code_dir, 'my_history_columns.list'), os.path.join(make_isoch_dir, 'my_history_columns.list'))
-
+    
     #cd into the isochrone directory and run the codes
     os.chdir(make_isoch_dir)
     os.system("./make_eeps " + inputfile)

@@ -51,34 +51,25 @@
    ! mass fractions near surface
      
       surface h1
-      surface h2
       surface he3
       surface he4
       surface li7
-      surface be7
-      surface b8
+      surface be9
+      surface b11
       surface c12
+	  surface c13
       surface n14
-      surface o14
       surface o16
       surface f19
-      surface ne18
-      surface ne19
       surface ne20
-      surface mg22
+	  surface na23
       surface mg24
       surface si28
       surface s32
-      surface ar36
       surface ca40
-      surface ti44
-      surface cr48
-      surface cr56
-      surface fe52
-      surface fe54
+      surface ti48
       surface fe56
-      surface ni56
-
+	  
    ! conditions near center
 
       log_center_T ! temperature
@@ -98,6 +89,18 @@
       center ne20
       center mg24
       center si28
+ 
+    ! log10 total luminosity for reaction categories (Lsun units)
+      
+      pp
+      cno
+      tri_alfa
+      burn_c
+      burn_n
+      burn_o
+      c12_c12
+      c12_o16
+      o16_o16
  
    !asteroseismic properties
       
