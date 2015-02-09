@@ -1,4 +1,4 @@
-! the first few lines of the log file contain parameter values as of the start of the run
+B1;2c! the first few lines of the log file contain parameter values as of the start of the run
 ! for completeness, those items are described here:
    
    ! initial_mass -- star mass at start of run (Msun units)
@@ -57,12 +57,12 @@
       surface be9
       surface b11
       surface c12
-	  surface c13
+      surface c13
       surface n14
       surface o16
       surface f19
       surface ne20
-	  surface na23
+      surface na23
       surface mg24
       surface si28
       surface s32
