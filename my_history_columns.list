@@ -69,7 +69,7 @@
       surface ca40
       surface ti48
       surface fe56
-	  
+
    ! conditions near center
 
       log_center_T ! temperature

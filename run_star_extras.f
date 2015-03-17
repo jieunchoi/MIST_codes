@@ -26,7 +26,6 @@
       use star_def
       use const_def
 	  use crlibm_lib
-      ! use run_star_support
       
       implicit none
       
@@ -35,31 +34,35 @@
       ! these routines are called by the standard run_star check_model
       contains
     
-	      subroutine extras_controls(s, ierr)
-	         type (star_info), pointer :: s
-	         integer, intent(out) :: ierr
-	         ierr = 0
-			 
-			 original_diffusion_dt_limit = s% diffusion_dt_limit			          
-			 s% other_wind => VW_superwind
+	      subroutine extras_controls(id, ierr)
+	          integer, intent(in) :: id
+	          integer, intent(out) :: ierr
+	          type (star_info), pointer :: s
+	          ierr = 0
+	          call star_ptr(id, s, ierr)
+	          if (ierr /= 0) return
+			  
+			  original_diffusion_dt_limit = s% diffusion_dt_limit
+			  s% other_wind => VW_superwind
+			  
 	      end subroutine extras_controls
             
-	      integer function extras_startup(s, id, restart, ierr)
-
-             type (star_info), pointer :: s
-	         integer, intent(in) :: id
-	         logical, intent(in) :: restart
-	         integer, intent(out) :: ierr
-		     real(dp) :: core_ov_full_on, core_ov_full_off, frac, rot_full_off, rot_full_on, frac2, vct30, vct100
-			 
-	         ierr = 0
-	         extras_startup = 0
-	         if (.not. restart) then
-	            call alloc_extra_info(s)
-	         else ! it is a restart
-	            call unpack_extra_info(s)
-	         end if
-			 
+	      integer function extras_startup(id, restart, ierr)
+			  integer, intent(in) :: id
+			  logical, intent(in) :: restart
+			  integer, intent(out) :: ierr
+			  type (star_info), pointer :: s
+			  real(dp) :: core_ov_full_on, core_ov_full_off, frac, rot_full_off, rot_full_on, frac2, vct30, vct100
+	          ierr = 0
+	          call star_ptr(id, s, ierr)
+	          if (ierr /= 0) return
+	          extras_startup = 0
+	          if (.not. restart) then
+	             call alloc_extra_info(s)
+	          else ! it is a restart
+	             call unpack_extra_info(s)
+	          end if
+			  		 
 			 !set OPACITIES: Zbase for Type 2 Opacities automatically to the Z for the star
 			 s% Zbase = 1.0 - (s% job% initial_h1 + s% job% initial_h2 + &
 			 s% job% initial_he3 + s% job% initial_he4)
@@ -67,31 +70,11 @@
 			 write(*,*) 'Zbase for Type 2 Opacities: ', s% Zbase
 			 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
 
-			!set CONVECTIVE OVERSHOOT: extra param are set in inlist: star_job
-			 !core_ov_full_off = s% job% extras_rpar(1) !1.1
-			 !core_ov_full_on = s% job% extras_rpar(2) !1.7
-			 !
-	         !if (s% star_mass < core_ov_full_off) then
-			 !	 frac = 0
-	         !else if (s% star_mass >= core_ov_full_off .and. s% star_mass <= core_ov_full_on) then
-			 !	 frac = (s% star_mass - core_ov_full_off) / &
-	         !           (core_ov_full_on - core_ov_full_off)
-	         !    frac = 0.5d0*(1 - cos(pi*frac))
-			 !else
-			 !    frac = 1d0
-	         !end if
-
-             frac = 1d0
-	         s% overshoot_f_above_burn_h = frac * s% overshoot_f_above_burn_h
-			 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
-			 write(*,*) 'core convective overshoot fraction: ', frac
-			 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
-
 			 !set ROTATION: extra param are set in inlist: star_job
-			 rot_full_off = s% job% extras_rpar(3) !1.2
-			 rot_full_on = s% job% extras_rpar(4) !1.8
+			 rot_full_off = s% job% extras_rpar(1) !1.2
+			 rot_full_on = s% job% extras_rpar(2) !1.8
 			 
-			 if (s% job% extras_rpar(5) > 0.0) then
+			 if (s% job% extras_rpar(3) > 0.0) then
 	         	if (s% star_mass < rot_full_off) then
 			 		 frac2 = 0
 			 		 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
@@ -102,14 +85,14 @@
 	         	           (rot_full_on - rot_full_off)
 	         	    frac2 = 0.5d0*(1 - cos(pi*frac2))
 			 		 s% job% set_near_zams_omega_div_omega_crit_steps = 10
-			 		 s% job% new_omega_div_omega_crit = s% job% extras_rpar(5) * frac2
+			 		 s% job% new_omega_div_omega_crit = s% job% extras_rpar(3) * frac2
 			 		 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
 			 		 write(*,*) 'new omega_div_omega_crit, fraction', s% job% new_omega_div_omega_crit, frac2
 			 		 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
 			 	else
 			 		 frac2 = 1.0
 			 		 s% job% set_near_zams_omega_div_omega_crit_steps = 10
-			 		 s% job% new_omega_div_omega_crit = s% job% extras_rpar(5) * frac2 !nominally 0.4
+			 		 s% job% new_omega_div_omega_crit = s% job% extras_rpar(3) * frac2 !nominally 0.4
 			 		 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
 			 		 write(*,*) 'new omega_div_omega_crit, fraction', s% job% new_omega_div_omega_crit, frac2
 			 		 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
@@ -126,29 +109,35 @@
 			 vct100 = 3e-3
 			 
 			 if (s% initial_mass > 30.0) then
-				 frac = (s% initial_mass-30.0)/(100.0-30.0)
-				 frac = 0.5d0*(1 - cos(pi*frac))
-				 s% varcontrol_target = vct30 + (vct100-vct30)*frac
-				 
-				 if (s% initial_mass > 100.0) then
-					 s% varcontrol_target = vct100
-				 end if
-				 
-				 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
-				 write(*,*) 'varcontrol_target is set to ', s% varcontrol_target
-				 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
+			 	 frac = (s% initial_mass-30.0)/(100.0-30.0)
+			 	 frac = 0.5d0*(1 - cos(pi*frac))
+			 	 s% varcontrol_target = vct30 + (vct100-vct30)*frac
+			 	 
+			 	 if (s% initial_mass > 100.0) then
+			 		 s% varcontrol_target = vct100
+			 	 end if
+			 	 
+			 	 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
+			 	 write(*,*) 'varcontrol_target is set to ', s% varcontrol_target
+			 	 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
 			 end if
 			 
 	      end function extras_startup
       
 	      ! returns either keep_going, retry, backup, or terminate.
-	      integer function extras_check_model(s, id, id_extra)
-	         type (star_info), pointer :: s
+	      integer function extras_check_model(id, id_extra)
 	         integer, intent(in) :: id, id_extra
-             real(dp) :: envelope_mass_fraction, L_He, L_tot, orig_eta, target_eta, min_center_h1_for_diff
+			 integer :: ierr
+			 type (star_info), pointer :: s
+	         real(dp) :: envelope_mass_fraction, L_He, L_tot, orig_eta, target_eta, min_center_h1_for_diff
 			 real(dp), parameter :: huge_dt_limit = 3.15d16 ! ~1 Gyr
 			 real(dp), parameter :: new_varcontrol_target = 1d-3
-	         extras_check_model = keep_going
+
+			 ierr = 0
+			 
+	         call star_ptr(id, s, ierr)
+	         if (ierr /= 0) return
+	         extras_check_model = keep_going         
 			 
 			 !increase VARCONTROL: increase varcontrol when the model hits the AGB phase
 			 if ((s% initial_mass < 10) .and. (s% center_h1 < 1d-4) .and. (s% center_he4 < 1d-4)) then
@@ -207,50 +196,72 @@
      		 if (s% center_h1 < min_center_h1_for_diff) then
 				s% do_element_diffusion = .false.
 			 end if
-				
+			
 	      end function extras_check_model
-		                                                                                                                                                                      
-	      integer function how_many_extra_history_columns(s, id, id_extra)
-	         type (star_info), pointer :: s
+		     
+			                                                                                                                                                                  
+	      integer function how_many_extra_history_columns(id, id_extra)
 	         integer, intent(in) :: id, id_extra
+	         integer :: ierr
+	         type (star_info), pointer :: s
+	         ierr = 0
+	         call star_ptr(id, s, ierr)
+	         if (ierr /= 0) return
 	         how_many_extra_history_columns = 0
 	      end function how_many_extra_history_columns
       
-	      subroutine data_for_extra_history_columns(s, id, id_extra, n, names, vals, ierr)
-	         type (star_info), pointer :: s
+      
+	      subroutine data_for_extra_history_columns(id, id_extra, n, names, vals, ierr)
 	         integer, intent(in) :: id, id_extra, n
 	         character (len=maxlen_history_column_name) :: names(n)
 	         real(dp) :: vals(n)
 	         integer, intent(out) :: ierr
-
-	         ierr = 0
-	      end subroutine data_for_extra_history_columns
-      
-	      integer function how_many_extra_profile_columns(s, id, id_extra)
 	         type (star_info), pointer :: s
+	         ierr = 0
+	         call star_ptr(id, s, ierr)
+	         if (ierr /= 0) return
+	      end subroutine data_for_extra_history_columns
+
+      
+	      integer function how_many_extra_profile_columns(id, id_extra)
+	         use star_def, only: star_info
 	         integer, intent(in) :: id, id_extra
+	         integer :: ierr
+	         type (star_info), pointer :: s
+	         ierr = 0
+	         call star_ptr(id, s, ierr)
+	         if (ierr /= 0) return
 	         how_many_extra_profile_columns = 0
 	      end function how_many_extra_profile_columns
       
-	      subroutine data_for_extra_profile_columns(s, id, id_extra, n, nz, names, vals, ierr)
-	         type (star_info), pointer :: s
+      
+	      subroutine data_for_extra_profile_columns(id, id_extra, n, nz, names, vals, ierr)
+	         use star_def, only: star_info, maxlen_profile_column_name
+	         use const_def, only: dp
 	         integer, intent(in) :: id, id_extra, n, nz
 	         character (len=maxlen_profile_column_name) :: names(n)
 	         real(dp) :: vals(nz,n)
 	         integer, intent(out) :: ierr
+	         type (star_info), pointer :: s
 	         integer :: k
 	         ierr = 0
-          end subroutine data_for_extra_profile_columns
+	         call star_ptr(id, s, ierr)
+	         if (ierr /= 0) return
+	      end subroutine data_for_extra_profile_columns
+
       
 	      ! returns either keep_going or terminate.
 	      ! note: cannot request retry or backup; extras_check_model can do that.
-	      integer function extras_finish_step(s, id, id_extra)
-	         type (star_info), pointer :: s
+	      integer function extras_finish_step(id, id_extra)
 	         integer, intent(in) :: id, id_extra
 	         integer :: ierr
+	         type (star_info), pointer :: s
+	         ierr = 0
+	         call star_ptr(id, s, ierr)
+	         if (ierr /= 0) return
 	         extras_finish_step = keep_going
 	         call store_extra_info(s)
-
+			 
 			 !set NET: evolve 100 steps then change to approx21_extras net
              if (s% model_number == 100) then
 				
@@ -287,30 +298,36 @@
 	         ierr = 0
 	      end subroutine VW_superwind
 		  
-	      subroutine extras_after_evolve(s, id, id_extra, ierr)
-	         type (star_info), pointer :: s
+	      subroutine extras_after_evolve(id, id_extra, ierr)
 	         integer, intent(in) :: id, id_extra
 	         integer, intent(out) :: ierr
+	         type (star_info), pointer :: s
 	         ierr = 0
+	         call star_ptr(id, s, ierr)
+	         if (ierr /= 0) return
 	      end subroutine extras_after_evolve
-            
+      
+      
 	      subroutine alloc_extra_info(s)
 	         integer, parameter :: extra_info_alloc = 1
 	         type (star_info), pointer :: s
 	         call move_extra_info(s,extra_info_alloc)
 	      end subroutine alloc_extra_info
       
+      
 	      subroutine unpack_extra_info(s)
 	         integer, parameter :: extra_info_get = 2
 	         type (star_info), pointer :: s
 	         call move_extra_info(s,extra_info_get)
 	      end subroutine unpack_extra_info
-            
+      
+      
 	      subroutine store_extra_info(s)
 	         integer, parameter :: extra_info_put = 3
 	         type (star_info), pointer :: s
 	         call move_extra_info(s,extra_info_put)
 	      end subroutine store_extra_info
+      
       
 	      subroutine move_extra_info(s,op)
 	         integer, parameter :: extra_info_alloc = 1
@@ -382,5 +399,6 @@
 	         end subroutine move_flg
       
 	      end subroutine move_extra_info
+
    	   
       end module run_star_extras

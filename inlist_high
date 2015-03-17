@@ -1,4 +1,4 @@
-!highmass
+!high mass
 
 &star_job
 
@@ -11,13 +11,11 @@
 	  
       history_columns_file = 'my_history_columns.list'
 	  
-      !parameters to be used for mass on/off for overshoot & rotation
-      extras_lrpar = 5
-      extras_rpar(1) = 1.1 !full off
-      extras_rpar(2) = 1.7 !full on
-      extras_rpar(3) = 1.2 !full off
-      extras_rpar(4) = 1.8 !full on
-	  extras_rpar(5) = 0.4 !omega_div_omega_crit
+      !parameters to be used for mass on/off for rotation
+      extras_lrpar = 3
+      extras_rpar(1) = 1.2 !full off
+      extras_rpar(2) = 1.8 !full on
+      extras_rpar(3) = 0.4 !omega_div_omega_crit
 
 !OPACITY, NETWORK, RATE, etc.
 
@@ -25,7 +23,7 @@
       change_net = .true.
       new_net_name = 'basic.net'
 	  extras_lcpar = 2
-	  extras_cpar(1) = 'approx21_extras.net'
+	  extras_cpar(1) = 'mesa_45.net'
 	  
 	  !first 100 models are run with simple_photosphere then switched to the following
 	  extras_cpar(2) = '<<BC_TABLE>>'
@@ -78,22 +76,31 @@
       which_atm_option = 'simple_photosphere'
 	  	 
       use_Ledoux_criterion = .true.
-      alpha_semiconvection = 0.01
-      thermo_haline_coeff = 666.66 !(2/3 of 1000 as found by Charbonnel 2007)
+      alpha_semiconvection = 0.1
+      thermohaline_coeff = 666.66
 		 
       mixing_length_alpha = 1.84
       mlt_option = 'Henyey'
 	  
       okay_to_reduce_gradT_excess = .true.
+
+      overshoot_f0_above_nonburn = 0.01
+      overshoot_f0_below_nonburn = 0.01
+      overshoot_f0_above_burn_h  = 0.01
+      overshoot_f0_below_burn_h  = 0.01
+      overshoot_f0_above_burn_he = 0.01
+      overshoot_f0_below_burn_he = 0.01
+      overshoot_f0_above_burn_z  = 0.01
+      overshoot_f0_below_burn_z  = 0.01
        
       overshoot_f_above_nonburn = 0.01831
       overshoot_f_below_nonburn = 0.01831
-      overshoot_f_above_burn_h  = 0.02000
-      overshoot_f_below_burn_h  = 0.01831
-      overshoot_f_above_burn_he = 0.01831
-      overshoot_f_below_burn_he = 0.01831
-      overshoot_f_above_burn_z  = 0.01831
-      overshoot_f_below_burn_z  = 0.01831
+      overshoot_f_above_burn_h  = 0.016	
+      overshoot_f_below_burn_h  = 0.016
+      overshoot_f_above_burn_he = 0.016
+      overshoot_f_below_burn_he = 0.016
+      overshoot_f_above_burn_z  = 0.016
+      overshoot_f_below_burn_z  = 0.016
       overshoot_below_noburn_factor = 10
 		 
       !always have overshooting on in the inlist, core overshooting
@@ -105,7 +112,7 @@
       use_Type2_opacities = .true.
       kap_Type2_full_off_X = 1d-3
       kap_Type2_full_on_X = 1d-6
-	  Zbase = 0.00 ! this is set to Z of the star in run_star_extras.fs
+	  Zbase = 0.00 ! this is set to Z of the star in run_star_extras.f
 	     
       !rotational mixing if applicable	 
       D_SH_factor =  1.0
@@ -114,13 +121,13 @@
       D_GSF_factor = 1.0
       D_DSI_factor = 1.0
       D_ST_factor = 0.0
-      am_D_mix_factor = 0.0228
-      am_gradmu_factor = 0.1
+      am_D_mix_factor = 0.033
+      am_gradmu_factor = 0.05
 		 
       RGB_wind_scheme = 'Dutch'
       AGB_wind_scheme = 'Dutch'
       RGB_to_AGB_wind_switch = 1d-4
-      Dutch_wind_eta = 0.6
+      Dutch_wind_eta = 1.0
       max_rotational_mdot_boost = 10
       max_wind = 1d-3
 
@@ -150,6 +157,9 @@
 
       !limits on max drop in abundance mass fraction, this considers both nuclear rate and offsetting effect of mixing flow
       dX_nuc_drop_limit = 5d-3
+
+      !better resolution of the Henyey hook
+      delta_lg_XH_cntr_max = -1
 		 
 	  !limit on magnitude of relative change at any grid point
 	  delta_lgP_limit = -1
