@@ -84,8 +84,8 @@
 	  
       okay_to_reduce_gradT_excess = .true.
 
-      overshoot_f0_above_nonburn = 0.01
-      overshoot_f0_below_nonburn = 0.01
+      overshoot_f0_above_nonburn = 0.01831
+      overshoot_f0_below_nonburn = 0.01831
       overshoot_f0_above_burn_h  = 0.01
       overshoot_f0_below_burn_h  = 0.01
       overshoot_f0_above_burn_he = 0.01
@@ -150,8 +150,8 @@
 	  
       max_allowed_nz = 20000 ! maximum number of grid points allowed
 
-      max_iter_for_resid_tol1 = 3
-      tol_residual_norm1 = 1d-5
+!      iter_for_resid_tol2 = 3
+!      tol_residual_norm1 = 1d-5
       
       min_timestep_limit = 1d-12 ! (seconds)
 

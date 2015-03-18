@@ -84,8 +84,8 @@
 
       okay_to_reduce_gradT_excess = .true.
       
-      overshoot_f0_above_nonburn = 0.01
-      overshoot_f0_below_nonburn = 0.01
+      overshoot_f0_above_nonburn = 0.01831
+      overshoot_f0_below_nonburn = 0.01831
       overshoot_f0_above_burn_h  = 0.01
       overshoot_f0_below_burn_h  = 0.01
       overshoot_f0_above_burn_he = 0.01
