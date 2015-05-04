@@ -25,7 +25,7 @@ mistgrid_dir = os.environ['MIST_GRID_DIR']
 
 def mesa2fsps(runname):
     
-    #Path to the new organzed directory
+    #Path to the new organized directory
     newdirname = os.path.join(mistgrid_dir,runname)
     
     runname_format = '_'.join(runname.split('/'))
@@ -60,7 +60,7 @@ def mesa2fsps(runname):
     #Run the isochrone code
     os.chdir(make_isoch_dir)
     os.system("./make_iso " + inputfile)
-    
+
     #Get the path to the home directory for the run (runname)
     with open(inputfile) as f:
         lines=f.readlines()
