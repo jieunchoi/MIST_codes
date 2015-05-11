@@ -32,7 +32,7 @@
       log_LHe ! log10 power_he_burn
       log_LZ  !log10 total burning power excluding LH and LHe and photodisintegrations
       log_Teff ! log10 effective temperature
-	  log_abs_Lgrav !log10 abs(eps_grav_integral) (in Lsun units)
+      log_abs_Lgrav !log10 abs(eps_grav_integral) (in Lsun units)
       log_R ! log10 radius in Rsun units
       log_g ! log10 gravity
       log_surf_z
