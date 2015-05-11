@@ -111,14 +111,24 @@ def gen_summary(rawdirname):
             if '' in enddatelist:
                 enddatelist.remove('')
             
-            #If not start and finish in the same month:
+            #If not start and finish in the same month, make them the same month and just shift the dates:
             if startdatelist[1] != enddatelist[1]:
                 if startdatelist[2] == '31':
-                    startdatelist[2] = '0'
+                    startdatelist[2] = '1'
+                    enddatelist[2] = str(int(enddatelist[2])+1)
                 elif startdatelist[2] == '30':
+                    startdatelist[2] = '1'
                     if startdatelist[1] in ['Jan', 'Mar', 'May', 'Jul', 'Aug', 'Oct', 'Dec']:
-                        startdatelist[2] = '0'
-                        enddatelist[2] = '2'
+                        enddatelist[2] = str(int(enddatelist[2])+2)
+                    else:
+                        enddatelist[2] = str(int(enddatelist[2])+1)
+                elif startdatelist[2] == '29':
+                    startdatelist[2] = '1'
+                    if startdatelist[1] in ['Jan', 'Mar', 'May', 'Jul', 'Aug', 'Oct', 'Dec']:
+                        enddatelist[2] = str(int(enddatelist[2])+3)
+                    else:
+                        enddatelist[2] = str(int(enddatelist[2])+1)
+                startdatelist[1] = enddatelist[1]
             start = datetime.timedelta(int(startdatelist[2]), int(startdatelist[3].split(':')[-1]), 0,0,int(startdatelist[3].split(':')[-2]), int(startdatelist[3].split(':')[-3]))
             end = datetime.timedelta(int(enddatelist[2]), int(enddatelist[3].split(':')[-1]), 0,0,int(enddatelist[3].split(':')[-2]), int(enddatelist[3].split(':')[-3]))
             runtime = str(datetime.timedelta(seconds=datetime.timedelta.total_seconds(end-start)))

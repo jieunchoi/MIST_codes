@@ -46,7 +46,7 @@
       surf_avg_omega_div_omega_crit
       surf_avg_v_crit ! critical rotational velocity at equator
       surf_avg_v_div_v_crit
-      surf_avg_L_div_Ledd
+      surf_avg_Lrad_div_Ledd
       v_div_csound_surf
 
    ! mass fractions near surface
