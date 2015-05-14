@@ -105,7 +105,7 @@
 				
 
 			 !set VARCONTROL: for massive stars, turn up varcontrol gradually to help them evolve
-			 vct30 = 2e-4
+			 vct30 = 1e-4
 			 vct100 = 3e-3
 			 
 			 if (s% initial_mass > 30.0) then
@@ -142,28 +142,29 @@
 			 !increase VARCONTROL: increase varcontrol when the model hits the AGB phase
 			 if ((s% initial_mass < 10) .and. (s% center_h1 < 1d-4) .and. (s% center_he4 < 1d-4)) then
 				 if (s% varcontrol_target < new_varcontrol_target) then !only print the first time
+                                         s% varcontrol_target = new_varcontrol_target
 					 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
-					 write(*,*) 'increasing varcontrol to', new_varcontrol_target
+					 write(*,*) 'increasing varcontrol to ', new_varcontrol_target
 					 write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
-				 s% varcontrol_target = new_varcontrol_target
 				 end if
+
 			 end if
 			 
 			 !suppress LATE BURNING: turn off burning post-AGB			 
-			 envelope_mass_fraction = 1d0 - max(s% he_core_mass, s% c_core_mass, s% o_core_mass)/s% star_mass
+!			 envelope_mass_fraction = 1d0 - max(s% he_core_mass, s% c_core_mass, s% o_core_mass)/s% star_mass
 			 
-			 L_He = s% power_he_burn*Lsun
-			 L_tot = s% photosphere_L*Lsun
-			 if (s% initial_mass < 10) then
-				 if ((envelope_mass_fraction < 0.1) .and. (s% center_h1 < 1d-4) .and. (s% center_he4 < 1d-4) .and. (s% L_phot > 3.0)) then
-					 if (s% category_factors(3) > 0) then !only print the first time
-						 write(*,*) '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
-						 write(*,*) 'now at post AGB phase, turning off all burning except for H'
-						 write(*,*) '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
-					 end if
-					 s% category_factors(3:) = 0.0
-				 end if
-			 end if
+!			 L_He = s% power_he_burn*Lsun
+!			 L_tot = s% photosphere_L*Lsun
+!			 if (s% initial_mass < 10) then
+!				 if ((envelope_mass_fraction < 0.1) .and. (s% center_h1 < 1d-4) .and. (s% center_he4 < 1d-4) .and. (s% L_phot > 3.0)) then
+!					 if (s% category_factors(3) > 0) then !only print the first time
+!						 write(*,*) '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
+!						 write(*,*) 'now at post AGB phase, turning off all burning except for H'
+!						 write(*,*) '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
+!					 end if
+!					 s% category_factors(3:) = 0.0
+!				 end if
+!			 end if
 			 
 			 !define STOPPING CRITERION: stopping criterion for C burning, massive stars.
 			 if ((s% center_h1 < 1d-4) .and. (s% center_he4 < 1d-4) .and. (s% center_c12 < 1d-4)) then
@@ -262,15 +263,13 @@
 	         extras_finish_step = keep_going
 	         call store_extra_info(s)
 			 
-			 !set NET: evolve 100 steps then change to approx21_extras net
+			 !set BC: change to tables after running on simple photosphere
              if (s% model_number == 100) then
 				
 				write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
-				write(*,*) 'changing net to ', s% job% extras_cpar(1)
-                write(*,*) 'switching from simple photosphere to ', s% job% extras_cpar(2)
+                write(*,*) 'switching from simple photosphere to ', s% job% extras_cpar(1)
 				write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
 
-                call star_change_to_new_net(id, .true., s% job% extras_cpar(1), ierr)
                 s% which_atm_option = s% job% extras_cpar(2)
 				
 			 endif

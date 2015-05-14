@@ -28,12 +28,23 @@ def make_inlist_inputs(runname, Z, startype):
     
     #Array of all masses
     massgrid = lambda i,f,step: np.linspace(i,f,round(((f-i)/step))+1.0)
-    bigmassgrid = np.unique(np.hstack((np.array([0.08]), massgrid(0.1,0.3,0.05),\
-                                           massgrid(0.3,0.4,0.01), massgrid(0.4,2.0,0.05),\
-                                           massgrid(2.0,5.0,0.2), massgrid(5,12,0.5),\
-                                           massgrid(12,20,1.0), massgrid(20,40,2), massgrid(40,150,5))
+
+    bigmassgrid = np.unique(np.hstack((np.array([0.05]), massgrid(0.1,0.4,0.05), massgrid(0.4,2.0,0.1),\
+                                           massgrid(2.0,12.0,0.5),\
+                                           massgrid(12,20,2.0), massgrid(20,40,4), massgrid(40,150,5))
                                         ))
-    
+
+#    bigmassgrid = np.unique(np.hstack((np.array([0.08]), massgrid(0.1,0.3,0.05),\
+#                                           massgrid(0.3,0.4,0.01), massgrid(0.4,2.0,0.05),\
+#                                           massgrid(2.0,5.0,0.2), massgrid(5,12,0.5),\
+#                                           massgrid(12,20,1.0), massgrid(20,40,2), massgrid(40,150,5))
+#                                        ))
+
+#    bigmassgrid = np.unique(np.hstack((massgrid(1.0,7.0,1.0), massgrid(8.0,20,2.0), massgrid(20,150,10.0))))
+#    bigmassgrid = np.unique(np.hstack((massgrid(0.1,1.5,0.1), massgrid(1.6,3.2,0.4))))
+#    bigmassgrid = np.array([0.5, 1.0, 2.0, 5.0, 10.0, 15.0, 30.0, 40.0, 50.0, 70.0, 90.0, 120.0, 150.0])
+#    bigmassgrid = np.array([0.1, 0.6, 0.7, 1.0, 1.3, 1.6, 2.0, 3.0, 4.0, 5.0])
+
     #Choose the correct mass range and boundary conditions                                   
     if (startype == 'VeryLow'):
         massindex = np.where(bigmassgrid <= 0.25)

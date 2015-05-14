@@ -8,7 +8,6 @@
 #SBATCH -o <<RUNNAME>>.o
 #SBATCH -e <<RUNNAME>>.e
 
-
 export OMP_NUM_THREADS=4
 cd <<DIRNAME>>
 ./clean
