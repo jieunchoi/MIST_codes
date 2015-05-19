@@ -22,26 +22,26 @@ import numpy as np
 
 def calc_xyz(znew, feh=False):
     
-    #Specify solar abundaces, present-day photosphere from Asplund+2009
-    solar_h1 = 0.7381
-    solar_h2 = 0.0
-    solar_he3 = 2.484751525e-5
-    solar_he4 = 0.2484751525
+    #Specify solar abundaces, protosolar from Asplund+2009
+    solar_h1 = 0.7154
+    solar_h2 = 1.43e-5
+    solar_he3 = 4.49e-5
+    solar_he4 = 0.2702551
     
     solar_x = solar_h1 + solar_h2
     solar_y = solar_he3 + solar_he4
-    solar_z = 0.0134
+    solar_z = 1.0-solar_x-solar_y
     
     #Input is either Z or [Fe/H]
     if feh == True:
         znew = 10**(znew)*solar_z
     
     #Primordial He abundance and assume linear enrichment to today's solar Y
-    yp = 0.2534 #adopted by Planck, from Aver+2012
+    yp = 0.24725 #from Planck 2013 + WMAP polarization + high resolution CMB
     
     slope = (solar_y - yp)/solar_z
     ynew = yp + slope*znew
-    he3he4_rat = 1e-4
+    he3he4_rat = 1.66e-4 #from Jupiter, Mahaffy+1998
     
     #Compute X based on user-provided Z and extrapolated Y
     xnew = 1.0-ynew-znew
