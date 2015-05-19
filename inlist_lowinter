@@ -89,6 +89,7 @@
 	  
       !to help with convergence
       okay_to_reduce_gradT_excess = .true.
+      Pextra_factor = 2.0
 	  
 	  !H core overshoot calibrated to M67
 	  overshoot_f_above_nonburn_core = 0.016

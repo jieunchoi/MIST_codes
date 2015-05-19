@@ -270,7 +270,7 @@
                 write(*,*) 'switching from simple photosphere to ', s% job% extras_cpar(1)
 				write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
 
-                s% which_atm_option = s% job% extras_cpar(2)
+                s% which_atm_option = s% job% extras_cpar(1)
 				
 			 endif
 	      end function extras_finish_step
