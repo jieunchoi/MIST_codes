@@ -37,7 +37,7 @@ def calc_xyz(znew, feh=False):
         znew = 10**(znew)*solar_z
     
     #Primordial He abundance and assume linear enrichment to today's solar Y
-    yp = 0.2534 #adopted by Planck, from Aver+2012
+    yp = 0.24725 #from Planck 2013 + WMAP polarization + high resolution CMB
     
     slope = (solar_y - yp)/solar_z
     ynew = yp + slope*znew
