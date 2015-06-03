@@ -84,7 +84,6 @@ def gen_summary(rawdirname):
                 status = 'FAILED'
         
         if status != 'OK':
-            reason = 'unknown'
             if (len(errcontent) > 0):
                 status = 'FAILED'
                 reason = 'unknown_error'

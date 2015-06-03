@@ -39,6 +39,7 @@
       surf_avg_omega !surf_v_rot/R
       surf_avg_v_rot !km/sec rotational velocity at equator
       surf_num_c12_div_num_o16 !ratio of number fractions, >1 for C star
+      v_wind_Km_per_s
 
    ! just for massive rotating stars
 
@@ -100,7 +101,6 @@
       burn_n
       burn_o
       c12_c12
-      c12_o16
  
    !asteroseismic properties
       
