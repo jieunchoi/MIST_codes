@@ -46,7 +46,8 @@
       if (ierr /= 0) return
       
       original_diffusion_dt_limit = s% diffusion_dt_limit
-      s% other_wind => Reimers_then_VW
+      !s% other_wind => Reimers_then_VW
+	  s% other_wind => Reimers_then_Blocker
       
       end subroutine extras_controls
       
@@ -332,6 +333,33 @@
          w = reimers_w
       end if
       end subroutine Reimers_then_VW
+	  
+	  subroutine Reimers_then_Blocker(id, Lsurf, Msurf, Rsurf, Tsurf, w, ierr)
+      use star_def
+      integer, intent(in) :: id
+      real(dp), intent(in) :: Lsurf, Msurf, Rsurf, Tsurf ! surface values (cgs)
+!     NOTE: surface is outermost cell. not necessarily at photosphere.
+!     NOTE: don't assume that vars are set at this point.
+!     so if you want values other than those given as args,
+!     you should use values from s% xh(:,:) and s% xa(:,:) only.
+!     rather than things like s% Teff or s% lnT(:) which have not been set yet.
+      real(dp), intent(out) :: w ! wind in units of Msun/year (value is >= 0)
+      integer, intent(out) :: ierr
+      real(dp) :: plain_reimers, reimers_w, blocker_w
+	  type (star_info), pointer :: s
+	  ierr = 0
+      call star_ptr(id, s, ierr)
+      if (ierr /= 0) return
+	  
+	  plain_reimers = 4d-13*(Lsurf*Rsurf/Msurf)/(Lsun*Rsun/Msun)
+	  
+	  reimers_w = plain_reimers * s% Reimers_wind_eta
+	  blocker_w = plain_reimers * s% Blocker_wind_eta * &
+               4.83d-9 * pow_cr(Msurf/Msun,-2.1d0) * pow_cr(Lsurf/Lsun,2.7d0)
+	  
+	  w = max(reimers_w, blocker_w)
+	  
+	  end subroutine Reimers_then_Blocker
       
       subroutine extras_after_evolve(id, id_extra, ierr)
       integer, intent(in) :: id, id_extra
