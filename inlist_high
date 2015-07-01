@@ -15,7 +15,7 @@
       extras_lrpar = 3
       extras_rpar(1) = 1.2 !full off
       extras_rpar(2) = 1.8 !full on
-      extras_rpar(3) = 0.4 !omega_div_omega_crit
+      extras_rpar(3) = 0.0 !omega_div_omega_crit
 
 !OPACITY, NETWORK, RATE, etc.
 
@@ -81,49 +81,48 @@
 	  	 
       use_Ledoux_criterion = .true.
       alpha_semiconvection = 0.1
-      thermohaline_option = 'Brown_Garaud_Stellmach_13'
-      thermohaline_coeff = 1.0
+      thermohaline_coeff = 666.0
 		 
-      mixing_length_alpha = 1.83
+      mixing_length_alpha = 1.82
       mlt_option = 'Henyey'
       
       !to help with convergence
       okay_to_reduce_gradT_excess = .true.
       Pextra_factor = 2.0
 	  
-	  !H core overshoot calibrated to M67
-	  overshoot_f_above_nonburn_core = 0.016
-      overshoot_f_above_burn_h_core  = 0.016	
+      !H core overshoot calibrated to M67
+      overshoot_f_above_nonburn_core = 0.016
+      overshoot_f_above_burn_h_core  = 0.016
       overshoot_f_above_burn_he_core = 0.016
       overshoot_f_above_burn_z_core  = 0.016
-	  overshoot_f0_above_nonburn_core = 0.01
-      overshoot_f0_above_burn_h_core  = 0.01
-      overshoot_f0_above_burn_he_core = 0.01
-      overshoot_f0_above_burn_z_core  = 0.01
+      overshoot_f0_above_nonburn_core = 0.008
+      overshoot_f0_above_burn_h_core  = 0.008
+      overshoot_f0_above_burn_he_core = 0.008
+      overshoot_f0_above_burn_z_core  = 0.008
 
-	  !envelope overshoot calibrated to the sun	  
-      overshoot_f_above_nonburn_shell = 0.01831
-      overshoot_f_below_nonburn_shell = 0.01831	  
-      overshoot_f_above_burn_h_shell  = 0.01831
-      overshoot_f_below_burn_h_shell  = 0.01831
-      overshoot_f_above_burn_he_shell = 0.01831
-      overshoot_f_below_burn_he_shell = 0.01831
-      overshoot_f_above_burn_z_shell  = 0.01831
-      overshoot_f_below_burn_z_shell  = 0.01831
-      overshoot_f0_above_nonburn_shell = 0.009
-      overshoot_f0_below_nonburn_shell = 0.009
-      overshoot_f0_above_burn_h_shell  = 0.009
-      overshoot_f0_below_burn_h_shell  = 0.009
-      overshoot_f0_above_burn_he_shell = 0.009
-      overshoot_f0_below_burn_he_shell = 0.009
-      overshoot_f0_below_burn_z_shell  = 0.009      
-      overshoot_f0_above_burn_z_shell  = 0.009
+      !envelope overshoot calibrated to the sun
+      overshoot_f_above_nonburn_shell = 0.0174
+      overshoot_f_below_nonburn_shell = 0.0174
+      overshoot_f_above_burn_h_shell  = 0.0174
+      overshoot_f_below_burn_h_shell  = 0.0174
+      overshoot_f_above_burn_he_shell = 0.0174
+      overshoot_f_below_burn_he_shell = 0.0174
+      overshoot_f_above_burn_z_shell  = 0.0174
+      overshoot_f_below_burn_z_shell  = 0.0174
+      overshoot_f0_above_nonburn_shell = 0.0087
+      overshoot_f0_below_nonburn_shell = 0.0087
+      overshoot_f0_above_burn_h_shell  = 0.0087
+      overshoot_f0_below_burn_h_shell  = 0.0087
+      overshoot_f0_above_burn_he_shell = 0.0087
+      overshoot_f0_below_burn_he_shell = 0.0087
+      overshoot_f0_below_burn_z_shell  = 0.0087
+      overshoot_f0_above_burn_z_shell  = 0.0087
 		 
       !CO enhanced opacities
       use_Type2_opacities = .true.
       kap_Type2_full_off_X = 1d-3
       kap_Type2_full_on_X = 1d-6
-	  Zbase = 0.00 ! this is set to Z of the star in run_star_extras.f
+      Zbase = 0.00 ! this is set to Z of the star in run_star_extras.f
 	     
       !rotational mixing if applicable	 
       D_SH_factor =  1.0
