@@ -175,7 +175,7 @@
       end if
       end if
       
-      define STOPPING CRITERION: stopping criterion for C burning, massive stars.
+!      define STOPPING CRITERION: stopping criterion for C burning, massive stars.
       if ((s% center_h1 < 1d-4) .and. (s% center_he4 < 1d-4) .and. (s% center_c12 < 1d-4)) then
          termination_code_str(t_xtra1) = 'central C12 mass fraction below 1e-4'
          s% termination_code = t_xtra1
@@ -280,6 +280,7 @@
       
       subroutine Reimers_then_VW(id, Lsurf, Msurf, Rsurf, Tsurf, w, ierr)
       use star_def
+	  use chem_def, only: ih1, ihe4
       integer, intent(in) :: id
       real(dp), intent(in) :: Lsurf, Msurf, Rsurf, Tsurf ! surface values (cgs)
 !     NOTE: surface is outermost cell. not necessarily at photosphere.
@@ -290,8 +291,12 @@
       real(dp), intent(out) :: w ! wind in units of Msun/year (value is >= 0)
       integer, intent(out) :: ierr
       real(dp) :: logP, P, reimers_w, pre_superwind_w, superwind_w, vexp, agb_w, center_h1, center_he4
+	  integer :: h1, he4
+	  type (star_info), pointer :: s
       ierr = 0
-
+      call star_ptr(id, s, ierr)
+      if (ierr /= 0) return
+	  
 !     first Reimers for the MS+RGB
       reimers_w = 4d-13*(Lsurf*Rsurf/Msurf)/(Lsun*Rsun/Msun)
       reimers_w = reimers_w * s% Reimers_wind_eta
@@ -317,12 +322,15 @@
       agb_w = min(pre_superwind_w, superwind_w)
       
 !     use Reimers for RGB then switch to VW during AGB
-      center_h1 = s% xa(h1,nz)
-      center_he4 = s% xa(he4,nz)
+      h1 = s% net_iso(ih1)
+      he4 = s% net_iso(ihe4)
+      center_h1 = s% xa(h1,s% nz)
+      center_he4 = s% xa(he4,s% nz)
       if (center_h1 < 0.01d0 .and. center_he4 < s% RGB_to_AGB_wind_switch) then
          w = agb_w
       else
          w = reimers_w
+      end if
       end subroutine Reimers_then_VW
       
       subroutine extras_after_evolve(id, id_extra, ierr)
