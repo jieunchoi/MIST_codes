@@ -51,7 +51,7 @@ def write_fsps_iso(file):
     """    
     
     #Specify the column names for FSPS isochrones
-    fsps_col_names = '# log(age)     Mini          Mact          logl          logt          logg      Composition      Phase         Mdot'
+    fsps_col_names = '# log(age)     Mini          Mact          logl          logt          logg      Composition      Phase         logMdot'
 
     data, mist_col_names = read_mist(file)
     numcol = np.shape(data)[1]
@@ -77,7 +77,7 @@ def write_fsps_iso(file):
     
     with open(fsps_iso_filename, 'w') as f: 
         for i in range(numrow):
-            row = [log_age[i], mini[i], mact[i], log_L[i], log_t[i], log_g[i], co_rat[i], phase[i], mdot[i]]
+            row = [log_age[i], mini[i], mact[i], log_L[i], log_t[i], log_g[i], co_rat[i], phase[i], np.log10(abs(mdot[i]))]
             fmt_row = fmt.format(*row)
             
             #Print column names every time the age changes
