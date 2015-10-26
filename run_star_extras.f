@@ -47,7 +47,7 @@
       
       original_diffusion_dt_limit = s% diffusion_dt_limit
       !s% other_wind => Reimers_then_VW
-	  s% other_wind => Reimers_then_Blocker
+      s% other_wind => Reimers_then_Blocker
       
       end subroutine extras_controls
       
@@ -121,6 +121,9 @@
             s% varcontrol_target = vct100
          end if
          
+         !CONVERGENCE TEST CHANGING C
+         s% varcontrol_target = s% varcontrol_target * 1.0 
+
          write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
          write(*,*) 'varcontrol_target is set to ', s% varcontrol_target
          write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
@@ -132,10 +135,11 @@
       integer function extras_check_model(id, id_extra)
       integer, intent(in) :: id, id_extra
       integer :: ierr, r, burn_category
-      real(dp) :: envelope_mass_fraction, L_He, L_tot, orig_eta, target_eta, min_center_h1_for_diff
+      real(dp) :: envelope_mass_fraction, L_He, L_tot, orig_eta, target_eta, min_center_h1_for_diff, critmass, feh
       real(dp) :: category_factors(num_categories)
       real(dp), parameter :: huge_dt_limit = 3.15d16 ! ~1 Gyr
       real(dp), parameter :: new_varcontrol_target = 1d-3
+      real(dp), parameter :: Zsol = 0.0142
       type (star_info), pointer :: s
       type (Net_General_Info), pointer :: g
       
@@ -148,12 +152,37 @@
       call get_net_ptr(s% net_handle, g, ierr)
       if (ierr /= 0) stop 'bad handle'
       
-!     increase VARCONTROL: increase varcontrol when the model hits the AGB phase
+!     increase VARCONTROL and MDOT: increase varcontrol and Mdot when the model hits the TPAGB phase
       if ((s% initial_mass < 10) .and. (s% center_h1 < 1d-4) .and. (s% center_he4 < 1d-4)) then
-         if (s% varcontrol_target < new_varcontrol_target) then !only print the first time
+         !try turning up Mdot
+         feh = log10_cr((1.0 - (s% job% initial_h1 + s% job% initial_h2 + s% job% initial_he3 + s% job% initial_he4))/Zsol)
+         if (feh < -0.3) then
+            critmass = pow_cr(feh,2d0)*0.3618377 + feh*1.47045658 + 5.69083898
+            if (feh < -2.15) then
+               critmass = pow_cr(-2.15d0,2d0)*0.3618377 -2.15*1.47045658 + 5.69083898
+            end if
+         else if ((feh >= -0.3) .and. (feh <= -0.22)) then
+            critmass = feh*18.75 + 10.925
+         else
+            critmass = feh*1.09595794 + 7.0660861
+         end if 
+         if ((s% initial_mass > critmass) .and. (s% have_done_TP)) then
+            if (s% Blocker_wind_eta < 1.0) then
+               write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
+               write(*,*) 'turning up Blocker'
+               write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
+            end if
+            s% Blocker_wind_eta = 3.0
+         end if
+
+         if ((s% have_done_TP) .and. (s% varcontrol_target < new_varcontrol_target)) then !only print the first time
             s% varcontrol_target = new_varcontrol_target
+            
+!     CONVERGENCE TEST CHANGING C
+     s% varcontrol_target = s% varcontrol_target * 1.0
+            
             write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
-            write(*,*) 'increasing varcontrol to ', new_varcontrol_target
+            write(*,*) 'increasing varcontrol to ', s% varcontrol_target
             write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
          end if
       end if
@@ -176,11 +205,17 @@
       end if
       end if
       
-!      define STOPPING CRITERION: stopping criterion for C burning, massive stars.
-      if ((s% center_h1 < 1d-4) .and. (s% center_he4 < 1d-4) .and. (s% center_c12 < 1d-4)) then
-         termination_code_str(t_xtra1) = 'central C12 mass fraction below 1e-4'
-         s% termination_code = t_xtra1
-         extras_check_model = terminate
+!     define STOPPING CRITERION: stopping criterion for C burning, massive stars.
+      if ((s% center_h1 < 1d-4) .and. (s% center_he4 < 1d-4)) then
+         if ((s% center_c12 < 1d-4) .and. (s% initial_mass >= 10.0)) then
+            termination_code_str(t_xtra1) = 'central C12 mass fraction below 1e-4'
+            s% termination_code = t_xtra1
+            extras_check_model = terminate
+         else if ((s% center_c12 < 1d-2) .and. (s% initial_mass < 10.0)) then
+            termination_code_str(t_xtra2) = 'central C12 mass fraction below 1e-2'
+            s% termination_code = t_xtra2
+            extras_check_model = terminate
+         end if
       end if
       
 !     define STOPPING CRITERION: stopping criterion for TAMS, low mass stars.
@@ -306,7 +341,7 @@
 !     compute pulsation period assuming the fundamental mode
       logP = -2.07 + 1.94*log10_cr(Rsurf/Rsun)-0.9*log10_cr(Msurf/Msun) !in days
       P = pow_cr(10d0, logP)    !in days
-      
+
 !     for periods below ~500-800 days, exponentially increasing mdot
       if (Msurf/Msun < 2.5) then
          pre_superwind_w = pow_cr(10d0, -11.4+0.0123*P)
@@ -336,6 +371,7 @@
 	  
 	  subroutine Reimers_then_Blocker(id, Lsurf, Msurf, Rsurf, Tsurf, w, ierr)
       use star_def
+      use chem_def, only: ih1, ihe4
       integer, intent(in) :: id
       real(dp), intent(in) :: Lsurf, Msurf, Rsurf, Tsurf ! surface values (cgs)
 !     NOTE: surface is outermost cell. not necessarily at photosphere.
@@ -345,7 +381,8 @@
 !     rather than things like s% Teff or s% lnT(:) which have not been set yet.
       real(dp), intent(out) :: w ! wind in units of Msun/year (value is >= 0)
       integer, intent(out) :: ierr
-      real(dp) :: plain_reimers, reimers_w, blocker_w
+      integer :: h1, he4
+      real(dp) :: plain_reimers, reimers_w, blocker_w, center_h1, center_he4
 	  type (star_info), pointer :: s
 	  ierr = 0
       call star_ptr(id, s, ierr)
@@ -356,8 +393,18 @@
 	  reimers_w = plain_reimers * s% Reimers_wind_eta
 	  blocker_w = plain_reimers * s% Blocker_wind_eta * &
                4.83d-9 * pow_cr(Msurf/Msun,-2.1d0) * pow_cr(Lsurf/Lsun,2.7d0)
-	  
-	  w = max(reimers_w, blocker_w)
+
+          h1 = s% net_iso(ih1)
+          he4 = s% net_iso(ihe4)
+          center_h1 = s% xa(h1,s% nz)
+          center_he4 = s% xa(he4,s% nz)
+
+          !prevent the low mass RGBs from using Blocker
+          if (center_h1 < 0.01d0 .and. center_he4 > 0.1d0) then
+             w = reimers_w
+          else 
+             w = max(reimers_w, blocker_w)
+          end if
 	  
 	  end subroutine Reimers_then_Blocker
       

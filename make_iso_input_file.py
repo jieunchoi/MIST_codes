@@ -61,10 +61,7 @@ def make_iso_input_file(runname, mode):
     header = ["#data directories: 1) history files, 2) eeps, 3) isochrones\n", tracks_dir+"\n", eeps_dir+"\n", iso_dir+"\n", \
     "# read history_columns\n", os.path.join(make_isoch_dir, "my_history_columns.list")+"\n", "# specify tracks\n", str(len(tracks_list))+"\n"]
 
-#    footer = ["#specify isochrones\n", runname_format+".iso\n", "min_max\n", "107\n", "5.0\n", "10.3\n", "single\n"]
-#    footer = ["#specify isochrones\n", runname_format+".iso\n", "min_max\n", "31\n", "9.4\n", "9.71\n", "single\n"]
-#    footer = ["#specify isochrones\n", runname_format+".iso\n", "min_max\n", "21\n", "6.0\n", "8.0\n", "single\n"]
-    footer = ["#specify isochrones\n", runname_format+".iso\n", "min_max\n", "5\n", "8.0\n", "8.3\n", "single\n"]
+    footer = ["#specify isochrones\n", runname_format+".iso\n", "min_max\n", "107\n", "5.0\n", "10.3\n", "single\n"]
 
     #Write the file
     print "**************************************************************************"

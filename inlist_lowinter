@@ -19,15 +19,15 @@
 
 !OPACITY, NETWORK, RATE, etc.
 
-	  !network 
+      !network 
       change_net = .true.
-      new_net_name = 'basic.net' !'mesa_45.net'
+      new_net_name = 'mesa_49.net'
 	  
       !first 100 models are run with simple_photosphere then switched to the following
       extras_lcpar = 1
       extras_cpar(1) = '<<BC_TABLE>>'
 	  
-	  !opacities with AGSS09 abundances
+      !opacities with AGSS09 abundances
       kappa_file_prefix = 'a09'
       kappa_lowT_prefix = 'lowT_fa05_a09p'
       kappa_CO_prefix = 'a09_co'
@@ -72,8 +72,8 @@
 !WHEN TO STOP
 
       !in run_star_extras, it's set to H1 depletion in the core for low mass stars
-      gamma_center_limit = 10 !1d2
-
+      gamma_center_limit = 100.0
+      
 !PHYSICS
 
       !only for the first 100 model steps
@@ -137,13 +137,12 @@
       am_D_mix_factor = 0.033
       am_gradmu_factor = 0.05
 
-!      use_other_wind = .true.
-      RGB_wind_scheme = 'Reimers' !Reimers_then_VW'
-      AGB_wind_scheme = 'van Loon' !'Reimers_then_VW'
+      use_other_wind = .true.
+      RGB_wind_scheme = 'Reimers'
+      AGB_wind_scheme = 'Blocker'
       RGB_to_AGB_wind_switch = 1d-4
-      Reimers_wind_eta = 0.2
-!      Blocker_wind_eta = 0.2
-      van_Loon_wind_eta = 1.0
+      Reimers_wind_eta = 0.1
+      Blocker_wind_eta = 0.2
 
       max_rotational_mdot_boost = 10
       max_wind = 1d-3
@@ -167,7 +166,7 @@
 
       mesh_delta_coeff = 1.0
       varcontrol_target = 1d-4
-      max_allowed_nz = 10000
+      max_allowed_nz = 50000
 	  
       !better resolution of the Henyey hook
       delta_lg_XH_cntr_max = -1
@@ -178,15 +177,6 @@
       delta_lgL_limit = 0.02 
       delta_lgL_hard_limit = 0.05
 	  
-!	  !increase resolution
-!      mesh_logX_species(1) = 'h1'
-!      mesh_logX_min_for_extra(1) = -6
-!      mesh_dlogX_dlogP_extra(1) = 0.75
-      
-!      mesh_logX_species(2) = 'he4'
-!      mesh_logX_min_for_extra(2) = -6
-!      mesh_dlogX_dlogP_extra(2) = 0.75
-
       !multiply mesh_delta_coeff in overshooting regions by this factor
       xtra_coef_os_above_nonburn = 0.5
       xtra_coef_os_below_nonburn = 0.5

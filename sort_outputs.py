@@ -85,6 +85,8 @@ def gen_summary(rawdirname):
         
         if status != 'OK':
             if (len(errcontent) > 0):
+                if ((len(errcontent) == 1) & (errcontent == './rn: line 4: svn: command not found')):
+                    break
                 status = 'FAILED'
                 reason = 'unknown_error'
                 for line in errcontent:
@@ -96,7 +98,7 @@ def gen_summary(rawdirname):
                         break
                     elif 'Socket timed out on send/recv operation' in line:
                         reason = 'socket_timed_out'
-        
+                        
         #Retrieve the run time information
         dates = subprocess.Popen('grep [0-9][0-9]:[0-9][0-9]:[0-9][0-9] ' + listoutfiles[index], shell=True, stdout=subprocess.PIPE)
         try:
@@ -282,7 +284,7 @@ def do_organize(runname):
     os.mkdir(os.path.join(newdirname, "plots"))
     mesa_plot_grid.plot_HRD(runname)
     mesa_plot_grid.plot_combine(runname, iso=False)
-    
+
     print "************************************************************"
     print "******************PLOTTING THE ISOCHRONES*******************"
     print "************************************************************"

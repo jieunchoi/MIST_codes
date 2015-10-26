@@ -15,19 +15,19 @@
       extras_lrpar = 3
       extras_rpar(1) = 1.2 !full off
       extras_rpar(2) = 1.8 !full on
-      extras_rpar(3) = 0.0 !omega_div_omega_crit
+      extras_rpar(3) = 0.4 !omega_div_omega_crit
 
 !OPACITY, NETWORK, RATE, etc.
 
-	  !network 
+      !network 
       change_net = .true.
-      new_net_name = 'mesa_45.net'
+      new_net_name = 'mesa_49.net'
 	  
       !first 100 models are run with simple_photosphere then switched to the following
-	  extras_lcpar = 1
+      extras_lcpar = 1
       extras_cpar(1) = '<<BC_TABLE>>'
 
-	  !opacities with AGSS09 abundances
+      !opacities with AGSS09 abundances
       kappa_file_prefix = 'a09'
       kappa_lowT_prefix = 'lowT_fa05_a09p'
       kappa_CO_prefix = 'a09_co'
@@ -155,9 +155,9 @@
 		 		 
 !MESH AND TIMESTEP PARAMETERS
 
-      mesh_delta_coeff = 1.0
+      mesh_delta_coeff = 0.5
       varcontrol_target = 1d-4
-      max_allowed_nz = 10000
+      max_allowed_nz = 50000
 	  
       !better resolution of the Henyey hook
       delta_lg_XH_cntr_max = -1

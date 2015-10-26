@@ -1,14 +1,14 @@
 #!/bin/bash
 
-#SBATCH -n 4
+#SBATCH -n 8
 #SBATCH -N 1
 #SBATCH -t <<RUNTIME>>
-#SBATCH --mem 4000
+#SBATCH --mem 6000
 #SBATCH -p conroy
 #SBATCH -o <<RUNNAME>>.o
 #SBATCH -e <<RUNNAME>>.e
 
-export OMP_NUM_THREADS=4
+export OMP_NUM_THREADS=8
 cd <<DIRNAME>>
 ./clean
 ./mk
