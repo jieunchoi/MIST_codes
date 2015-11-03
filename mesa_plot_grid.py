@@ -37,7 +37,7 @@ def plot_HRD(gridname, logg=False):
         starmass = float(file.split('eeps/')[1].split('M')[0])/100.0
         star = mp.EEPfile(file)
     	if logg == False:
-            star.plot_HR(colorname='RoyalBlue')
+            star.plot_HR(color='RoyalBlue')
             if starmass < 0.8:
                 plt.axis([5.5, 3.0, -6, 4])
             elif starmass < 10.0:
