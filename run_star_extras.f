@@ -28,6 +28,8 @@
       use crlibm_lib
       use rates_def
       use net_def
+	  use photo_out, only: output_star_photo
+	  use star_utils, only: get_name_for_restart_file
       
       implicit none
       
@@ -142,6 +144,8 @@
       real(dp), parameter :: Zsol = 0.0142
       type (star_info), pointer :: s
       type (Net_General_Info), pointer :: g
+      character (len=strlen) :: filename, num_str, fstring
+      integer :: num_digits
       
       ierr = 0	 
       call star_ptr(id, s, ierr)
@@ -151,6 +155,16 @@
       ierr = 0
       call get_net_ptr(s% net_handle, g, ierr)
       if (ierr /= 0) stop 'bad handle'
+	  
+	  if ((s% center_h1 < 0.6)) then
+	  !save a model and photo
+	  call star_write_model(id, s% job% save_model_filename, ierr)
+      call get_name_for_restart_file(s% model_number, s% photo_digits, num_str)
+      filename = trim(s% photo_directory) // '/' // trim(num_str) 
+      call output_to_file(filename, id, ierr) 
+      if (ierr /= 0) return  
+	  end if
+	  
       
 !     increase VARCONTROL and MDOT: increase varcontrol and Mdot when the model hits the TPAGB phase
       if ((s% initial_mass < 10) .and. (s% center_h1 < 1d-4) .and. (s% center_he4 < 1d-4)) then
@@ -187,22 +201,31 @@
          end if
       end if
       
-!     suppress LATE BURNING: turn off burning post-AGB			 
+!     treat postAGB: suppress late burning by turn off burning post-AGB and also save a model and photo
       envelope_mass_fraction = 1d0 - max(s% he_core_mass, s% c_core_mass, s% o_core_mass)/s% star_mass
       category_factors(:) = 1.0 !turn off burning except for H
       category_factors(3:) = 0.0
       if ((s% initial_mass < 10) .and. (envelope_mass_fraction < 0.1) .and. (s% center_h1 < 1d-4) .and. (s% center_he4 < 1d-4) &
       .and. (s% L_phot > 3.0) .and. (s% Teff > 7000.0)) then
-      if (burn_check == 0.0) then !only print the first time
-         write(*,*) '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
-         write(*,*) 'now at post AGB phase, turning off all burning except for H'
-         write(*,*) '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
-         do r=1,g% num_reactions
-            burn_category = reaction_categories(g% reaction_id(r))
-            s% rate_factors(r) = category_factors(burn_category)
-         end do
-         burn_check = 1.0
-      end if
+		  if (burn_check == 0.0) then !only print the first time
+			  write(*,*) '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
+			  write(*,*) 'now at post AGB phase, turning off all burning except for H & saving a model + photo'
+			  write(*,*) '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
+			  
+			  !save a model and photo
+			  call star_write_model(id, s% job% save_model_filename, ierr)
+	          call get_name_for_restart_file(s% model_number, s% photo_digits, num_str)
+	          filename = trim(s% photo_directory) // '/' // trim(num_str) 
+	          call output_to_file(filename, id, ierr) 
+	          if (ierr /= 0) return   
+			  
+			  !turn off burning
+			  do r=1,g% num_reactions
+				  burn_category = reaction_categories(g% reaction_id(r))
+				  s% rate_factors(r) = category_factors(burn_category)
+			  end do
+			  burn_check = 1.0
+		  end if		  
       end if
       
 !     define STOPPING CRITERION: stopping criterion for C burning, massive stars.
@@ -240,7 +263,7 @@
          s% do_element_diffusion = .false.
       end if
       
-      end function extras_check_model
+	  end function extras_check_model
       
       
       integer function how_many_extra_history_columns(id, id_extra)

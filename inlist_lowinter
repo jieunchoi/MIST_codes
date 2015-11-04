@@ -68,6 +68,8 @@
       star_history_name = '<<MASS>>M<<BC_LABEL>>_history.data'
       write_controls_info_with_profile = .false.
       write_profiles_flag = .false.
+	  
+	  save_model_filename = '<<MASS>>M<<BC_LABEL>>_pAGB.mod'
 
 !WHEN TO STOP
 
