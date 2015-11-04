@@ -28,8 +28,6 @@
       use crlibm_lib
       use rates_def
       use net_def
-	  use photo_out, only: output_star_photo
-	  use star_utils, only: get_name_for_restart_file
       
       implicit none
       
@@ -144,8 +142,7 @@
       real(dp), parameter :: Zsol = 0.0142
       type (star_info), pointer :: s
       type (Net_General_Info), pointer :: g
-      character (len=strlen) :: filename, num_str, fstring
-      integer :: num_digits
+      character (len=strlen) :: photoname
       
       ierr = 0	 
       call star_ptr(id, s, ierr)
@@ -154,17 +151,7 @@
       
       ierr = 0
       call get_net_ptr(s% net_handle, g, ierr)
-      if (ierr /= 0) stop 'bad handle'
-	  
-	  if ((s% center_h1 < 0.6)) then
-	  !save a model and photo
-	  call star_write_model(id, s% job% save_model_filename, ierr)
-      call get_name_for_restart_file(s% model_number, s% photo_digits, num_str)
-      filename = trim(s% photo_directory) // '/' // trim(num_str) 
-      call output_to_file(filename, id, ierr) 
-      if (ierr /= 0) return  
-	  end if
-	  
+      if (ierr /= 0) stop 'bad handle'	  
       
 !     increase VARCONTROL and MDOT: increase varcontrol and Mdot when the model hits the TPAGB phase
       if ((s% initial_mass < 10) .and. (s% center_h1 < 1d-4) .and. (s% center_he4 < 1d-4)) then
@@ -214,10 +201,8 @@
 			  
 			  !save a model and photo
 			  call star_write_model(id, s% job% save_model_filename, ierr)
-	          call get_name_for_restart_file(s% model_number, s% photo_digits, num_str)
-	          filename = trim(s% photo_directory) // '/' // trim(num_str) 
-	          call output_to_file(filename, id, ierr) 
-	          if (ierr /= 0) return   
+			  photoname = 'photos/pAGB_photo'
+			  call star_save_for_restart(id, photoname, ierr)
 			  
 			  !turn off burning
 			  do r=1,g% num_reactions
