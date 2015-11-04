@@ -10,7 +10,7 @@
 !MISC. SETUP
 	  
       history_columns_file = 'my_history_columns.list'
-	  save_model_filename = '<<MASS>>M<<BC_LABEL>>_pAGB.mod'
+      save_model_filename = '<<MASS>>M<<BC_LABEL>>_pAGB.mod'
 	  
       !parameters to be used for mass on/off for rotation
       extras_lrpar = 3
