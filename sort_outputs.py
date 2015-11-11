@@ -164,7 +164,7 @@ def sort_histfiles(rawdirname):
     
     """
 
-    Organizes the history files.
+    Organizes the history files and creates a separate directory.
 
     Args:
         rawdirname: the name of the grid with the suffix '_raw'
@@ -179,7 +179,7 @@ def sort_histfiles(rawdirname):
 
     #Make the track directory in the new reduced MESA run directory
     new_parentdirname = rawdirname.split("_raw")[0]
-    histfiles_dirname = os.path.join(os.path.join(mistgrid_dir, new_parentdirname), "tracks")
+    histfiles_dirname = os.path.join(os.path.join(mistgrid_dir, new_parentdirname + "_tracks"))
     os.mkdir(histfiles_dirname)
 
     #Rename & copy the history files over
@@ -299,8 +299,9 @@ def do_organize(runname):
     print "************************************************************"
     gen_summary(rawdirname)
     
-    #Move the summary file to the tracks directory
-    os.system("mv tracks_summary.txt " + os.path.join(newdirname, "tracks"))
+    #Copy the summary file to both directories
+    os.system("cp tracks_summary.txt " + newdirname+'_tracks")
+    os.system("mv tracks_summary.txt " + newdirname)
     
     print "************************************************************"
     print "****************SORTING THE INLIST FILES********************"
@@ -331,18 +332,21 @@ def do_organize(runname):
     mesa_plot_grid.plot_combine(runname, iso=True)
     
     print "************************************************************"
-    print "****************COMPRESSING THE DIRECTORY*******************"
+    print "******COMPRESSING BOTH TRACKS AND REDUCED DIRECTORIES*******"
     print "************************************************************"
     os.chdir(mistgrid_dir)
     #When decompressed, this .tar.gz opens a MIST_vXX/feh_XXX_afe_XXX directory
     os.system("tar -zcvf " + '_'.join(runname.split('/')) + ".tar.gz " + runname)
+    os.system("tar -zcvf " + '_'.join(runname.split('/')) + "_tracks.tar.gz " + runname+'_tracks')
     
     print "************************************************************"
     print "****************MIGRATING FILES TO STORAGE******************"
     print "************************************************************"
     os.system("rm -rf " + runname)
+    os.system("rm -rf " + runname + '_tracks')
     os.system("mv " + rawdirname + " " + os.path.join(storage_dir, runname.split('/')[0]))
     os.system("mv " + '_'.join(runname.split('/')) + ".tar.gz " + os.path.join(storage_dir, runname.split('/')[0]))
+    os.system("mv " + '_'.join(runname.split('/')) + "_tracks.tar.gz " + os.path.join(storage_dir, runname.split('/')[0]))
     
 if __name__ == "__main__":
     
