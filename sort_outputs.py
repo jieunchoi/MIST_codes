@@ -300,7 +300,7 @@ def do_organize(runname):
     gen_summary(rawdirname)
     
     #Copy the summary file to both directories
-    os.system("cp tracks_summary.txt " + newdirname+'_tracks")
+    os.system("cp tracks_summary.txt " + newdirname + "_tracks")
     os.system("mv tracks_summary.txt " + newdirname)
     
     print "************************************************************"
