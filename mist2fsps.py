@@ -70,6 +70,16 @@ def write_fsps_iso(file):
     co_rat = data[:, mist_col_names.index('surf_num_c12_div_num_o16')].T
     phase = data[:, mist_col_names.index('phase')].T
     mdot = data[:, mist_col_names.index('star_mdot')].T
+    h1 = data[:,mist_col_names.index('surface_h1')].T
+    cn_rat = ((data[:,mist_col_names.index('surface_c12')].T/12.0) + (data[:,mist_col_names.index('surface_c13')].T/13.0))/(data[:,mist_col_names.index('surface_n14')].T/14.0)
+    
+    WRind = np.where((log_t > 4.0) & (h1 < 0.3))
+    phase[WRind] = 9
+    #use co ratio column and use dummy values to distinguish between WC/WO or WN
+    WCind = np.where((phase == 9) & (cn_rat > 1.0))
+    co_rat[WCind] = 99
+    WNind = np.where((phase == 9) & (cn_rat <= 1.0))
+    co_rat[WNind] = 9
     
     #Set up the file to write to  
     runname = file.rstrip('.iso').split("/")[-1]

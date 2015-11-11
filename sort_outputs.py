@@ -226,6 +226,40 @@ def save_inlists(rawdirname):
             newinlistfilename = os.path.join(os.path.join(mistgrid_dir, new_parentdirname),'inlists/'+format_mass_string+'M_'+bc_name+'.inlist')
         os.system("cp " + inlistfile + " " + newinlistfilename)
 
+def save_lowM_photo_model(rawdirname):
+    
+    """
+
+    Saves the .mod and photo saved at postAGB for the low mass stars.
+
+    Args:
+        rawdirname: the name of the grid with the suffix '_raw'
+    
+    Returns:
+        None
+
+    """
+    
+    #Get the list of photos and models
+    listofphoto = glob.glob(os.path.join(mistgrid_dir, os.path.join(rawdirname+'/*/photos/pAGB_photo')))
+    listofmod = glob.glob(os.path.join(mistgrid_dir, os.path.join(rawdirname+'/*/*pAGB.mod')))
+
+    #Nake the inlist directory in the new reduced MESA run directory
+    new_parentdirname = rawdirname.split("_raw")[0]
+    models_photos_files_dirname = os.path.join(os.path.join(mistgrid_dir, new_parentdirname), "models_photos")
+    os.mkdir(models_photos_files_dirname)
+    
+    #check first if these files exist in case the grid consists only of high mass stars.
+    if len(listofphoto) < 1:
+        print "THERE ARE NO PHOTOS OR MODELS SAVED AT THE POST-AGB PHASE."
+    else:
+        for i in range(len(listofphoto)):
+            format_mass_string = listofphoto[i].split('/')[-3].split('M_')[0]
+            newphotofilename = os.path.join(os.path.join(mistgrid_dir, new_parentdirname),'models_photos/'+format_mass_string+'M_pAGB.photo')
+            newmodfilename = os.path.join(os.path.join(mistgrid_dir, new_parentdirname),'models_photos/'+format_mass_string+'M_pAGB.mod')
+            os.system("mv " + listofphoto[i] + " " + newinlistfilename)
+            os.system("mv " + listofmod[i] + " " + newinlistfilename)
+
 def do_organize(runname):
     
     """
@@ -272,6 +306,11 @@ def do_organize(runname):
     print "****************SORTING THE INLIST FILES********************"
     print "************************************************************"
     save_inlists(rawdirname)
+    
+    print "************************************************************"
+    print "***************SORTING THE PHOTOS AND MODELS****************"
+    print "************************************************************"
+    save_lowM_photo_model(rawdirname)
     
     print "************************************************************"
     print "**********************MAKE ISOCHRONES***********************"
