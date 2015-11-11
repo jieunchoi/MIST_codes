@@ -257,8 +257,8 @@ def save_lowM_photo_model(rawdirname):
             format_mass_string = listofphoto[i].split('/')[-3].split('M_')[0]
             newphotofilename = os.path.join(os.path.join(mistgrid_dir, new_parentdirname),'models_photos/'+format_mass_string+'M_pAGB.photo')
             newmodfilename = os.path.join(os.path.join(mistgrid_dir, new_parentdirname),'models_photos/'+format_mass_string+'M_pAGB.mod')
-            os.system("mv " + listofphoto[i] + " " + newinlistfilename)
-            os.system("mv " + listofmod[i] + " " + newinlistfilename)
+            os.system("mv " + listofphoto[i] + " " + newphotofilename)
+            os.system("mv " + listofmod[i] + " " + newmodfilename)
 
 def do_organize(runname):
     
