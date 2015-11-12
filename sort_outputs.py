@@ -179,7 +179,7 @@ def sort_histfiles(rawdirname):
 
     #Make the track directory in the new reduced MESA run directory
     new_parentdirname = rawdirname.split("_raw")[0]
-    histfiles_dirname = os.path.join(os.path.join(mistgrid_dir, new_parentdirname + "_tracks"))
+    histfiles_dirname = os.path.join(os.path.join(mistgrid_dir, new_parentdirname))
     os.mkdir(histfiles_dirname)
 
     #Rename & copy the history files over
@@ -299,8 +299,7 @@ def do_organize(runname):
     print "************************************************************"
     gen_summary(rawdirname)
     
-    #Copy the summary file to both directories
-    os.system("cp tracks_summary.txt " + newdirname + "_tracks")
+    #Copy the summary file
     os.system("mv tracks_summary.txt " + newdirname)
     
     print "************************************************************"
@@ -334,7 +333,11 @@ def do_organize(runname):
     print "************************************************************"
     print "******COMPRESSING BOTH TRACKS AND REDUCED DIRECTORIES*******"
     print "************************************************************"
-    os.chdir(mistgrid_dir)
+    #make a separate tracks directory
+    os.system("cp " + os.path.join(newdirname, "tracks/tracks_summary.txt") + " " + newdirname)
+    os.system("mv " + os.path.join(newdirname, "tracks") + " " + newdirname + "_tracks"
+
+    os.chdir(mistgrid_dir)    
     #When decompressed, this .tar.gz opens a MIST_vXX/feh_XXX_afe_XXX directory
     os.system("tar -zcvf " + '_'.join(runname.split('/')) + ".tar.gz " + runname)
     os.system("tar -zcvf " + '_'.join(runname.split('/')) + "_tracks.tar.gz " + runname+'_tracks')
