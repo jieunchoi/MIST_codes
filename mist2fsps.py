@@ -73,8 +73,6 @@ def write_fsps_iso(file):
     h1 = data[:,mist_col_names.index('surface_h1')].T
     cn_rat = ((data[:,mist_col_names.index('surface_c12')].T/12.0) + (data[:,mist_col_names.index('surface_c13')].T/13.0))/(data[:,mist_col_names.index('surface_n14')].T/14.0)
     
-    WRind = np.where((log_t > 4.0) & (h1 < 0.3))
-    phase[WRind] = 9
     #use co ratio column and use dummy values to distinguish between WC/WO or WN
     WCind = np.where((phase == 9) & (cn_rat > 1.0))
     co_rat[WCind] = 99
