@@ -179,7 +179,7 @@ def sort_histfiles(rawdirname):
 
     #Make the track directory in the new reduced MESA run directory
     new_parentdirname = rawdirname.split("_raw")[0]
-    histfiles_dirname = os.path.join(os.path.join(mistgrid_dir, new_parentdirname))
+    histfiles_dirname = os.path.join(os.path.join(mistgrid_dir, new_parentdirname + "/tracks"))
     os.mkdir(histfiles_dirname)
 
     #Rename & copy the history files over
@@ -257,8 +257,8 @@ def save_lowM_photo_model(rawdirname):
             format_mass_string = listofphoto[i].split('/')[-3].split('M_')[0]
             newphotofilename = os.path.join(os.path.join(mistgrid_dir, new_parentdirname),'models_photos/'+format_mass_string+'M_pAGB.photo')
             newmodfilename = os.path.join(os.path.join(mistgrid_dir, new_parentdirname),'models_photos/'+format_mass_string+'M_pAGB.mod')
-            os.system("mv " + listofphoto[i] + " " + newphotofilename)
-            os.system("mv " + listofmod[i] + " " + newmodfilename)
+            os.system("cp " + listofphoto[i] + " " + newphotofilename)
+            os.system("cp " + listofmod[i] + " " + newmodfilename)
 
 def do_organize(runname):
     
@@ -335,7 +335,7 @@ def do_organize(runname):
     print "************************************************************"
     #make a separate tracks directory
     os.system("cp " + os.path.join(newdirname, "tracks/tracks_summary.txt") + " " + newdirname)
-    os.system("mv " + os.path.join(newdirname, "tracks") + " " + newdirname + "_tracks"
+    os.system("mv " + os.path.join(newdirname, "tracks") + " " + newdirname + "_tracks")
 
     os.chdir(mistgrid_dir)    
     #When decompressed, this .tar.gz opens a MIST_vXX/feh_XXX_afe_XXX directory
