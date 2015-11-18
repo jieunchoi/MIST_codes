@@ -70,7 +70,7 @@ class EEPfile:
             
         return all_xvar
 
-    def plot_vars(self, xvar, yvar, xlabel='', ylabel='', color='black', linewidth=1.5, linestyle='-', label='', loc=1, pltnum = 1, x_inv=0, y_inv=0, saveplot=0, figname=''):
+    def plot_vars(self, xvar, yvar, xlabel='', ylabel='', color='black', linewidth=1.5, linestyle='-', label='', loc=1, pltnum = 1, x_inv=0, y_inv=0, saveplot=0, figname='', phase=None):
         
         """
 
@@ -82,7 +82,7 @@ class EEPfile:
         
         Keywords:
             regular matplotlib keywords: xlabel, ylabel, color, linewidth, linestyle, label, loc
-            mesa_plot_hist keyword: pltnum, x_inv, y_inv, saveplot, figname
+            mesa_plot_hist keyword: pltnum, x_inv, y_inv, saveplot, figname, phase
     
         Usage:
             >> star.plot_vars('log_center_Rho', 'log_center_T', linewidth=2.0, color='blue', saveplot=1, figname='center_rhoT.pdf')
@@ -128,9 +128,15 @@ class EEPfile:
             leg = plt.legend(loc=loc)
             leg.draw_frame(False)
         
+        if phase != None:
+            p = self.read_vars('phase')
+            p_ind = np.where(p == phase)
+            if len(p_ind) > 0:
+                ax.plot(x[p_ind], y[p_ind], color=color, linewidth=4.0, alpha=0.3)
+        
         return x, y
                 
-    def plot_HR(self, color='black', linestyle='-', linewidth=1.5, label='', loc=1, pltnum=2, logg=False, figname='', saveplot=0):
+    def plot_HR(self, color='black', linestyle='-', linewidth=1.5, label='', loc=1, pltnum=2, logg=False, figname='', saveplot=0, phase=None):
         
         """
 
@@ -141,7 +147,7 @@ class EEPfile:
             
         Keywords:
             regular matplotlib keywords: color, linestyle, linewidth, label, loc
-            mesa_plot_hist keyword: pltnum, logg, figname, saveplot
+            mesa_plot_hist keyword: pltnum, logg, figname, saveplot, phase
     
         Usage:
             >> star.plot_HR()
@@ -150,11 +156,11 @@ class EEPfile:
         
         #plot the HR diagram in logg-logTeff space
         if logg == False:
-            logTeff, logL = self.plot_vars('log_Teff','log_L', pltnum=pltnum, color=color, linestyle=linestyle, linewidth=linewidth, label=label, loc=3, xlabel=r'$\log(T_{\rm eff})\;[\rm K]$', ylabel=r'$\log(L/L_{\odot}$)', x_inv=1, saveplot=saveplot, figname=figname)
+            logTeff, logL = self.plot_vars('log_Teff','log_L', pltnum=pltnum, color=color, linestyle=linestyle, linewidth=linewidth, label=label, loc=3, xlabel=r'$\log(T_{\rm eff})\;[\rm K]$', ylabel=r'$\log(L/L_{\odot}$)', x_inv=1, saveplot=saveplot, figname=figname, phase=phase)
             return logTeff, logL
             
         #plot the regular HR diagram
         else:
-            logTeff, logg = self.plot_vars('log_Teff','log_g', pltnum=pltnum, color=color, linestyle=linestyle, linewidth=linewidth, label=label, loc=3, xlabel=r'$\log(T_{\rm eff})\;[\rm K]$', ylabel=r'$\log(g)\;[\rm g\;cm^{-3}]$', x_inv=1, y_inv=1, saveplot=saveplot, figname=figname)
+            logTeff, logg = self.plot_vars('log_Teff','log_g', pltnum=pltnum, color=color, linestyle=linestyle, linewidth=linewidth, label=label, loc=3, xlabel=r'$\log(T_{\rm eff})\;[\rm K]$', ylabel=r'$\log(g)\;[\rm g\;cm^{-3}]$', x_inv=1, y_inv=1, saveplot=saveplot, figname=figname, phase=phase)
             return logTeff, logg
         
