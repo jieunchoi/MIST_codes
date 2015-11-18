@@ -22,6 +22,9 @@ Example:
     >>> make_replacements(make_inlist_inputs(runname, Z, 'VeryLow'), '10M.inlist',\
         direc='/home/project/inlist', file_base='inlist_project_base', clear_direc=True)
         
+Acknowledgment: 
+    Thanks to Joshua Burkart for providing assistance with and content for earlier versions of this code.
+        
 """
 
 import numpy as np
