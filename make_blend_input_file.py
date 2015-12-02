@@ -39,13 +39,13 @@ def make_blend_input_file(runname, file1, file2):
     blendedfile = mass+'M.track.eep'
     inputfilename = "input.blend_"+runname
     
-    #The blending mass range goes from >=0.3 to <0.6 or >=8 to <15, +0.01 is there for transition purposes
+    #The blending mass range goes from >0.3 to <0.6 or >10 to <16
     if float_mass < 5.0:
         min_blend = 0.3
-        max_blend = 0.55
+        max_blend = 0.6
     elif float_mass >= 5.0:
         min_blend = 10.0
-        max_blend = 15.0
+        max_blend = 16.0
     frac = (float_mass - min_blend)/(max_blend - min_blend)
     blendfrac_BC1 = 0.5*(1.0 - np.cos(math.pi*frac))
     blendfrac_BC2 = 1.0 - blendfrac_BC1
