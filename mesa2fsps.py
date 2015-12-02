@@ -39,7 +39,7 @@ def mesa2fsps(runname):
     
     #cd into the isochrone directory and run the codes
     os.chdir(make_isoch_dir)
-    os.system("./make_eeps " + inputfile)
+    os.system("./make_eep " + inputfile)
     
     #Loop through the low and high masses and blend the tracks
     initial_eeps_list_fullname = glob.glob(os.path.join(mistgrid_dir, runname+"/eeps/*.eep"))
