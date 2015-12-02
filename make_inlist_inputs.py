@@ -16,7 +16,10 @@ See Also:
     
 Example:
     >>> replist = make_inlist_inputs(runname, Z, startype)
-
+    
+Acknowledgment:
+    Thanks to Joshua Burkart for providing assistance with and content for earlier versions of this code.
+    
 """
 
 import sys
