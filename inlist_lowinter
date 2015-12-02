@@ -73,8 +73,8 @@
 !WHEN TO STOP
 
       !in run_star_extras, it's set to H1 depletion in the core for low mass stars
-      gamma_center_limit = 100.0
-      
+      gamma_center_limit = 20.0
+            
 !PHYSICS
 
       !only for the first 100 model steps
