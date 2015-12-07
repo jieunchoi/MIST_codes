@@ -50,8 +50,8 @@ def make_blend_input_file(runname, file1, file2):
         min_blend = 10.0
         max_blend = 16.0
         frac = (float_mass - min_blend)/(max_blend - min_blend)
-        blendfrac_BC1 = 1.0 - blendfrac_BC1
         blendfrac_BC2 = 0.5*(1.0 - np.cos(math.pi*frac))
+        blendfrac_BC1 = 1.0 - blendfrac_BC2
     
     #Write out the contents of the file
     content = ["#data directory\n", eeps_dir+"\n", "#number of tracks to blend\n", "2\n", \
