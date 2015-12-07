@@ -61,7 +61,7 @@ def write_fsps_iso(file):
     fmt = "{:8.2f}{:14.8f}{:14.8f}{:14.8f}{:14.8f}{:14.8f}{:14.8f}{:14.8f}{:14.5e}"
     
     #Identify columns
-    log_age = data[:, mist_col_names.index('log_age')].T    
+    log_age = data[:, mist_col_names.index('log10_isochrone_age_yr')].T    
     mini = data[:, mist_col_names.index('initial_mass')].T
     mact = data[:, mist_col_names.index('star_mass')].T
     log_L = data[:, mist_col_names.index('log_L')].T
