@@ -23,6 +23,7 @@ import subprocess
 import datetime
 import mesa_plot_grid
 import mesa2fsps
+import mesa_hist_trim
 
 mistgrid_dir = os.environ['MIST_GRID_DIR']
 storage_dir = os.environ['STORE_DIR']
@@ -182,7 +183,8 @@ def sort_histfiles(rawdirname):
     histfiles_dirname = os.path.join(os.path.join(mistgrid_dir, new_parentdirname + "/tracks"))
     os.mkdir(histfiles_dirname)
 
-    #Rename & copy the history files over
+
+    #Trim repeated model numbers, then rename & copy the history files over
     for histfile in listofhist:
         if 'M_history.data' in histfile:
             unformat_mass_string = histfile.split('LOGS/')[1].split('M_history.data')[0]
@@ -192,6 +194,7 @@ def sort_histfiles(rawdirname):
             bc_name = histfile.split('LOGS/')[1].split('M_')[1].split('_history.data')[0]
             newhistfilename = histfile.split('LOGS')[0]+'LOGS/'+reformat_massname.reformat_massname(unformat_mass_string)+'M_' + bc_name + '.track'
         os.system("cp " + histfile + " " + newhistfilename)
+        mesa_hist_trim.trim_file(newhistfilename)
         os.system("mv " + newhistfilename + " " + histfiles_dirname)
         
 def save_inlists(rawdirname):
