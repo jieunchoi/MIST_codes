@@ -15,7 +15,7 @@
       extras_lrpar = 3
       extras_rpar(1) = 1.2 !full off
       extras_rpar(2) = 1.8 !full on
-      extras_rpar(3) = 0.4 !omega_div_omega_crit
+      extras_rpar(3) = 0.6 !omega_div_omega_crit
 
 !OPACITY, NETWORK, RATE, etc.
 
@@ -57,7 +57,7 @@
 !OUTPUT OPTIONS
 
       history_interval = 1
-      terminal_interval = 100
+      terminal_interval = 10
       write_header_frequency = 10
       photostep = 2500
       
@@ -76,7 +76,7 @@
          
 !PHYSICS
 
-	  !only for the first 100 model steps
+      !only for the first 100 model steps
       which_atm_option = 'simple_photosphere'
 	  	 
       use_Ledoux_criterion = .true.
@@ -138,7 +138,6 @@
       AGB_wind_scheme = 'Dutch'
       RGB_to_AGB_wind_switch = 1d-4
       Dutch_wind_eta = 1.0
-      max_rotational_mdot_boost = 10
       max_wind = 1d-3
 
       do_element_diffusion = .true.
