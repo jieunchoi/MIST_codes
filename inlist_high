@@ -59,7 +59,8 @@
       history_interval = 1
       terminal_interval = 10
       write_header_frequency = 10
-      photostep = 2500
+	  photo_digits = 5
+      photostep = 250
       
       star_history_dbl_format = '(1pes32.16e3, 1x)'
       star_history_int_format = '(i32, 1x)'
