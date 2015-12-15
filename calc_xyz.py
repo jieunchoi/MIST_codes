@@ -45,9 +45,10 @@ def calc_xyz(znew, feh=False):
     
     #Compute X based on user-provided Z and extrapolated Y
     xnew = 1.0-ynew-znew
+    h2h1_rat = 2.0e-5 #from Jupiter & solar wind, Asplund 2009
     
-    h1 = xnew
-    h2 = 0.0
+    h1 = xnew/(1.0+h2h1_rat)
+    h2 = xnew/(1.0+1.0/h2h1_rat)
     he3 = ynew/(1.0+1.0/he3he4_rat)
     he4 = ynew/(1.0+he3he4_rat)
     znew = znew
