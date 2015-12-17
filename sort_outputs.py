@@ -86,12 +86,10 @@ def gen_summary(rawdirname):
         
         if status != 'OK':
             if (len(errcontent) > 0):
-                if ((len(errcontent) == 1) & (errcontent == './rn: line 4: svn: command not found')):
-                    break
                 status = 'FAILED'
                 reason = 'unknown_error'
                 for line in errcontent:
-                    if 'DUE TO TIME LIMIT ***' in line:
+                    if 'DUE TO TIME LIMIT' in line:
                         reason = 'need_more_time'
                         break
                     elif 'exceeded memory limit' in line:
