@@ -15,7 +15,7 @@
       extras_lrpar = 3
       extras_rpar(1) = 1.2 !full off
       extras_rpar(2) = 1.8 !full on
-      extras_rpar(3) = 0.6 !omega_div_omega_crit
+      extras_rpar(3) = 0.4 !omega_div_omega_crit
 
 !OPACITY, NETWORK, RATE, etc.
 
@@ -59,7 +59,7 @@
       history_interval = 1
       terminal_interval = 10
       write_header_frequency = 10
-	  photo_digits = 5
+      photo_digits = 5
       photostep = 250
       
       star_history_dbl_format = '(1pes32.16e3, 1x)'

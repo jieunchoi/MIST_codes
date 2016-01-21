@@ -16,7 +16,7 @@
       extras_lrpar = 3
       extras_rpar(1) = 1.2 !full off
       extras_rpar(2) = 1.8 !full on
-      extras_rpar(3) = 0.6 !omega_div_omega_crit
+      extras_rpar(3) = 0.4 !omega_div_omega_crit
 
 !OPACITY, NETWORK, RATE, etc.
 
@@ -74,8 +74,7 @@
 !WHEN TO STOP
 
       !in run_star_extras, it's set to H1 depletion in the core for low mass stars
-      !gamma_center_limit = 20.0
-      HB_limit = 0.1
+      gamma_center_limit = 20.0
             
 !PHYSICS
 

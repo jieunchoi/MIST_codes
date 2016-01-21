@@ -184,6 +184,7 @@ def sort_histfiles(rawdirname):
 
     #Trim repeated model numbers, then rename & copy the history files over
     for histfile in listofhist:
+        print 'processing', histfile
         if 'M_history.data' in histfile:
             unformat_mass_string = histfile.split('LOGS/')[1].split('M_history.data')[0]
             newhistfilename = histfile.split('LOGS')[0]+'LOGS/'+reformat_massname.reformat_massname(unformat_mass_string)+'M.track'
@@ -335,8 +336,8 @@ def do_organize(runname):
     print "******COMPRESSING BOTH TRACKS AND REDUCED DIRECTORIES*******"
     print "************************************************************"
     #make a separate tracks directory
-    os.system("cp " + os.path.join(newdirname, "tracks/tracks_summary.txt") + " " + newdirname)
     os.system("mv " + os.path.join(newdirname, "tracks") + " " + newdirname + "_tracks")
+    os.system("cp " + os.path.join(newdirname, "tracks_summary.txt") + " " + newdirname + "_tracks")
 
     os.chdir(mistgrid_dir)    
     #When decompressed, this .tar.gz opens a MIST_vXX/feh_XXX_afe_XXX directory

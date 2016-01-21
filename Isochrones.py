@@ -13,7 +13,7 @@ class MESA_Isochrones:
         self.filename=filename.strip()
         try:
             self.version, self.data = self.read_iso_file()
-            self.ages=np.array([self.data[i]['log_age'][0] for i in range(len(self.data))])
+            self.ages=np.array([self.data[i][0][1] for i in range(len(self.data))])
         except IOError:
             print("Failed to open isochrone file: ")
             print(self.filename)
