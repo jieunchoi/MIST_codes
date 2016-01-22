@@ -77,7 +77,7 @@ def mesa2fsps(runname):
             os.system("rm -f " + eepname)
             continue
         #Get the total number of EEPs from input.eep
-        #5 lines of header + nominally, 454, 1710, or 798
+        #5 lines of header
         with open(os.path.join(make_isoch_dir, "input.eep"), "r") as inputf:
             inputeep_data = inputf.readlines()
         #Add 1 to account for the first primary EEP
@@ -127,7 +127,7 @@ def mesa2fsps(runname):
     #Write out a textfile of interpolated EEPs
     with open(eeps_directory+"/interpolated_eeps.txt", "w") as list_interp_eeps:
         for incomplete_eeps in incomplete_eeps_arr:
-            list_interp_eeps.write(incomplete_eeps)
+            list_interp_eeps.write(incomplete_eeps+"\n")
 
     #Interpolate the new tracks
     os.system("./make_track " + "input.tracks_"+runname_format)
