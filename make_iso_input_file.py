@@ -19,12 +19,13 @@ import glob
 import re
 import os
 import sys
+import numpy as np
 
 make_isoch_dir = os.environ['ISO_DIR']
 code_dir = os.environ['MIST_CODE_DIR']
 mistgrid_dir = os.environ['MIST_GRID_DIR']
 
-def make_iso_input_file(runname, mode):
+def make_iso_input_file(runname, mode, incomplete=[]):
     
     #Convert MIST_vXX/feh_XXX_afe_XXX to MIST_vXX_feh_XXX_afe_XXX
     runname_format = '_'.join(runname.split('/'))
@@ -48,14 +49,18 @@ def make_iso_input_file(runname, mode):
         
     #Generate a list of final track names (i.e., as if low masses have been blended)
     if mode == 'iso':
-        initial_tracks_list = glob.glob(tracks_dir+"/*.track")
-        good_names = ['M_' not in x for x in initial_tracks_list]
-        bad_names = ['M_' in x for x in initial_tracks_list]
-        good_names_list = [x for x, y in zip(initial_tracks_list, good_names) if y]
-        bad_names_list = [x for x, y in zip(initial_tracks_list, bad_names) if y]
-
-        fake_names_list = list(set([x.split('M_')[0]+'M.track' for x in bad_names_list]))
-        tracks_list = sorted(good_names_list+fake_names_list)
+        initial_tracks_list = glob.glob(eeps_dir+"/*M.track.eep")
+        tracks_list = sorted([x.split('.eep')[0] for x in initial_tracks_list])
+    
+    #Generate a list of track names that are complete only
+    if mode == 'interp_eeps':
+        initial_tracks_list = glob.glob(eeps_dir+"/*M.track.eep")
+        for failed_eep in incomplete:
+            failed_eep_ind = np.where(np.array(initial_tracks_list) == failed_eep)[0][0]
+            initial_tracks_list.pop(failed_eep_ind)
+        tracks_list = sorted([x.split('.eep')[0] for x in initial_tracks_list])
+        max_good_mass = float(tracks_list[-1].split('/')[-1].split('M')[0])/100.0
+        min_good_mass = float(tracks_list[0].split('/')[-1].split('M')[0])/100.0
         
     #Header and footer in the file
     header = ["#data directories: 1) history files, 2) eeps, 3) isochrones\n", tracks_dir+"\n", eeps_dir+"\n", iso_dir+"\n", \
@@ -71,9 +76,13 @@ def make_iso_input_file(runname, mode):
         for headerline in header:
             newinputfile.write(headerline)
         for full_trackname in tracks_list:
-            trackname = full_trackname.split("/tracks/")[-1]
+            trackname = full_trackname.split("/")[-1]
             newinputfile.write(trackname+"\n")
         for footerline in footer:
             newinputfile.write(footerline)
     
     os.system("mv " + inputfilename + " " + make_isoch_dir)
+
+    #Used to check which masses can/can't be interpolated in mesa2fsps.py
+    if mode == 'interp_eeps':
+        return min_good_mass, max_good_mass
