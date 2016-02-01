@@ -68,6 +68,24 @@ def mesa2fsps(runname):
     tracks_directory = lines[1].replace("\n", "")
     home_run_directory = tracks_directory.split("/tracks")[0]
 
+    #Get the total number of EEPs from input.eep
+    #5 lines of header
+    with open(os.path.join(make_isoch_dir, "input.eep"), "r") as inputf:
+        inputeep_data = inputf.readlines()
+    #Add 1 to account for the first primary EEP
+    lowmass_num_lines = 5 + 1
+    intmass_num_lines = 5 + 1
+    highmass_num_lines = 5 + 1
+    for i_l, line in enumerate(inputeep_data[2:11]):
+        #Get the secondary EEP number
+        numseceep = int(line.strip('\n').split(' ')[-1])
+        #Add one for each primary EEP
+        if i_l < 3:
+            lowmass_num_lines += numseceep+1
+        if i_l < 7:
+            highmass_num_lines += numseceep+1 
+        intmass_num_lines += numseceep+1
+
     #Generate a list of incomplete EEPs
     eeps_directory = os.path.join(home_run_directory, "eeps")
     incomplete_eeps_arr = []
@@ -75,25 +93,7 @@ def mesa2fsps(runname):
         #Remove the pre-blended EEPs
         if "M_" in eepname:
             os.system("rm -f " + eepname)
-            continue
-        #Get the total number of EEPs from input.eep
-        #5 lines of header
-        with open(os.path.join(make_isoch_dir, "input.eep"), "r") as inputf:
-            inputeep_data = inputf.readlines()
-        #Add 1 to account for the first primary EEP
-        lowmass_num_lines = 5 + 1
-        intmass_num_lines = 5 + 1
-        highmass_num_lines = 5 + 1
-        for i_l, line in enumerate(inputeep_data[2:11]):
-            #Get the secondary EEP number
-            numseceep = int(line.strip('\n').split(' ')[-1])
-            #Add one for each primary EEP
-            if i_l < 3:
-                lowmass_num_lines += numseceep+1
-            if i_l < 7:
-                highmass_num_lines += numseceep+1 
-            intmass_num_lines += numseceep+1
-        
+            continue        
         #Check the length of each EEP file and identify the ones that are incomplete
         numeeps = int(subprocess.Popen('wc -l '+eepname, stdout=subprocess.PIPE, shell=True).stdout.read().split(' ')[-2])
         mass_val = float(eepname.split('M.track')[0].split('/')[-1])/100.0
@@ -102,8 +102,8 @@ def mesa2fsps(runname):
         if ((mass_val>=0.6)&(mass_val<10.0)&(numeeps!=intmass_num_lines)):
             if ((mass_val>=0.6)&(mass_val<10.0)&(numeeps!=highmass_num_lines)):
                 incomplete_eeps_arr.append(eepname)
-            if ((mass_val>=10.0)&(numeeps!=highmass_num_lines)):
-                incomplete_eeps_arr.append(eepname)
+        if ((mass_val>=10.0)&(numeeps!=highmass_num_lines)):
+            incomplete_eeps_arr.append(eepname)
 
     #Make the input file for the track interpolator consisting of only complete EEP files to interpolate bad EEPs from
     os.chdir(code_dir)
@@ -125,6 +125,7 @@ def mesa2fsps(runname):
             trackinputfile.write(eepline)
 
     #Write out a textfile of interpolated EEPs
+    incomplete_eeps_arr.sort()
     with open(eeps_directory+"/interpolated_eeps.txt", "w") as list_interp_eeps:
         for incomplete_eeps in incomplete_eeps_arr:
             list_interp_eeps.write(incomplete_eeps+"\n")
