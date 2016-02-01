@@ -100,7 +100,7 @@ def mesa2fsps(runname):
         if ((mass_val<0.6)&(numeeps!=lowmass_num_lines)):
             incomplete_eeps_arr.append(eepname)
         if ((mass_val>=0.6)&(mass_val<10.0)&(numeeps!=intmass_num_lines)):
-            if ((mass_val>=0.6)&(mass_val<10.0)&(numeeps!=highmass_num_lines)):
+            if ((mass_val>6.0)&(mass_val<10.0)&(numeeps!=highmass_num_lines)):
                 incomplete_eeps_arr.append(eepname)
         if ((mass_val>=10.0)&(numeeps!=highmass_num_lines)):
             incomplete_eeps_arr.append(eepname)
