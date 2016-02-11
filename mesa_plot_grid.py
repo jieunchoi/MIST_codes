@@ -32,7 +32,7 @@ def plot_HRD(gridname, logg=False):
     #Assumes gridname has the form MIST_vXX/feh_XXX_afe_XXX
     lowest_dir = gridname.split('/')[-1]
     grid_dir = os.path.join(mistgrid_dir, gridname)
-    filelist = glob.glob(os.path.join(grid_dir, 'eeps/*M.track.eep'))
+    filelist = glob.glob(os.path.join(grid_dir, 'eeps/*M.track.eep*'))
     for file in filelist:
         starmass = float(file.split('eeps/')[1].split('M')[0])/100.0
         star = mp.EEPfile(file)
@@ -148,7 +148,7 @@ def plot_combine(gridname, logg=False, iso=False, remove_pdf=False):
     for file in sorted(filelist):
         command += file + ' '
             
-    if remove_pdf == True:    
-        os.system("rm " + os.path.join(grid_dir, 'plots/'+lowest_dir+'_[0-1]*ind.pdf'))
+    if remove_pdf == True:
+        os.system("rm -f " + os.path.join(grid_dir, 'plots/') + "*ind.pdf")
 
     os.system(command)

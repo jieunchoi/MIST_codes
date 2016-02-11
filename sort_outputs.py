@@ -320,17 +320,17 @@ def do_organize(runname):
     mesa2fsps.mesa2fsps(runname)
     
     print "************************************************************"
-    print "****************PLOTTING THE EEPS FILES******************"
+    print "******************PLOTTING THE EEPS FILES*******************"
     print "************************************************************"
     os.mkdir(os.path.join(newdirname, "plots"))
     mesa_plot_grid.plot_HRD(runname)
-    mesa_plot_grid.plot_combine(runname, iso=False)
+    mesa_plot_grid.plot_combine(runname, iso=False, remove_pdf=False)
 
     print "************************************************************"
     print "******************PLOTTING THE ISOCHRONES*******************"
     print "************************************************************"
     mesa_plot_grid.plot_iso(runname)
-    mesa_plot_grid.plot_combine(runname, iso=True)
+    mesa_plot_grid.plot_combine(runname, iso=True, remove_pdf=False)
     
     print "************************************************************"
     print "******COMPRESSING BOTH TRACKS AND REDUCED DIRECTORIES*******"
