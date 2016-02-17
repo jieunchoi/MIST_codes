@@ -25,7 +25,7 @@ make_isoch_dir = os.environ['ISO_DIR']
 code_dir = os.environ['MIST_CODE_DIR']
 mistgrid_dir = os.environ['MIST_GRID_DIR']
 
-def make_iso_input_file(runname, mode, incomplete=[]):
+def make_iso_input_file(runname, mode, basic, incomplete=[]):
     
     #Convert MIST_vXX/feh_XXX_afe_XXX to MIST_vXX_feh_XXX_afe_XXX
     runname_format = '_'.join(runname.split('/'))
@@ -63,10 +63,16 @@ def make_iso_input_file(runname, mode, incomplete=[]):
         min_good_mass = float(tracks_list[0].split('/')[-1].split('M')[0])/100.0
         
     #Header and footer in the file
+    if basic == True:
+        mhc_file = "my_history_columns_basic.list"
+        iso_file = runname_format+"_basic.iso\n"
+    else:
+        mhc_file = "my_history_columns_shorter.list"
+        iso_file = runname_format+"_full.iso\n"
+    
     header = ["#data directories: 1) history files, 2) eeps, 3) isochrones\n", tracks_dir+"\n", eeps_dir+"\n", iso_dir+"\n", \
-    "# read history_columns\n", os.path.join(make_isoch_dir, "my_history_columns_shorter.list")+"\n", "# specify tracks\n", str(len(tracks_list))+"\n"]
-
-    footer = ["#specify isochrones\n", runname_format+".iso\n", "min_max\n", "log10\n", "107\n", "5.0\n", "10.3\n", "single\n"]
+        "# read history_columns\n", os.path.join(make_isoch_dir, mhc_file)+"\n", "# specify tracks\n", str(len(tracks_list))+"\n"]
+    footer = ["#specify isochrones\n", iso_file, "min_max\n", "log10\n", "107\n", "5.0\n", "10.3\n", "single\n"]
 
     #Write the file
     print "**************************************************************************"

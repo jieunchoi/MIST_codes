@@ -24,7 +24,7 @@ make_isoch_dir = os.environ['ISO_DIR']
 code_dir = os.environ['MIST_CODE_DIR']
 mistgrid_dir = os.environ['MIST_GRID_DIR']
 
-def mesa2fsps(runname):
+def mesa2fsps(runname, basic=False):
     
     #Path to the new organized directory
     newdirname = os.path.join(mistgrid_dir,runname)
@@ -32,11 +32,17 @@ def mesa2fsps(runname):
     runname_format = '_'.join(runname.split('/'))
     inputfile = "input."+runname_format
     
-    #Make the input file for the isochrones code to make eeps
-    make_iso_input_file(runname, "eeps")
-    
+    #if basic = True, then only print out a very basic set of columns
+    #if basic != True, then print out all of the columns except for things like num_retries, etc.
+
     #Copy the most recent copy of my_history_columns.list file to the iso directory
-    shutil.copy(os.path.join(code_dir, 'my_history_columns.list'), os.path.join(make_isoch_dir, 'my_history_columns.list'))
+    if basic == True:
+        shutil.copy(os.path.join(code_dir, 'my_history_columns_basic.list'), os.path.join(make_isoch_dir, 'my_history_columns_basic.list'))
+    else:
+        shutil.copy(os.path.join(code_dir, 'my_history_columns_shorter.list'), os.path.join(make_isoch_dir, 'my_history_columns_shorter.list'))
+
+    #Make the input file for the isochrones code to make eeps
+    make_iso_input_file(runname, "eeps", basic)
     
     #cd into the isochrone directory and run the codes
     os.chdir(make_isoch_dir)
@@ -56,7 +62,7 @@ def mesa2fsps(runname):
         
     #Make the input file for the isochrones code to make isochrones
     os.chdir(code_dir)
-    make_iso_input_file(runname, "iso")
+    make_iso_input_file(runname, "iso", basic)
     
     #Run the isochrone code
     os.chdir(make_isoch_dir)
@@ -100,14 +106,16 @@ def mesa2fsps(runname):
         if ((mass_val<0.6)&(numeeps!=lowmass_num_lines)):
             incomplete_eeps_arr.append(eepname)
         if ((mass_val>=0.6)&(mass_val<10.0)&(numeeps!=intmass_num_lines)):
-            if ((mass_val>6.0)&(mass_val<10.0)&(numeeps!=highmass_num_lines)):
+            if ((mass_val>6.0)&(mass_val<10.0)&(numeeps==highmass_num_lines)):
+                continue
+            else:
                 incomplete_eeps_arr.append(eepname)
         if ((mass_val>=10.0)&(numeeps!=highmass_num_lines)):
             incomplete_eeps_arr.append(eepname)
 
     #Make the input file for the track interpolator consisting of only complete EEP files to interpolate bad EEPs from
     os.chdir(code_dir)
-    min_good_mass, max_good_mass = make_iso_input_file(runname, "interp_eeps", incomplete=incomplete_eeps_arr)
+    min_good_mass, max_good_mass = make_iso_input_file(runname, "interp_eeps", basic, incomplete=incomplete_eeps_arr)
     for incomplete_eeps in incomplete_eeps_arr:
         mass_val = float(incomplete_eeps.split('M.track')[0].split('/')[-1])/100.0
         if (mass_val < min_good_mass) | (mass_val > max_good_mass):
