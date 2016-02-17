@@ -142,11 +142,11 @@ def mesa2fsps(runname, basic=False):
     os.system("./make_track " + "input.tracks_"+runname_format)
     
     #Make the FSPS isochrones
-    isoch_directory = os.path.join(home_run_directory, "isochrones")
-    isoch_output = glob.glob(isoch_directory + "/*.iso")
-    fsps_iso_filename = mist2fsps.write_fsps_iso(isoch_output[0])
+#    isoch_directory = os.path.join(home_run_directory, "isochrones")
+#    isoch_output = glob.glob(isoch_directory + "/*.iso")
+#    fsps_iso_filename = mist2fsps.write_fsps_iso(isoch_output[0])
 
-    shutil.move(os.path.join(make_isoch_dir, fsps_iso_filename), isoch_directory)
+#    shutil.move(os.path.join(make_isoch_dir, fsps_iso_filename), isoch_directory)
     
     
     

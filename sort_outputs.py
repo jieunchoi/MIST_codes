@@ -317,7 +317,8 @@ def do_organize(runname):
     print "************************************************************"
     print "**********************MAKE ISOCHRONES***********************"
     print "************************************************************"
-    mesa2fsps.mesa2fsps(runname)
+#    mesa2fsps.mesa2fsps(runname, basic=True)
+    mesa2fsps.mesa2fsps(runname, basic=False)
     
     print "************************************************************"
     print "******************PLOTTING THE EEPS FILES*******************"
