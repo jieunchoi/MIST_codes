@@ -235,17 +235,16 @@
       
 !     check DIFFUSION: to determine whether or not diffusion should happen
 !     no diffusion for fully convective, post-MS, and mega-old models 
+	  s% diffusion_dt_limit = 3.15d7
       if(abs(s% mass_conv_core - s% star_mass) < 1d-2) then ! => fully convective
          s% diffusion_dt_limit = huge_dt_limit
-         s% do_element_diffusion = .false.
       end if
       if (s% star_age > 5d10) then !50 Gyr is really old
          s% diffusion_dt_limit = huge_dt_limit
-         s% do_element_diffusion = .false.
       end if
-      min_center_h1_for_diff = 1d-4
+      min_center_h1_for_diff = 1d-10
       if (s% center_h1 < min_center_h1_for_diff) then
-         s% do_element_diffusion = .false.
+         s% diffusion_dt_limit = huge_dt_limit
       end if
       
 	  end function extras_check_model
