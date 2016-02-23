@@ -1,0 +1,194 @@
+!low and intermediate mass
+
+&star_job
+      
+!PMS
+
+      create_pre_main_sequence_model = .true.
+      pre_ms_T_c = 5d5
+
+!MISC. SETUP
+	  
+      history_columns_file = 'my_history_columns.list'
+      save_model_filename = '<<MASS>>M<<BC_LABEL>>_pAGB.mod'
+	  
+      !parameters to be used for mass on/off for rotation
+      extras_lrpar = 3
+      extras_rpar(1) = 1.2 !full off
+      extras_rpar(2) = 1.8 !full on
+      extras_rpar(3) = 0.4 !omega_div_omega_crit
+
+!OPACITY, NETWORK, RATE, etc.
+
+      !network 
+      change_net = .true.
+      new_net_name = 'mesa_49.net'
+	  
+      !first 100 models are run with simple_photosphere then switched to the following
+      extras_lcpar = 1
+      extras_cpar(1) = '<<BC_TABLE>>'
+	  
+      !opacities with AGSS09 abundances
+      kappa_file_prefix = 'a09'
+      kappa_lowT_prefix = 'lowT_fa05_a09p'
+      kappa_CO_prefix = 'a09_co'
+
+      !use jina
+      set_rates_preference = .true.
+      new_rates_preference = 2
+
+!CHANGE SOLAR ABUNDANCES
+
+      set_uniform_initial_composition = .true.
+      initial_h1 = <<H1>>
+      initial_h2 = <<H2>>
+      initial_he3 = <<He3>>
+      initial_he4 = <<He4>>
+      !for initial Z = <<Z>>
+
+      initial_zfracs = 6 ! AGSS09_zfracs
+	          
+/ ! end of star_job namelist
+
+&controls
+
+      report_why_dt_limits = .false.
+      initial_mass = <<MASS>>
+
+!OUTPUT OPTIONS
+
+      history_interval = 1
+      terminal_interval = 10
+      write_header_frequency = 10
+	  photo_digits = 5
+      photostep = 250
+
+      star_history_dbl_format = '(1pes32.16e3, 1x)'
+      star_history_int_format = '(i32, 1x)'
+      star_history_txt_format = '(a32, 1x)'
+
+      star_history_name = '<<MASS>>M<<BC_LABEL>>_history.data'
+      write_controls_info_with_profile = .false.
+      write_profiles_flag = .false.
+
+!WHEN TO STOP
+
+      !in run_star_extras, it's set to H1 depletion in the core for low mass stars
+      gamma_center_limit = 20.0
+            
+!PHYSICS
+
+      !only for the first 100 model steps
+      which_atm_option = 'simple_photosphere'
+
+      use_Ledoux_criterion = .true.
+      alpha_semiconvection = 0.1
+      thermohaline_coeff = 666.0
+
+      mixing_length_alpha = 1.82
+      mlt_option = 'Henyey'
+	  
+      !to help with convergence
+      okay_to_reduce_gradT_excess = .true.
+      Pextra_factor = 2.0
+
+      !H core overshoot calibrated to M67
+      overshoot_f_above_nonburn_core = 0.016
+      overshoot_f_above_burn_h_core  = 0.016
+      overshoot_f_above_burn_he_core = 0.016
+      overshoot_f_above_burn_z_core  = 0.016
+      overshoot_f0_above_nonburn_core = 0.008
+      overshoot_f0_above_burn_h_core  = 0.008
+      overshoot_f0_above_burn_he_core = 0.008
+      overshoot_f0_above_burn_z_core  = 0.008
+
+      !envelope overshoot calibrated to the sun
+      overshoot_f_above_nonburn_shell = 0.0174
+      overshoot_f_below_nonburn_shell = 0.0174
+      overshoot_f_above_burn_h_shell  = 0.0174
+      overshoot_f_below_burn_h_shell  = 0.0174
+      overshoot_f_above_burn_he_shell = 0.0174
+      overshoot_f_below_burn_he_shell = 0.0174
+      overshoot_f_above_burn_z_shell  = 0.0174
+      overshoot_f_below_burn_z_shell  = 0.0174
+      overshoot_f0_above_nonburn_shell = 0.0087
+      overshoot_f0_below_nonburn_shell = 0.0087
+      overshoot_f0_above_burn_h_shell  = 0.0087
+      overshoot_f0_below_burn_h_shell  = 0.0087
+      overshoot_f0_above_burn_he_shell = 0.0087
+      overshoot_f0_below_burn_he_shell = 0.0087
+      overshoot_f0_below_burn_z_shell  = 0.0087
+      overshoot_f0_above_burn_z_shell  = 0.0087
+
+      !enhance `overshoot_f_below_nonburn_shell` by this factor during 3DUP in TPAGB
+      overshoot_below_noburn_shell_factor = 10
+      
+      !CO enhanced opacities
+      use_Type2_opacities = .true.
+      kap_Type2_full_off_X = 1d-3
+      kap_Type2_full_on_X = 1d-6
+      Zbase = 0.00 ! this is set to Z of the star in run_star_extras.f
+	  
+      !rotational mixing if applicable
+      D_SH_factor =  1.0
+      D_SSI_factor = 1.0
+      D_ES_factor =  1.0
+      D_GSF_factor = 1.0
+      D_DSI_factor = 1.0
+      D_ST_factor = 0.0
+      am_D_mix_factor = 0.033
+      am_gradmu_factor = 0.05
+
+      use_other_wind = .true.
+      RGB_wind_scheme = 'Reimers'
+      AGB_wind_scheme = 'Blocker'
+      RGB_to_AGB_wind_switch = 1d-4
+      Reimers_wind_eta = 0.1
+      Blocker_wind_eta = 0.2
+      max_wind = 1d-3
+
+      do_element_diffusion = .true.
+      diffusion_dt_limit = 3.15e13
+      diffusion_min_T_at_surface = 1d3
+
+      radiation_turbulence_coeff = 1.0
+	  
+      !to help with breathing pulses
+      include_dmu_dt_in_eps_grav = .true.
+
+!CORE MASS DEFINITION
+
+      he_core_boundary_h1_fraction = 1d-4
+      c_core_boundary_he4_fraction = 1d-4
+      o_core_boundary_c12_fraction = 1d-4
+	  	  
+!MESH AND TIMESTEP PARAMETERS
+
+      mesh_delta_coeff = 1.0
+      varcontrol_target = 1d-4
+      max_allowed_nz = 50000
+	  
+      !better resolution of the Henyey hook
+      delta_lg_XH_cntr_max = -1
+
+      ! limit for magnitude of max change
+      delta_lgTeff_limit = 0.005
+      delta_lgTeff_hard_limit = 0.01
+      delta_lgL_limit = 0.02 
+      delta_lgL_hard_limit = 0.05
+	  
+      !multiply mesh_delta_coeff in overshooting regions by this factor
+      xtra_coef_os_above_nonburn = 0.5
+      xtra_coef_os_below_nonburn = 0.5
+      xtra_coef_os_above_burn_h = 0.5
+      xtra_coef_os_below_burn_h = 0.5
+      xtra_coef_os_above_burn_he = 0.5
+      xtra_coef_os_below_burn_he = 0.5
+      xtra_coef_os_above_burn_z = 0.5
+      xtra_coef_os_below_burn_z = 0.5
+      
+/ ! end of controls namelist
+
+&pgstar         
+
+/ ! end of pgstar namelist
