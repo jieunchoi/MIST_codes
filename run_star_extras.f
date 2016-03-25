@@ -227,7 +227,7 @@
       end if
       
 !     define STOPPING CRITERION: stopping criterion for TAMS, low mass stars.
-      if ((s% center_h1 < 1d-4) .and. (s% initial_mass < 0.59)) then
+      if ((s% center_h1 < 1d-4) .and. (s% initial_mass < 0.71)) then
          termination_code_str(t_xtra2) = 'central H1 mass fraction below 1e-4'
          s% termination_code = t_xtra2
          extras_check_model = terminate

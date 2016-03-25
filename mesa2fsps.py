@@ -39,7 +39,7 @@ def mesa2fsps(runname, basic=False):
     if basic == True:
         shutil.copy(os.path.join(code_dir, 'my_history_columns_basic.list'), os.path.join(make_isoch_dir, 'my_history_columns_basic.list'))
     else:
-        shutil.copy(os.path.join(code_dir, 'my_history_columns_shorter.list'), os.path.join(make_isoch_dir, 'my_history_columns_shorter.list'))
+        shutil.copy(os.path.join(code_dir, 'my_history_columns_full.list'), os.path.join(make_isoch_dir, 'my_history_columns_full.list'))
 
     #Make the input file for the isochrones code to make eeps
     make_iso_input_file(runname, "eeps", basic)
@@ -67,6 +67,10 @@ def mesa2fsps(runname, basic=False):
     #Run the isochrone code
     os.chdir(make_isoch_dir)
     os.system("./make_iso " + inputfile)
+    if basic == False:
+        iso_name = os.path.join(os.path.join(newdirname, "isochrones"), '_'.join(runname.split('/'))+"_full.iso")
+        os.system("./make_cmd " + iso_name)
+        os.system("mv " + iso_name+".cmd " + iso_name.split("_full")[0]+".iso.cmd")
 
     #Get the path to the home directory for the run (runname)
     with open(inputfile) as f:
@@ -103,9 +107,9 @@ def mesa2fsps(runname, basic=False):
         #Check the length of each EEP file and identify the ones that are incomplete
         numeeps = int(subprocess.Popen('wc -l '+eepname, stdout=subprocess.PIPE, shell=True).stdout.read().split(' ')[-2])
         mass_val = float(eepname.split('M.track')[0].split('/')[-1])/100.0
-        if ((mass_val<0.6)&(numeeps!=lowmass_num_lines)):
+        if ((mass_val<=0.7)&(numeeps<lowmass_num_lines)):
             incomplete_eeps_arr.append(eepname)
-        if ((mass_val>=0.6)&(mass_val<10.0)&(numeeps!=intmass_num_lines)):
+        if ((mass_val>0.7)&(mass_val<10.0)&(numeeps!=intmass_num_lines)):
             if ((mass_val>6.0)&(mass_val<10.0)&(numeeps==highmass_num_lines)):
                 continue
             else:
@@ -140,13 +144,6 @@ def mesa2fsps(runname, basic=False):
 
     #Interpolate the new tracks
     os.system("./make_track " + "input.tracks_"+runname_format)
-    
-    #Make the FSPS isochrones
-#    isoch_directory = os.path.join(home_run_directory, "isochrones")
-#    isoch_output = glob.glob(isoch_directory + "/*.iso")
-#    fsps_iso_filename = mist2fsps.write_fsps_iso(isoch_output[0])
-
-#    shutil.move(os.path.join(make_isoch_dir, fsps_iso_filename), isoch_directory)
     
     
     
