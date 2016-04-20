@@ -61,7 +61,7 @@ def make_iso_input_file(runname, mode, basic, incomplete=[]):
         mhc_file = "my_history_columns_basic.list"
         iso_file = runname_format+"_basic.iso\n"
     else:
-        mhc_file = "my_history_columns_shorter.list"
+        mhc_file = "my_history_columns_full.list"
         iso_file = runname_format+"_full.iso\n"
     
     header = ["#data directories: 1) history files, 2) eeps, 3) isochrones\n", tracks_dir+"\n", eeps_dir+"\n", iso_dir+"\n", \

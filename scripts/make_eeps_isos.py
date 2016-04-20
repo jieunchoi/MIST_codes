@@ -34,7 +34,7 @@ def make_eeps_isos(runname, basic=False, fsps=False):
     if basic == True:
         shutil.copy(os.path.join(os.environ['MIST_CODE_DIR'], 'mesafiles/my_history_columns_basic.list'), os.path.join(os.environ['ISO_DIR'], 'my_history_columns_basic.list'))
     else:
-        shutil.copy(os.path.join(os.environ['MIST_CODE_DIR'], 'mesafiles/my_history_columns_shorter.list'), os.path.join(os.environ['ISO_DIR'], 'my_history_columns_shorter.list'))
+        shutil.copy(os.path.join(os.environ['MIST_CODE_DIR'], 'mesafiles/my_history_columns_full.list'), os.path.join(os.environ['ISO_DIR'], 'my_history_columns_full.list'))
 
     #Make the input file for the isochrones code to make eeps
     make_iso_input_file.make_iso_input_file(runname, "eeps", basic)
@@ -98,9 +98,9 @@ def make_eeps_isos(runname, basic=False, fsps=False):
         #Check the length of each EEP file and identify the ones that are incomplete
         numeeps = int(subprocess.Popen('wc -l '+eepname, stdout=subprocess.PIPE, shell=True).stdout.read().split(' ')[-2])
         mass_val = float(eepname.split('M.track')[0].split('/')[-1])/100.0
-        if ((mass_val<0.6)&(numeeps!=lowmass_num_lines)):
+        if ((mass_val<=0.7)&(numeeps!=lowmass_num_lines)):
             incomplete_eeps_arr.append(eepname)
-        if ((mass_val>=0.6)&(mass_val<10.0)&(numeeps!=intmass_num_lines)):
+        if ((mass_val>0.7)&(mass_val<10.0)&(numeeps!=intmass_num_lines)):
             if ((mass_val>6.0)&(mass_val<10.0)&(numeeps==highmass_num_lines)):
                 continue
             else:
