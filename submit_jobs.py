@@ -29,28 +29,28 @@ if __name__ == "__main__":
     runname = sys.argv[1]
     FeH = sys.argv[2]
     Z = calc_xyz.calc_xyz(float(FeH),feh=True)[-1]
-    dirname = os.path.join(mistgrid_dir, runname)
+    dirname = os.path.join(os.environ['MIST_GRID_DIR'], runname)
     
     #Create a working directory
     try:
         os.mkdir(dirname)
     except OSError:
         print "The directory already exists"
-            sys.exit(0)
+        sys.exit(0)
 
     #Generate inlists using template inlist files
     tempstor_inlist_dir = os.path.join(os.environ['MESAWORK_DIR'], 'inlists/inlists_'+'_'.join(runname.split('/')))
     new_inlist_name = '<<MASS>>M<<BC_LABEL>>.inlist'
     make_replacements.make_replacements(make_inlist_inputs.make_inlist_inputs(runname, Z, 'VeryLow'), new_inlist_name,\
-        direc=tempstor_inlist_dir, file_base=os.path.join(code_dir,'mesafiles/inlist_lowinter'), clear_direc=True)
+        direc=tempstor_inlist_dir, file_base=os.path.join(os.environ['MIST_CODE_DIR'],'mesafiles/inlist_lowinter'), clear_direc=True)
     make_replacements.make_replacements(make_inlist_inputs.make_inlist_inputs(runname, Z, 'LowDiffBC'), new_inlist_name,\
-        direc=tempstor_inlist_dir, file_base=os.path.join(code_dir,'mesafiles/inlist_lowinter'))
+        direc=tempstor_inlist_dir, file_base=os.path.join(os.environ['MIST_CODE_DIR'],'mesafiles/inlist_lowinter'))
     make_replacements.make_replacements(make_inlist_inputs.make_inlist_inputs(runname, Z, 'Intermediate'), new_inlist_name,\
-        direc=tempstor_inlist_dir, file_base=os.path.join(code_dir,'mesafiles/inlist_lowinter'))
+        direc=tempstor_inlist_dir, file_base=os.path.join(os.environ['MIST_CODE_DIR'],'mesafiles/inlist_lowinter'))
     make_replacements.make_replacements(make_inlist_inputs.make_inlist_inputs(runname, Z, 'HighDiffBC'), new_inlist_name,\
-        direc=tempstor_inlist_dir, file_base=os.path.join(code_dir,'mesafiles/inlist_high'))
+        direc=tempstor_inlist_dir, file_base=os.path.join(os.environ['MIST_CODE_DIR'],'mesafiles/inlist_high'))
     make_replacements.make_replacements(make_inlist_inputs.make_inlist_inputs(runname, Z, 'VeryHigh'), new_inlist_name,\
-        direc=tempstor_inlist_dir, file_base=os.path.join(code_dir,'mesafiles/inlist_high'))
+        direc=tempstor_inlist_dir, file_base=os.path.join(os.environ['MIST_CODE_DIR'],'mesafiles/inlist_high'))
         
     inlist_list = os.listdir(tempstor_inlist_dir)
     inlist_list.sort()
@@ -64,9 +64,9 @@ if __name__ == "__main__":
 
         #Copy over the contents of the template directory and copy over the most recent my_history_columns.list and run_star_extras.f
         try:
-            shutil.copytree(os.path.join(work_dir, "cleanworkdir"), pathtoinlistdir)
-            shutil.copy(os.path.join(code_dir, 'mesafiles/my_history_columns.list'), os.path.join(os.path.join(work_dir, "cleanworkdir"), 'my_history_columns.list'))
-            shutil.copy(os.path.join(code_dir, 'mesafiles/run_star_extras.f'), os.path.join(os.path.join(work_dir, "cleanworkdir"), 'src/run_star_extras.f'))
+            shutil.copytree(os.path.join(os.environ['MESAWORK_DIR'], "cleanworkdir"), pathtoinlistdir)
+            shutil.copy(os.path.join(os.environ['MIST_CODE_DIR'], 'mesafiles/my_history_columns.list'), os.path.join(os.path.join(os.environ['MESAWORK_DIR'], "cleanworkdir"), 'my_history_columns.list'))
+            shutil.copy(os.path.join(os.environ['MIST_CODE_DIR'], 'mesafiles/run_star_extras.f'), os.path.join(os.path.join(os.environ['MESAWORK_DIR'], "cleanworkdir"), 'src/run_star_extras.f'))
         except OSError:
             pass
 
@@ -77,7 +77,7 @@ if __name__ == "__main__":
         shutil.rmtree(tempstor_inlist_dir)
 
         #Create and move the SLURM file to the correct directory
-        runbasefile = os.path.join(code_dir, 'mesafiles/SLURM_MISTgrid.sh')
+        runbasefile = os.path.join(os.environ['MIST_CODE_DIR'], 'mesafiles/SLURM_MISTgrid.sh')
         slurmfile = make_slurm_sh.make_slurm_sh(inlistname, pathtoinlistdir, runbasefile)
         shutil.move(slurmfile, pathtoinlistdir)
         
@@ -85,5 +85,5 @@ if __name__ == "__main__":
         os.chdir(pathtoinlistdir)
         print "sbatch " + slurmfile
         os.system("sbatch "+slurmfile)
-        os.chdir(code_dir)
+        os.chdir(os.environ['MIST_CODE_DIR'])
     

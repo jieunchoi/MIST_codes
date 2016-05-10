@@ -75,12 +75,12 @@ def make_iso_input_file(runname, mode, basic, incomplete=[]):
         +"{:>7.2f}".format(fehval)+"{:>12.2f}".format(float(fehyzinfo[:,1][fehyzinfo_ind]))+"{:>9}".format(vvcrit.split('vvcrit')[-1])+"\n"
     header = ["#version string, max 8 characters\n", "1.0\n", "#initial Y, initial Z, [Fe/H], [alpha/Fe], v/vcrit\n",\
         fmt_abun_info, "#data directories: 1) history files, 2) eeps, 3) isochrones\n", tracks_dir+"\n", eeps_dir+"\n", iso_dir+"\n", \
-        "# read history_columns\n", os.path.join(make_isoch_dir, mhc_file)+"\n", "# specify tracks\n", str(len(tracks_list))+"\n"]
+        "# read history_columns\n", os.path.join(os.environ['ISO_DIR'], mhc_file)+"\n", "# specify tracks\n", str(len(tracks_list))+"\n"]
     footer = ["#specify isochrones\n", iso_file, "min_max\n", "log10\n", "107\n", "5.0\n", "10.3\n", "single\n"]
 
     #Write the file
     print "**************************************************************************"
-    print "WRITE NEW ISO INPUT FILE..... "+make_isoch_dir+"/"+inputfilename
+    print "WRITE NEW ISO INPUT FILE..... "+os.environ['ISO_DIR']+"/"+inputfilename
     print "**************************************************************************"
     with open(inputfilename, "w") as newinputfile:
         for headerline in header:
@@ -91,7 +91,7 @@ def make_iso_input_file(runname, mode, basic, incomplete=[]):
         for footerline in footer:
             newinputfile.write(footerline)
     
-    os.system("mv " + inputfilename + " " + make_isoch_dir)
+    os.system("mv " + inputfilename + " " + os.environ['ISO_DIR'])
 
     #Used to check which masses can/can't be interpolated in mesa2fsps.py
     if mode == 'interp_eeps':
