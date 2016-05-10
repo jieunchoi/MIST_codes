@@ -73,9 +73,6 @@ if __name__ == "__main__":
         #Populate each directory with appropriate inlists and rename as inlist_project
         shutil.copy(os.path.join(tempstor_inlist_dir,inlistname), os.path.join(pathtoinlistdir, 'inlist_project'))
 
-        #Clean up the temporarily stored inlist directory
-        shutil.rmtree(tempstor_inlist_dir)
-
         #Create and move the SLURM file to the correct directory
         runbasefile = os.path.join(os.environ['MIST_CODE_DIR'], 'mesafiles/SLURM_MISTgrid.sh')
         slurmfile = make_slurm_sh.make_slurm_sh(inlistname, pathtoinlistdir, runbasefile)
