@@ -9,8 +9,7 @@ import matplotlib.pyplot as plt
 import os
 import numpy as np
 
-import isochrones
-import mesa_plot_eeps as mp
+from plot_routine import read_mist_models
 
 def plot_HRD(gridname, logg=False):
     
@@ -34,9 +33,10 @@ def plot_HRD(gridname, logg=False):
     filelist = glob.glob(os.path.join(grid_dir, 'eeps/*M.track.eep'))
     for file in filelist:
         starmass = float(file.split('eeps/')[1].split('M')[0])/100.0
-        star = mp.EEPfile(file)
+        star = read_mist_models.EEP(file)
+        logTeff, logL, logg = star.eeps['log_Teff'], star.eeps['log_L'], star.eeps['log_g']
     	if logg == False:
-            star.plot_HR(color='RoyalBlue')
+            plt.plot(logTeff, logL, color='RoyalBlue')
             if starmass < 0.8:
                 plt.axis([5.5, 3.0, -6, 4])
             elif starmass < 10.0:
@@ -46,7 +46,7 @@ def plot_HRD(gridname, logg=False):
             figname = os.path.join(grid_dir, 'plots/'+lowest_dir+'_'+file.split('eeps/')[1].split('M')[0] +'M'+ file.split('eeps/')[1].split('M')[1].split('.track')[0]+'_track_ind.pdf')
 
         elif logg == True:
-            star.plot_HR(colorname='RoyalBlue', logg=True)
+            plt.plot(logTeff, logg, color='RoyalBlue')
             if starmass < 0.8:
                 plt.axis([5.5, 3.0, 9, 0])
             elif starmass < 10.0:
@@ -88,11 +88,11 @@ def plot_iso(gridname):
     grid_dir = os.path.join(os.environ['MIST_GRID_DIR'], gridname)
     lowest_dir = gridname.split('/')[-1]
     iso_dir = glob.glob(os.path.join(grid_dir, 'isochrones/MIST*iso'))[0]
-    isochrone = isochrones.MESA_Isochrones(iso_dir)
+    isochrone = read_mist_models.ISO(iso_dir)
     
     age_list = np.linspace(5, 10.3, 107)
-    for age in age_list:
-        isochrone.plot_HRD(min_log_age=age-0.01,max_log_age=age+0.01, fig_num=1)
+    for i_a, age in enumerate(age_list):
+        plt.plot(isochrone.isos[i_a]['log_Teff'], isochrone.isos[i_a]['log_L'], fig_num=1)
         
         if age <= 7.0:
             plt.axis([5.5, 3.2, -3, 7])
