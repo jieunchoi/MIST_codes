@@ -20,7 +20,8 @@
 	 
    ! mass fractions near surface (averaged over the outer 1e−6% of the total stellar mass)
    
-      surface h1 !
+      surface h1
+	  surface he3
       surface he4
       surface c12
       surface o16
