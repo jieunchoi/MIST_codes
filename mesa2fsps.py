@@ -75,18 +75,18 @@ def mesa2fsps(runname, basic=False):
     #Get the path to the home directory for the run (runname)
     with open(inputfile) as f:
         lines=f.readlines()
-    tracks_directory = lines[1].replace("\n", "")
+    tracks_directory = lines[5].replace("\n", "")
     home_run_directory = tracks_directory.split("/tracks")[0]
 
     #Get the total number of EEPs from input.eep
-    #5 lines of header
+    #12 lines of header
     with open(os.path.join(make_isoch_dir, "input.eep"), "r") as inputf:
         inputeep_data = inputf.readlines()
     #Add 1 to account for the first primary EEP
-    lowmass_num_lines = 5 + 1
-    intmass_num_lines = 5 + 1
-    highmass_num_lines = 5 + 1
-    for i_l, line in enumerate(inputeep_data[2:11]):
+    lowmass_num_lines = 12 + 1
+    intmass_num_lines = 12 + 1
+    highmass_num_lines = 12 + 1
+    for i_l, line in enumerate(inputeep_data[2:8]):
         #Get the secondary EEP number
         numseceep = int(line.strip('\n').split(' ')[-1])
         #Add one for each primary EEP
@@ -97,7 +97,9 @@ def mesa2fsps(runname, basic=False):
         intmass_num_lines += numseceep+1
 
     #Generate a list of incomplete EEPs
+    home_run_directory
     eeps_directory = os.path.join(home_run_directory, "eeps")
+    print eeps_directory
     incomplete_eeps_arr = []
     for eepname in glob.glob(eeps_directory + "/*.eep"):
         #Remove the pre-blended EEPs
@@ -138,6 +140,7 @@ def mesa2fsps(runname, basic=False):
 
     #Write out a textfile of interpolated EEPs
     incomplete_eeps_arr.sort()
+    print eeps_directory
     with open(eeps_directory+"/interpolated_eeps.txt", "w") as list_interp_eeps:
         for incomplete_eeps in incomplete_eeps_arr:
             list_interp_eeps.write(incomplete_eeps+"\n")

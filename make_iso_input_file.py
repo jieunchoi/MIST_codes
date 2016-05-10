@@ -69,8 +69,18 @@ def make_iso_input_file(runname, mode, basic, incomplete=[]):
     else:
         mhc_file = "my_history_columns_full.list"
         iso_file = runname_format+"_full.iso\n"
-    
-    header = ["#data directories: 1) history files, 2) eeps, 3) isochrones\n", tracks_dir+"\n", eeps_dir+"\n", iso_dir+"\n", \
+
+    fehyzinfo = np.genfromtxt('feh_zinit_yinit_table.txt')
+    dirname = runname.split('/')[-1]
+    fehstr, feh, afestr, afe, vvcrit = dirname.split('_')
+    fehval = float(feh[1:])*1.0
+    if 'm' in feh:
+        fehval *= -1.0
+    fehyzinfo_ind = np.where(fehyzinfo[:,0] == fehval)[0]
+    fmt_abun_info = "{:>10.4f}".format(float(fehyzinfo[:,2][fehyzinfo_ind]))+"{:>12.5e}".format(float(fehyzinfo[:,3][fehyzinfo_ind]))\
+        +"{:>7.2f}".format(fehval)+"{:>12.2f}".format(float(fehyzinfo[:,1][fehyzinfo_ind]))+"{:>9}".format(vvcrit.split('vvcrit')[-1])+"\n"
+    header = ["#version string, max 8 characters\n", "1.0\n", "#initial Y, initial Z, [Fe/H], [alpha/Fe], v/vcrit\n",\
+        fmt_abun_info, "#data directories: 1) history files, 2) eeps, 3) isochrones\n", tracks_dir+"\n", eeps_dir+"\n", iso_dir+"\n", \
         "# read history_columns\n", os.path.join(make_isoch_dir, mhc_file)+"\n", "# specify tracks\n", str(len(tracks_list))+"\n"]
     footer = ["#specify isochrones\n", iso_file, "min_max\n", "log10\n", "107\n", "5.0\n", "10.3\n", "single\n"]
 
