@@ -32,7 +32,7 @@ def make_inlist_inputs(runname, Z, startype):
     #Array of all masses
     massgrid = lambda i,f,step: np.linspace(i,f,round(((f-i)/step))+1.0)
 
-    bigmassgrid = np.unique(np.hstack((np.array([0.09]), massgrid(0.1,0.3,0.05),\
+    bigmassgrid = np.unique(np.hstack((massgrid(0.1,0.3,0.05),\
                                            massgrid(0.3,0.4,0.01), massgrid(0.4,0.9,0.05),\
                                            massgrid(0.92,2.8,0.02), massgrid(3.0,8.0,0.2),\
                                            massgrid(9,20,1), massgrid(20,40,2), massgrid(40,150,5),\
