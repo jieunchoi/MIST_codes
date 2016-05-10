@@ -97,9 +97,7 @@ def mesa2fsps(runname, basic=False):
         intmass_num_lines += numseceep+1
 
     #Generate a list of incomplete EEPs
-    home_run_directory
     eeps_directory = os.path.join(home_run_directory, "eeps")
-    print eeps_directory
     incomplete_eeps_arr = []
     for eepname in glob.glob(eeps_directory + "/*.eep"):
         #Remove the pre-blended EEPs
