@@ -62,22 +62,26 @@ def make_eeps_isos(runname, basic=False, fsps=False):
     #Run the isochrone code
     os.chdir(os.environ['ISO_DIR'])
     os.system("./make_iso " + inputfile)
+    if basic == False:
+        iso_name = os.path.join(os.path.join(newdirname, "isochrones"), '_'.join(runname.split('/'))+"_full.iso")
+        os.system("./make_cmd " + iso_name)
+        os.system("mv " + iso_name+".cmd " + iso_name.split("_full")[0]+".iso.cmd")
 
     #Get the path to the home directory for the run (runname)
     with open(inputfile) as f:
         lines=f.readlines()
-    tracks_directory = lines[1].replace("\n", "")
+    tracks_directory = lines[5].replace("\n", "")
     home_run_directory = tracks_directory.split("/tracks")[0]
 
     #Get the total number of EEPs from input.eep
-    #5 lines of header
+    #12 lines of header
     with open(os.path.join(os.environ['ISO_DIR'], "input.eep"), "r") as inputf:
         inputeep_data = inputf.readlines()
     #Add 1 to account for the first primary EEP
-    lowmass_num_lines = 5 + 1
-    intmass_num_lines = 5 + 1
-    highmass_num_lines = 5 + 1
-    for i_l, line in enumerate(inputeep_data[2:11]):
+    lowmass_num_lines = 12 + 1
+    intmass_num_lines = 12 + 1
+    highmass_num_lines = 12 + 1
+    for i_l, line in enumerate(inputeep_data[2:8]):
         #Get the secondary EEP number
         numseceep = int(line.strip('\n').split(' ')[-1])
         #Add one for each primary EEP
