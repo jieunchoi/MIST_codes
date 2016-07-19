@@ -18,15 +18,13 @@ def read_mist(file):
     #Read header info
     with open(file) as f:
         data = f.readlines()
-        header = data[0:3]
-        print '------------------------------------------------------------'
-        print header[0].split('\n')[0]
-        print header[1].split('\n')[0]
-        print header[2].split('\n')[0]
-        print '------------------------------------------------------------'
+    header = data[:11]
+    print '------------------------------------------------------------'
+    print file
+    print '------------------------------------------------------------'
     
     #Read the column names
-    colname_string1 = data[4]
+    colname_string1 = data[10]
     colname_string2 = colname_string1.replace("\n", "")
     colname_string3 = colname_string2.replace("#", "")
     colname_list = colname_string3.split()

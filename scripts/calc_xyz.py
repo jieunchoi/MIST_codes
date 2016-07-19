@@ -1,7 +1,7 @@
 """
 
 Computes H1, H2, He3, He4 (and Z) given an arbitrary Z or Fe/H.
-Assumes Asplund+2009 solar abundances and Y_bbn = 0.2484
+Assumes Asplund+2009 solar abundances and Y_bbn = 0.249
 
 Args:
     znew: the new mass fraction in metals
