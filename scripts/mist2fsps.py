@@ -34,7 +34,7 @@ def read_mist(file):
 
     return data, colname_list
 
-def write_fsps_iso(file):
+def write_fsps_iso(file, logage=False):
     
     """
     
@@ -59,7 +59,10 @@ def write_fsps_iso(file):
     fmt = "{:8.2f}{:14.8f}{:14.8f}{:14.8f}{:14.8f}{:14.8f}{:14.8f}{:14.8f}{:14.5e}"
     
     #Identify columns
-    log_age = data[:, mist_col_names.index('log10_isochrone_age_yr')].T    
+    if logage == True:
+        log_age = data[:, mist_col_names.index('log10_isochrone_age_yr')].T
+    else:
+        log_age = np.log10(data[:, mist_col_names.index('isochrone_age_yr')].T)
     mini = data[:, mist_col_names.index('initial_mass')].T
     mact = data[:, mist_col_names.index('star_mass')].T
     log_L = data[:, mist_col_names.index('log_L')].T

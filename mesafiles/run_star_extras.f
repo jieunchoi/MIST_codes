@@ -235,7 +235,7 @@
       
 !     check DIFFUSION: to determine whether or not diffusion should happen
 !     no diffusion for fully convective, post-MS, and mega-old models 
-	  s% diffusion_dt_limit = 3.15d7
+	  s% diffusion_dt_limit = original_diffusion_dt_limit
       if(abs(s% mass_conv_core - s% star_mass) < 1d-2) then ! => fully convective
          s% diffusion_dt_limit = huge_dt_limit
       end if
