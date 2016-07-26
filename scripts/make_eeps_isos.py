@@ -22,7 +22,7 @@ import make_iso_input_file
 def make_eeps_isos(runname, basic=False, fsps=False):
     
     #Path to the new organized directory
-    newdirname = os.path.join(os.environ['MIST_CODE_DIR'],runname)
+    newdirname = os.path.join(os.environ['MIST_GRID_DIR'],runname)
     
     runname_format = '_'.join(runname.split('/'))
     inputfile = "input."+runname_format
@@ -44,7 +44,7 @@ def make_eeps_isos(runname, basic=False, fsps=False):
     os.system("./make_eep " + inputfile)
     
     #Loop through the low and high masses and blend the tracks
-    initial_eeps_list_fullname = glob.glob(os.path.join(os.environ['MIST_CODE_DIR'], runname+"/eeps/*.eep"))
+    initial_eeps_list_fullname = glob.glob(os.path.join(os.environ['MIST_GRID_DIR'], runname+"/eeps/*.eep"))
     initial_eeps_list = [x.split('eeps/')[1] for x in initial_eeps_list_fullname]
     blend_ind = ['M_' in x for x in initial_eeps_list]
     blend_list = [x for x, y in zip(initial_eeps_list, blend_ind) if y]

@@ -2,7 +2,7 @@ import glob
 import os
 import csv
 import subprocess
-import datetime
+from datetime import datetime
 
 from scripts import mesa_hist_trim
 from scripts import reformat_massname
@@ -81,8 +81,8 @@ def gen_summary(rawdirname):
         dates = subprocess.Popen('grep [0-9][0-9]:[0-9][0-9]:[0-9][0-9] ' + listoutfiles[index], shell=True, stdout=subprocess.PIPE)
         try:
             startdate, enddate = dates.stdout
-            startdate_fmt = datetime.strptime(startdate, '%a %b %d %H:%M:%S %Z %Y')
-            enddate_fmt = datetime.strptime(enddate, '%a %b %d %H:%M:%S %Z %Y')
+            startdate_fmt = datetime.strptime(startdate.rstrip('\n'), '%a %b %d %H:%M:%S %Z %Y')
+            enddate_fmt = datetime.strptime(enddate.rstrip('\n'), '%a %b %d %H:%M:%S %Z %Y')
             
             delta_time = (enddate_fmt - startdate_fmt)
             #Total run time in decimal hours
