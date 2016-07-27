@@ -62,10 +62,6 @@ def make_eeps_isos(runname, basic=False, fsps=False):
     #Run the isochrone code
     os.chdir(os.environ['ISO_DIR'])
     os.system("./make_iso " + inputfile)
-    if basic == False:
-        iso_name = os.path.join(os.path.join(newdirname, "isochrones"), '_'.join(runname.split('/'))+"_full.iso")
-        os.system("./make_cmd " + iso_name)
-        os.system("mv " + iso_name+".cmd " + iso_name.split("_full")[0]+".iso.cmd")
 
     #Get the path to the home directory for the run (runname)
     with open(inputfile) as f:

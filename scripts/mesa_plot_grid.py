@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import os
 import numpy as np
 
-from plot_routine import read_mist_models
+import read_mist_models
 
 def plot_HRD(gridname, logg=False):
     
