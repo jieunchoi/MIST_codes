@@ -56,7 +56,7 @@ def write_fsps_iso(file, logage=False):
     numrow = np.shape(data)[0]
     
     #Format specifications
-    fmt = "{:8.2f}{:14.8f}{:14.8f}{:14.8f}{:14.8f}{:14.8f}{:14.8f}{:14.8f}{:14.5e}"
+    fmt = "{:8.3f}{:14.8f}{:14.8f}{:14.8f}{:14.8f}{:14.8f}{:14.8f}{:14.8f}{:14.5e}"
     
     #Identify columns
     if logage == True:

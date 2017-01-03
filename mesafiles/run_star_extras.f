@@ -134,6 +134,150 @@
 !     returns either keep_going, retry, backup, or terminate.
       integer function extras_check_model(id, id_extra)
       integer, intent(in) :: id, id_extra
+      integer :: ierr
+      type (star_info), pointer :: s
+      ierr = 0	 
+      call star_ptr(id, s, ierr)
+      if (ierr /= 0) return
+      extras_check_model = keep_going
+                  
+	  end function extras_check_model
+      
+      
+      integer function how_many_extra_history_columns(id, id_extra)
+      integer, intent(in) :: id, id_extra
+      integer :: ierr
+      type (star_info), pointer :: s
+      ierr = 0
+      call star_ptr(id, s, ierr)
+      if (ierr /= 0) return
+      how_many_extra_history_columns = 6
+      end function how_many_extra_history_columns
+      
+      
+      subroutine data_for_extra_history_columns(id, id_extra, n, names, vals, ierr)
+      integer, intent(in) :: id, id_extra, n
+      character (len=maxlen_history_column_name) :: names(n)
+      real(dp) :: vals(n)
+      integer, intent(out) :: ierr
+      type (star_info), pointer :: s
+	  real(dp) :: ocz_top_radius, ocz_bot_radius, &
+          ocz_top_mass, ocz_bot_mass, mixing_length_at_bcz, &
+          dr, ocz_turnover_time_g, ocz_turnover_time_l
+      integer :: i, k, n_conv_bdy, nz, k_ocz_top, k_ocz_bot
+	  
+      ierr = 0
+      call star_ptr(id, s, ierr)
+      if (ierr /= 0) return
+	  
+!     output info about the CONV. ENV.: the CZ location, turnover time
+      nz = s% nz
+      n_conv_bdy = s% num_conv_boundaries
+      i = s% n_conv_regions
+      k_ocz_bot = 0
+      k_ocz_top = 0
+      ocz_turnover_time_g = 0
+      ocz_turnover_time_l = 0
+      
+      !check the outermost convection zone
+      if (s% cz_top_mass(i)/s% mstar > 0.99d0) then
+          ocz_bot_mass = s% cz_bot_mass(i)
+          ocz_top_mass = s% cz_top_mass(i)
+          !get top radius information
+          !start from k=2 (second most outer zone) in order to access k-1
+          do k=2,nz
+              if (s% m(k) < ocz_top_mass) then 
+                  ocz_top_radius = s% r(k-1)
+                  k_ocz_top = k-1
+                  exit
+              end if
+          end do
+          !get top radius information
+          do k=2,nz 
+              if (s% m(k) < ocz_bot_mass) then 
+                  ocz_bot_radius = s% r(k-1)
+                  k_ocz_bot = k-1
+                  exit
+              end if
+          end do  
+          
+          !if the star is fully convective, then the bottom boundary is the center
+          if ((k_ocz_bot == 0) .and. (k_ocz_top > 0)) then
+              k_ocz_bot = nz
+          end if
+
+          !compute the "global" turnover time
+          do k=k_ocz_top,k_ocz_bot
+              if (k==1) cycle
+              dr = s%r(k-1)-s%r(k)
+              ocz_turnover_time_g = ocz_turnover_time_g + (dr/s%conv_vel(k))
+          end do          
+
+          !compute the "local" turnover time
+          mixing_length_at_bcz = s% mlt_mixing_length(k_ocz_bot)
+          do k=k_ocz_bot,k_ocz_top,-1
+              if (s% r(k) > (s% r(k_ocz_bot)+(mixing_length_at_bcz))) then
+                  ocz_turnover_time_l = mixing_length_at_bcz/s% conv_vel(k)
+                  exit
+              end if
+          end do
+
+      else
+          ocz_top_mass = 0.0
+          ocz_bot_mass = 0.0
+          ocz_top_radius = 0.0
+          ocz_bot_radius = 0.0
+      endif 
+      
+      names(1) = 'conv_env_top_mass'
+      vals(1) = ocz_top_mass/msun
+      names(2) = 'conv_env_bot_mass'
+      vals(2) = ocz_bot_mass/msun
+      names(3) = 'conv_env_top_radius'
+      vals(3) = ocz_top_radius/rsun
+      names(4) = 'conv_env_bot_radius'
+      vals(4) = ocz_bot_radius/rsun
+      names(5) = 'conv_env_turnover_time_l'
+      vals(5) = ocz_turnover_time_l
+      names(6) = 'conv_env_turnover_time_g'
+      vals(6) = ocz_turnover_time_g
+      
+      end subroutine data_for_extra_history_columns
+      
+      
+      integer function how_many_extra_profile_columns(id, id_extra)
+      use star_def, only: star_info
+      integer, intent(in) :: id, id_extra
+      integer :: ierr
+      type (star_info), pointer :: s
+	  
+      ierr = 0
+      call star_ptr(id, s, ierr)
+      if (ierr /= 0) return
+      how_many_extra_profile_columns = 0
+	  
+      end function how_many_extra_profile_columns
+      
+      
+      subroutine data_for_extra_profile_columns(id, id_extra, n, nz, names, vals, ierr)
+      use star_def, only: star_info, maxlen_profile_column_name
+      use const_def, only: dp
+      integer, intent(in) :: id, id_extra, n, nz
+      character (len=maxlen_profile_column_name) :: names(n)
+      real(dp) :: vals(nz,n)
+      integer, intent(out) :: ierr
+      type (star_info), pointer :: s
+      integer :: k
+      ierr = 0
+      call star_ptr(id, s, ierr)
+      if (ierr /= 0) return
+      end subroutine data_for_extra_profile_columns
+      
+      
+!     returns either keep_going or terminate.
+!     note: cannot request retry or backup; extras_check_model can do that.
+      integer function extras_finish_step(id, id_extra)
+      integer, intent(in) :: id, id_extra
       integer :: ierr, r, burn_category
       real(dp) :: envelope_mass_fraction, L_He, L_tot, orig_eta, target_eta, min_center_h1_for_diff, critmass, feh
       real(dp) :: category_factors(num_categories)
@@ -142,17 +286,27 @@
       real(dp), parameter :: Zsol = 0.0142
       type (star_info), pointer :: s
       type (Net_General_Info), pointer :: g
+	  logical :: diff_test1, diff_test2, diff_test3
       character (len=strlen) :: photoname
-      
-      ierr = 0	 
+
+      ierr = 0
       call star_ptr(id, s, ierr)
       if (ierr /= 0) return
-      extras_check_model = keep_going
+      extras_finish_step = keep_going
+      call store_extra_info(s)
       
       ierr = 0
       call get_net_ptr(s% net_handle, g, ierr)
       if (ierr /= 0) stop 'bad handle'	  
       
+!     set BC: change to tables after running on simple photosphere
+      if (s% model_number == 100) then
+         write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
+         write(*,*) 'switching from simple photosphere to ', s% job% extras_cpar(1)
+         write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
+         s% which_atm_option = s% job% extras_cpar(1)
+      endif
+	  
 !     increase VARCONTROL and MDOT: increase varcontrol and Mdot when the model hits the TPAGB phase
       if ((s% initial_mass < 10) .and. (s% center_h1 < 1d-4) .and. (s% center_he4 < 1d-4)) then
          !try turning up Mdot
@@ -178,16 +332,16 @@
 
          if ((s% have_done_TP) .and. (s% varcontrol_target < new_varcontrol_target)) then !only print the first time
             s% varcontrol_target = new_varcontrol_target
-            
+         
 !     CONVERGENCE TEST CHANGING C
      s% varcontrol_target = s% varcontrol_target * 1.0
-            
+         
             write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
             write(*,*) 'increasing varcontrol to ', s% varcontrol_target
             write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
          end if
       end if
-      
+   
 !     treat postAGB: suppress late burning by turn off burning post-AGB and also save a model and photo
       envelope_mass_fraction = 1d0 - max(s% he_core_mass, s% c_core_mass, s% o_core_mass)/s% star_mass
       category_factors(:) = 1.0 !turn off burning except for H
@@ -212,113 +366,39 @@
 			  burn_check = 1.0
 		  end if		  
       end if
-      
+   
 !     define STOPPING CRITERION: stopping criterion for C burning, massive stars.
       if ((s% center_h1 < 1d-4) .and. (s% center_he4 < 1d-4)) then
          if ((s% center_c12 < 1d-4) .and. (s% initial_mass >= 10.0)) then
             termination_code_str(t_xtra1) = 'central C12 mass fraction below 1e-4'
             s% termination_code = t_xtra1
-            extras_check_model = terminate
+            extras_finish_step = terminate
          else if ((s% center_c12 < 1d-2) .and. (s% initial_mass < 10.0)) then
             termination_code_str(t_xtra2) = 'central C12 mass fraction below 1e-2'
             s% termination_code = t_xtra2
-            extras_check_model = terminate
+            extras_finish_step = terminate
          end if
       end if
-      
+   
 !     define STOPPING CRITERION: stopping criterion for TAMS, low mass stars.
       if ((s% center_h1 < 1d-4) .and. (s% initial_mass < 0.59)) then
          termination_code_str(t_xtra2) = 'central H1 mass fraction below 1e-4'
          s% termination_code = t_xtra2
-         extras_check_model = terminate
+         extras_finish_step = terminate
       end if
-      
+   
 !     check DIFFUSION: to determine whether or not diffusion should happen
 !     no diffusion for fully convective, post-MS, and mega-old models 
-	  s% diffusion_dt_limit = original_diffusion_dt_limit
-      if(abs(s% mass_conv_core - s% star_mass) < 1d-2) then ! => fully convective
-         s% diffusion_dt_limit = huge_dt_limit
-      end if
-      if (s% star_age > 5d10) then !50 Gyr is really old
-         s% diffusion_dt_limit = huge_dt_limit
-      end if
-      min_center_h1_for_diff = 1d-10
-      if (s% center_h1 < min_center_h1_for_diff) then
-         s% diffusion_dt_limit = huge_dt_limit
-      end if
-      
-	  end function extras_check_model
-      
-      
-      integer function how_many_extra_history_columns(id, id_extra)
-      integer, intent(in) :: id, id_extra
-      integer :: ierr
-      type (star_info), pointer :: s
-      ierr = 0
-      call star_ptr(id, s, ierr)
-      if (ierr /= 0) return
-      how_many_extra_history_columns = 0
-      end function how_many_extra_history_columns
-      
-      
-      subroutine data_for_extra_history_columns(id, id_extra, n, names, vals, ierr)
-      integer, intent(in) :: id, id_extra, n
-      character (len=maxlen_history_column_name) :: names(n)
-      real(dp) :: vals(n)
-      integer, intent(out) :: ierr
-      type (star_info), pointer :: s
-      ierr = 0
-      call star_ptr(id, s, ierr)
-      if (ierr /= 0) return
-      end subroutine data_for_extra_history_columns
-      
-      
-      integer function how_many_extra_profile_columns(id, id_extra)
-      use star_def, only: star_info
-      integer, intent(in) :: id, id_extra
-      integer :: ierr
-      type (star_info), pointer :: s
-      ierr = 0
-      call star_ptr(id, s, ierr)
-      if (ierr /= 0) return
-      how_many_extra_profile_columns = 0
-      end function how_many_extra_profile_columns
-      
-      
-      subroutine data_for_extra_profile_columns(id, id_extra, n, nz, names, vals, ierr)
-      use star_def, only: star_info, maxlen_profile_column_name
-      use const_def, only: dp
-      integer, intent(in) :: id, id_extra, n, nz
-      character (len=maxlen_profile_column_name) :: names(n)
-      real(dp) :: vals(nz,n)
-      integer, intent(out) :: ierr
-      type (star_info), pointer :: s
-      integer :: k
-      ierr = 0
-      call star_ptr(id, s, ierr)
-      if (ierr /= 0) return
-      end subroutine data_for_extra_profile_columns
-      
-      
-!     returns either keep_going or terminate.
-!     note: cannot request retry or backup; extras_check_model can do that.
-      integer function extras_finish_step(id, id_extra)
-      integer, intent(in) :: id, id_extra
-      integer :: ierr
-      type (star_info), pointer :: s
-      ierr = 0
-      call star_ptr(id, s, ierr)
-      if (ierr /= 0) return
-      extras_finish_step = keep_going
-      call store_extra_info(s)
-      
-!     set BC: change to tables after running on simple photosphere
-      if (s% model_number == 100) then
-         write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
-         write(*,*) 'switching from simple photosphere to ', s% job% extras_cpar(1)
-         write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
-         s% which_atm_option = s% job% extras_cpar(1)
-      endif
+	  min_center_h1_for_diff = 1d-10
+	  diff_test1 = abs(s% mass_conv_core - s% star_mass) < 1d-2 !fully convective
+	  diff_test2 = s% star_age > 5d10 !really old
+	  diff_test3 = s% center_h1 < min_center_h1_for_diff !past the main sequence
+	  if( diff_test1 .or. diff_test2 .or. diff_test3 )then
+	     s% diffusion_dt_limit = huge_dt_limit
+	  else
+	     s% diffusion_dt_limit = original_diffusion_dt_limit
+	  end if
+			
       end function extras_finish_step
       
       subroutine Reimers_then_VW(id, Lsurf, Msurf, Rsurf, Tsurf, w, ierr)
