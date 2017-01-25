@@ -151,7 +151,7 @@
       ierr = 0
       call star_ptr(id, s, ierr)
       if (ierr /= 0) return
-      how_many_extra_history_columns = 6
+      how_many_extra_history_columns = 7
       end function how_many_extra_history_columns
       
       
@@ -163,8 +163,8 @@
       type (star_info), pointer :: s
 	  real(dp) :: ocz_top_radius, ocz_bot_radius, &
           ocz_top_mass, ocz_bot_mass, mixing_length_at_bcz, &
-          dr, ocz_turnover_time_g, ocz_turnover_time_l
-      integer :: i, k, n_conv_bdy, nz, k_ocz_top, k_ocz_bot
+          dr, ocz_turnover_time_g, ocz_turnover_time_l_b, ocz_turnover_time_l_t
+      integer :: i, k, n_conv_bdy, nz, k_ocz_bot, k_ocz_top
 	  
       ierr = 0
       call star_ptr(id, s, ierr)
@@ -177,7 +177,8 @@
       k_ocz_bot = 0
       k_ocz_top = 0
       ocz_turnover_time_g = 0
-      ocz_turnover_time_l = 0
+      ocz_turnover_time_l_b = 0
+      ocz_turnover_time_l_t = 0
       
       !check the outermost convection zone
       if (s% cz_top_mass(i)/s% mstar > 0.99d0) then
@@ -213,15 +214,22 @@
               ocz_turnover_time_g = ocz_turnover_time_g + (dr/s%conv_vel(k))
           end do          
 
-          !compute the "local" turnover time
+          !compute the "local" turnover time half of a scale height above the BCZ
           mixing_length_at_bcz = s% mlt_mixing_length(k_ocz_bot)
-          do k=k_ocz_bot,k_ocz_top,-1
-              if (s% r(k) > (s% r(k_ocz_bot)+(mixing_length_at_bcz))) then
-                  ocz_turnover_time_l = mixing_length_at_bcz/s% conv_vel(k)
+          do k=k_ocz_top,k_ocz_bot
+              if (s% r(k) < (s% r(k_ocz_bot)+0.5*(mixing_length_at_bcz))) then
+                  ocz_turnover_time_l_b = mixing_length_at_bcz/s% conv_vel(k)
                   exit
               end if
           end do
-
+          
+          !compute the "local" turnover time one scale height above the BCZ
+          do k=k_ocz_top,k_ocz_bot
+              if (s% r(k) < (s% r(k_ocz_bot)+1.0*(mixing_length_at_bcz))) then
+                  ocz_turnover_time_l_t = mixing_length_at_bcz/s% conv_vel(k)
+                  exit
+              end if
+          end do
       else
           ocz_top_mass = 0.0
           ocz_bot_mass = 0.0
@@ -237,10 +245,12 @@
       vals(3) = ocz_top_radius/rsun
       names(4) = 'conv_env_bot_radius'
       vals(4) = ocz_bot_radius/rsun
-      names(5) = 'conv_env_turnover_time_l'
-      vals(5) = ocz_turnover_time_l
-      names(6) = 'conv_env_turnover_time_g'
-      vals(6) = ocz_turnover_time_g
+      names(5) = 'conv_env_turnover_time_g'
+      vals(5) = ocz_turnover_time_g
+      names(6) = 'conv_env_turnover_time_l_b'
+      vals(6) = ocz_turnover_time_l_b
+      names(7) = 'conv_env_turnover_time_l_t'
+      vals(7) = ocz_turnover_time_l_t
       
       end subroutine data_for_extra_history_columns
       
