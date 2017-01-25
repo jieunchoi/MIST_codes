@@ -28,7 +28,7 @@ if __name__ == "__main__":
     #Digest the inputs
     runname = sys.argv[1]
     FeH = sys.argv[2]
-    Z = calc_xyz.calc_xyz(float(FeH),feh=True)[-1]
+    Z = calc_xyz.calc_xyz(float(FeH),input_feh=True)[-1]
     dirname = os.path.join(os.environ['MIST_GRID_DIR'], runname)
     
     #Create a working directory

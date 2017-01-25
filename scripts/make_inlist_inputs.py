@@ -81,7 +81,7 @@ def make_inlist_inputs(runname, Z, startype):
         bclabellist = list([bclabel]*np.size(massindex))
     
     #Create abundance lists
-    h1h2he3he4z = calc_xyz.calc_xyz(float(Z))
+    h1h2he3he4z = calc_xyz.calc_xyz(float(Z), input_feh=False)
     H1list = [h1h2he3he4z[0]]*np.size(massindex)
     H2list = [h1h2he3he4z[1]]*np.size(massindex)
     He3list = [h1h2he3he4z[2]]*np.size(massindex)
