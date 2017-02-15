@@ -6,11 +6,12 @@ Calls all of the necessary routines to submit a grid of specified name and metal
 
 Args:
     runname: the name of the grid
-    Z: the mass fraction in metals
+    FeH: metallicity
+    aFe: alpha-enhancement
     
 Example:
-    To run a Z=0.015 grid called MIST_v0.1
-    >>> ./submit_jobs MIST_v0.1 0.015
+    To run a [Fe/H] = 0, [a/Fe] = 0 grid called MIST_v0.1
+    >>> ./submit_jobs MIST_v0.1 0.0 0.0
 
 """
 
@@ -21,14 +22,13 @@ import shutil
 from scripts import make_slurm_sh
 from scripts import make_inlist_inputs
 from scripts import make_replacements
-from scripts import calc_xyz
 
 if __name__ == "__main__":
 
     #Digest the inputs
     runname = sys.argv[1]
     FeH = sys.argv[2]
-    Z = calc_xyz.calc_xyz(float(FeH),input_feh=True)[-1]
+    aFe = sys.argv[3]
     dirname = os.path.join(os.environ['MIST_GRID_DIR'], runname)
     
     #Create a working directory
@@ -41,15 +41,15 @@ if __name__ == "__main__":
     #Generate inlists using template inlist files
     tempstor_inlist_dir = os.path.join(os.environ['MESAWORK_DIR'], 'inlists/inlists_'+'_'.join(runname.split('/')))
     new_inlist_name = '<<MASS>>M<<BC_LABEL>>.inlist'
-    make_replacements.make_replacements(make_inlist_inputs.make_inlist_inputs(runname, Z, 'VeryLow'), new_inlist_name,\
+    make_replacements.make_replacements(make_inlist_inputs.make_inlist_inputs(runname, 'VeryLow'), new_inlist_name,\
         direc=tempstor_inlist_dir, file_base=os.path.join(os.environ['MIST_CODE_DIR'],'mesafiles/inlist_lowinter'), clear_direc=True)
-    make_replacements.make_replacements(make_inlist_inputs.make_inlist_inputs(runname, Z, 'LowDiffBC'), new_inlist_name,\
+    make_replacements.make_replacements(make_inlist_inputs.make_inlist_inputs(runname, 'LowDiffBC'), new_inlist_name,\
         direc=tempstor_inlist_dir, file_base=os.path.join(os.environ['MIST_CODE_DIR'],'mesafiles/inlist_lowinter'))
-    make_replacements.make_replacements(make_inlist_inputs.make_inlist_inputs(runname, Z, 'Intermediate'), new_inlist_name,\
+    make_replacements.make_replacements(make_inlist_inputs.make_inlist_inputs(runname, 'Intermediate'), new_inlist_name,\
         direc=tempstor_inlist_dir, file_base=os.path.join(os.environ['MIST_CODE_DIR'],'mesafiles/inlist_lowinter'))
-    make_replacements.make_replacements(make_inlist_inputs.make_inlist_inputs(runname, Z, 'HighDiffBC'), new_inlist_name,\
+    make_replacements.make_replacements(make_inlist_inputs.make_inlist_inputs(runname, 'HighDiffBC'), new_inlist_name,\
         direc=tempstor_inlist_dir, file_base=os.path.join(os.environ['MIST_CODE_DIR'],'mesafiles/inlist_high'))
-    make_replacements.make_replacements(make_inlist_inputs.make_inlist_inputs(runname, Z, 'VeryHigh'), new_inlist_name,\
+    make_replacements.make_replacements(make_inlist_inputs.make_inlist_inputs(runname, 'VeryHigh'), new_inlist_name,\
         direc=tempstor_inlist_dir, file_base=os.path.join(os.environ['MIST_CODE_DIR'],'mesafiles/inlist_high'))
         
     inlist_list = os.listdir(tempstor_inlist_dir)
@@ -72,6 +72,9 @@ if __name__ == "__main__":
 
         #Populate each directory with appropriate inlists and rename as inlist_project
         shutil.copy(os.path.join(tempstor_inlist_dir,inlistname), os.path.join(pathtoinlistdir, 'inlist_project'))
+        
+        #Populate each directory with the input abundance file named input_initial_composition.data
+        ####RUN AARON'S CODE HERE
 
         #Create and move the SLURM file to the correct directory
         runbasefile = os.path.join(os.environ['MIST_CODE_DIR'], 'mesafiles/SLURM_MISTgrid.sh')

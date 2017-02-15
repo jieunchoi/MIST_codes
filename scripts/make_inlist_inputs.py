@@ -5,7 +5,6 @@ inlist files. Outputs lists of replacements that are inputs to make_replacements
 
 Args:
     runname: the name of the grid
-    Z: the mass fraction in metals
     startype: the mass range of the models
 
 Returns:
@@ -15,7 +14,7 @@ See Also:
     make_replacements: takes the list of replacements as an input
     
 Example:
-    >>> replist = make_inlist_inputs(runname, Z, startype)
+    >>> replist = make_inlist_inputs(runname, 'VeryLow')
     
 Acknowledgment:
     Thanks to Joshua Burkart for providing assistance with and content for earlier versions of this code.
@@ -24,10 +23,8 @@ Acknowledgment:
 
 import sys
 import numpy as np
-
-import calc_xyz
     
-def make_inlist_inputs(runname, Z, startype):
+def make_inlist_inputs(runname, startype):
     
     #Array of all masses
     massgrid = lambda i,f,step: np.linspace(i,f,round(((f-i)/step))+1.0)
@@ -79,25 +76,12 @@ def make_inlist_inputs(runname, Z, startype):
     else:
         bctablelist = list([bctype]*np.size(massindex))
         bclabellist = list([bclabel]*np.size(massindex))
-    
-    #Create abundance lists
-    h1h2he3he4z = calc_xyz.calc_xyz(float(Z), input_feh=False)
-    H1list = [h1h2he3he4z[0]]*np.size(massindex)
-    H2list = [h1h2he3he4z[1]]*np.size(massindex)
-    He3list = [h1h2he3he4z[2]]*np.size(massindex)
-    He4list = [h1h2he3he4z[3]]*np.size(massindex)
-    Zlist = [h1h2he3he4z[4]]*np.size(massindex)
         
     #Make list of [replacement string, values]
     replist = [\
             ["<<MASS>>", masslist],\
             ["<<BC_LABEL>>", bclabellist],\
             ["<<BC_TABLE>>", bctablelist],\
-            ["<<H1>>", H1list],\
-            ["<<H2>>", H2list],\
-            ["<<He3>>", He3list],\
-            ["<<He4>>", He4list],\
-            ["<<Z>>", Zlist],\
         ]
     
     #Special case for LowDiffBC
@@ -106,11 +90,6 @@ def make_inlist_inputs(runname, Z, startype):
                 ["<<MASS>>", masslist*2],\
                 ["<<BC_LABEL>>", bclabellist],\
                 ["<<BC_TABLE>>", bctablelist],\
-                ["<<H1>>", H1list*2],\
-                ["<<H2>>", H2list*2],\
-                ["<<He3>>", He3list*2],\
-                ["<<He4>>", He4list*2],\
-                ["<<Z>>", Zlist*2],\
             ]
 
     return replist

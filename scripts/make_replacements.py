@@ -19,7 +19,7 @@ See Also:
     make_inlist_inputs: generates replist
     
 Example:
-    >>> make_replacements(make_inlist_inputs(runname, Z, 'VeryLow'), '10M.inlist',\
+    >>> make_replacements(make_inlist_inputs(runname, 'VeryLow'), '10M.inlist',\
         direc='/home/project/inlist', file_base='inlist_project_base', clear_direc=True)
         
 Acknowledgment: 

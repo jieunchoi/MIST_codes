@@ -36,16 +36,10 @@
       set_rates_preference = .true.
       new_rates_preference = 2
 	  
-!CHANGE SOLAR ABUNDANCES
+!SET INITIAL ABUNDANCES
 
-      set_uniform_initial_composition = .true.
-      initial_h1 = <<H1>>
-      initial_h2 = <<H2>>
-      initial_he3 = <<He3>>
-      initial_he4 = <<He4>>
-      !for initial Z = <<Z>>
-
-      initial_zfracs = 6 ! AGSS09_zfracs
+      file_for_uniform_xa = 'input_initial_composition.data'
+      set_uniform_initial_xa_from_file = .true.
 	          
 / ! end of star_job namelist
 
