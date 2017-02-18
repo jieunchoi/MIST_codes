@@ -54,7 +54,7 @@
       terminal_interval = 10
       write_header_frequency = 10
       photo_digits = 5
-      photostep = 250
+      photo_interval = 250
       
       star_history_dbl_format = '(1pes32.16e3, 1x)'
       star_history_int_format = '(i32, 1x)'
@@ -128,18 +128,26 @@
       D_ST_factor = 0.0
       am_D_mix_factor = 0.033
       am_gradmu_factor = 0.05
-		 
-      RGB_wind_scheme = 'Dutch'
-      AGB_wind_scheme = 'Dutch'
-      RGB_to_AGB_wind_switch = 1d-4
-      Dutch_wind_eta = 1.0
+		      
+      !mass loss
+      cool_wind_RGB_scheme = 'Dutch'
+      cool_wind_AGB_scheme = 'Dutch'
+      hot_wind_scheme = 'Dutch'
+
+      Dutch_scaling_factor = 1.0
+
+      cool_wind_full_on_T  = 1.0d4
+      cool_wind_full_on_T  = 1.0d4
+      hot_wind_full_on_T  = 1.0d4
+      hot_wind_full_off_T = 1.0d4
+
       max_wind = 1d-3
 
+      !diffusion
       do_element_diffusion = .true.
       diffusion_dt_limit = 3.15e13
-      diffusion_min_T_at_surface = 1d3 
-
-      radiation_turbulence_coeff = 1.0
+      diffusion_min_T_at_surface = 1d3
+      turbulent_diffusion_D0 = 1
 
 !CORE MASS DEFINITION
 	  

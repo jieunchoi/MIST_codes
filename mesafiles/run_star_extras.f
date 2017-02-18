@@ -33,7 +33,7 @@
       
       real(dp) :: original_diffusion_dt_limit
       real(dp) :: burn_check = 0.0
-      
+            
 !     these routines are called by the standard run_star check_model
       contains
       
@@ -45,10 +45,28 @@
       call star_ptr(id, s, ierr)
       if (ierr /= 0) return
       
-      original_diffusion_dt_limit = s% diffusion_dt_limit
-      !s% other_wind => Reimers_then_VW
-      s% other_wind => Reimers_then_Blocker
+      ! this is the place to set any procedure pointers you want to change
+      ! e.g., other_wind, other_mixing, other_energy  (see star_data.inc)
       
+      ! Uncomment these lines if you wish to use the functions in this file,
+      ! otherwise we use a null_ version which does nothing.
+      s% extras_startup => extras_startup
+      s% extras_check_model => extras_check_model
+      s% extras_finish_step => extras_finish_step
+      s% extras_after_evolve => extras_after_evolve
+      s% how_many_extra_history_columns => how_many_extra_history_columns
+      s% data_for_extra_history_columns => data_for_extra_history_columns
+      s% how_many_extra_profile_columns => how_many_extra_profile_columns
+      s% data_for_extra_profile_columns => data_for_extra_profile_columns  
+      s% other_wind => low_mass_wind_scheme
+      
+      ! Once you have set the function pointers you want,
+      ! then uncomment this (or set it in your star_job inlist)
+      ! to disable the printed warning message,
+       s% job% warn_run_star_extras =.false.       
+       
+       original_diffusion_dt_limit = s% diffusion_dt_limit
+
       end subroutine extras_controls
       
       integer function extras_startup(id, restart, ierr)
@@ -289,7 +307,7 @@
       integer function extras_finish_step(id, id_extra)
       integer, intent(in) :: id, id_extra
       integer :: ierr, r, burn_category
-      real(dp) :: envelope_mass_fraction, L_He, L_tot, orig_eta, target_eta, min_center_h1_for_diff, critmass, feh
+      real(dp) :: envelope_mass_fraction, L_He, L_tot, min_center_h1_for_diff, critmass, feh
       real(dp) :: category_factors(num_categories)
       real(dp), parameter :: huge_dt_limit = 3.15d16 ! ~1 Gyr
       real(dp), parameter :: new_varcontrol_target = 1d-3
@@ -332,12 +350,12 @@
             critmass = feh*1.09595794 + 7.0660861
          end if 
          if ((s% initial_mass > critmass) .and. (s% have_done_TP)) then
-            if (s% Blocker_wind_eta < 1.0) then
+            if (s% Blocker_scaling_factor < 1.0) then
                write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
                write(*,*) 'turning up Blocker'
                write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
             end if
-            s% Blocker_wind_eta = 3.0
+            s% Blocker_scaling_factor = 3.0
          end if
 
          if ((s% have_done_TP) .and. (s% varcontrol_target < new_varcontrol_target)) then !only print the first time
@@ -410,100 +428,112 @@
 	  end if
 			
       end function extras_finish_step
-      
-      subroutine Reimers_then_VW(id, Lsurf, Msurf, Rsurf, Tsurf, w, ierr)
-      use star_def
-	  use chem_def, only: ih1, ihe4
-      integer, intent(in) :: id
-      real(dp), intent(in) :: Lsurf, Msurf, Rsurf, Tsurf ! surface values (cgs)
-!     NOTE: surface is outermost cell. not necessarily at photosphere.
-!     NOTE: don't assume that vars are set at this point.
-!     so if you want values other than those given as args,
-!     you should use values from s% xh(:,:) and s% xa(:,:) only.
-!     rather than things like s% Teff or s% lnT(:) which have not been set yet.
-      real(dp), intent(out) :: w ! wind in units of Msun/year (value is >= 0)
-      integer, intent(out) :: ierr
-      real(dp) :: logP, P, reimers_w, pre_superwind_w, superwind_w, vexp, agb_w, center_h1, center_he4
-	  integer :: h1, he4
-	  type (star_info), pointer :: s
-      ierr = 0
-      call star_ptr(id, s, ierr)
-      if (ierr /= 0) return
-	  
-!     first Reimers for the MS+RGB
-      reimers_w = 4d-13*(Lsurf*Rsurf/Msurf)/(Lsun*Rsun/Msun)
-      reimers_w = reimers_w * s% Reimers_wind_eta
-      
-!     Vassiliadis and Wood 1993	 
-!     compute pulsation period assuming the fundamental mode
-      logP = -2.07 + 1.94*log10_cr(Rsurf/Rsun)-0.9*log10_cr(Msurf/Msun) !in days
-      P = pow_cr(10d0, logP)    !in days
-
-!     for periods below ~500-800 days, exponentially increasing mdot
-      if (Msurf/Msun < 2.5) then
-         pre_superwind_w = pow_cr(10d0, -11.4+0.0123*P)
-      else
-         pre_superwind_w = pow_cr(10d0, -11.4+0.0125*(P - 100.0*(Msurf/Msun - 2.5)))
-      end if
-      
-!     for periods above ~500-800 days, radiation pressure driven superwind
-!     ensure that vexp is not a negative value
-      vexp = min(15.0, max(3.0, -13.5+0.056*P))*1e5 !orig formula in km/s
-      superwind_w = (Lsurf/(clight*vexp))*(secyer/Msun)
-      
-!     want the exponential increase in Mdot with P then ~const superwind
-      agb_w = min(pre_superwind_w, superwind_w)
-      
-!     use Reimers for RGB then switch to VW during AGB
-      h1 = s% net_iso(ih1)
-      he4 = s% net_iso(ihe4)
-      center_h1 = s% xa(h1,s% nz)
-      center_he4 = s% xa(he4,s% nz)
-      if (center_h1 < 0.01d0 .and. center_he4 < s% RGB_to_AGB_wind_switch) then
-         w = agb_w
-      else
-         w = reimers_w
-      end if
-      end subroutine Reimers_then_VW
-	  
-	  subroutine Reimers_then_Blocker(id, Lsurf, Msurf, Rsurf, Tsurf, w, ierr)
+      	  
+	  subroutine low_mass_wind_scheme(id, Lsurf, Msurf, Rsurf, Tsurf, w, ierr)
       use star_def
       use chem_def, only: ih1, ihe4
       integer, intent(in) :: id
       real(dp), intent(in) :: Lsurf, Msurf, Rsurf, Tsurf ! surface values (cgs)
 !     NOTE: surface is outermost cell. not necessarily at photosphere.
-!     NOTE: don't assume that vars are set at this point.
-!     so if you want values other than those given as args,
-!     you should use values from s% xh(:,:) and s% xa(:,:) only.
-!     rather than things like s% Teff or s% lnT(:) which have not been set yet.
       real(dp), intent(out) :: w ! wind in units of Msun/year (value is >= 0)
       integer, intent(out) :: ierr
       integer :: h1, he4
-      real(dp) :: plain_reimers, reimers_w, blocker_w, center_h1, center_he4
+      real(dp) :: plain_reimers, reimers_w, blocker_w, vink_w, center_h1, center_he4
+      real(dp) :: alfa, w1, w2, Teff_jump, logMdot, dT, vinf_div_vesc, Zsurf
+      real(dp), parameter :: Zsolar_V = 0.019d0 ! for Vink et al formula
 	  type (star_info), pointer :: s
 	  ierr = 0
       call star_ptr(id, s, ierr)
       if (ierr /= 0) return
 	  
-	  plain_reimers = 4d-13*(Lsurf*Rsurf/Msurf)/(Lsun*Rsun/Msun)
-	  
-	  reimers_w = plain_reimers * s% Reimers_wind_eta
-	  blocker_w = plain_reimers * s% Blocker_wind_eta * &
-               4.83d-9 * pow_cr(Msurf/Msun,-2.1d0) * pow_cr(Lsurf/Lsun,2.7d0)
+      h1 = s% net_iso(ih1)
+      he4 = s% net_iso(ihe4)
+      center_h1 = s% xa(h1,s% nz)
+      center_he4 = s% xa(he4,s% nz)
+      Zsurf = 1.0 - (s% surface_h1 + s% surface_he3 + s% surface_he4)
+      
+      !reimers
+      plain_reimers = 4d-13*(Lsurf*Rsurf/Msurf)/(Lsun*Rsun/Msun)
+  
+      reimers_w = plain_reimers * s% Reimers_scaling_factor
 
-          h1 = s% net_iso(ih1)
-          he4 = s% net_iso(ihe4)
-          center_h1 = s% xa(h1,s% nz)
-          center_he4 = s% xa(he4,s% nz)
+      !blocker
+      blocker_w = plain_reimers * s% Blocker_scaling_factor * &
+          4.83d-9 * pow_cr(Msurf/Msun,-2.1d0) * pow_cr(Lsurf/Lsun,2.7d0)
+          
+      !vink
+      ! alfa = 1 for hot side, = 0 for cool side
+      if (s% Teff > 27500d0) then
+         alfa = 1
+      else if (s% Teff < 22500d0) then
+         alfa = 0
+      else ! use Vink et al 2001, eqns 14 and 15 to set "jump" temperature
+         Teff_jump = 1d3*(61.2d0 + 2.59d0*(-13.636d0 + 0.889d0*log10_cr(Zsurf/Zsolar_V)))
+         dT = 100d0
+         if (s% Teff > Teff_jump + dT) then
+            alfa = 1
+         else if (s% Teff < Teff_jump - dT) then
+            alfa = 0
+         else
+            alfa = (s% Teff - (Teff_jump - dT)) / (2*dT)
+         end if
+      end if
 
-          !prevent the low mass RGBs from using Blocker
-          if (center_h1 < 0.01d0 .and. center_he4 > 0.1d0) then
-             w = reimers_w
-          else 
-             w = max(reimers_w, blocker_w)
+      if (alfa > 0) then ! eval hot side wind (eqn 24)
+         vinf_div_vesc = 2.6d0 ! this is the hot side galactic value
+         vinf_div_vesc = vinf_div_vesc*pow_cr(Zsurf/Zsolar_V,0.13d0) ! corrected for Z
+         logMdot = &
+            - 6.697d0 &
+            + 2.194d0*log10_cr(s% photosphere_L/1d5) &
+            - 1.313d0*log10_cr(s% photosphere_m/30) &
+            - 1.226d0*log10_cr(vinf_div_vesc/2d0) &
+            + 0.933d0*log10_cr(s% Teff/4d4) &
+            - 10.92d0*pow2(log10_cr(s% Teff/4d4)) &
+            + 0.85d0*log10_cr(Zsurf/Zsolar_V)
+         w1 = exp10_cr(logMdot)
+      else
+         w1 = 0
+      end if
+
+      if (alfa < 1) then ! eval cool side wind (eqn 25)
+         vinf_div_vesc = 1.3d0 ! this is the cool side galactic value
+         vinf_div_vesc = vinf_div_vesc*pow_cr(Zsurf/Zsolar_V,0.13d0) ! corrected for Z
+         logMdot = &
+            - 6.688d0 &
+            + 2.210d0*log10_cr(s% photosphere_L/1d5) &
+            - 1.339d0*log10_cr(s% photosphere_m/30) &
+            - 1.601d0*log10_cr(vinf_div_vesc/2d0) &
+            + 1.07d0*log10_cr(s% Teff/2d4) &
+            + 0.85d0*log10_cr(Zsurf/Zsolar_V)
+         w2 = exp10_cr(logMdot)
+      else
+         w2 = 0
+      end if
+
+      vink_w = alfa*w1 + (1 - alfa)*w2
+
+
+      !for hot high mass MS stars, use V, then transition to R/B post-MS.
+      !V is for 12.5k - 50k
+      !for lower mass MS stars, use R or B.
+      
+      if (s% Teff > 12500d0) then
+          w = vink_w
+      else if ((s% Teff > 11500d0) .and. (s% Teff <= 12500d0)) then
+          !transition from V to cool
+          w = ((12500d0 - s% Teff)/(12500d0 - 11500d0)) * reimers_w &
+          + (1.0 - (12500d0 - s% Teff)/(12500d0 - 11500d0)) * vink_w
+      else
+          !for below 11500
+          !don't use B prior to AGB
+          if (center_h1 < 0.01d0 .and. center_he4 < s% RGB_to_AGB_wind_switch) then
+              w = max(reimers_w, blocker_w)
+          else
+              w = reimers_w
           end if
+      end if
 	  
-	  end subroutine Reimers_then_Blocker
+	  end subroutine low_mass_wind_scheme
       
       subroutine extras_after_evolve(id, id_extra, ierr)
       integer, intent(in) :: id, id_extra

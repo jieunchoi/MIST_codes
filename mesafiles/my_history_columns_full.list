@@ -21,7 +21,7 @@
       log_abs_Lgrav !log10 abs(eps_grav_integral) (in Lsun units)
       log_R ! log10 radius in Rsun units
       log_g ! log10 gravity
-      log_surf_z ! surface mass fraction in metals
+      log_surf_cell_z ! surface mass fraction in metals
       surf_avg_omega ! surf_v_rot/R
       surf_avg_v_rot ! km/sec rotational velocity at equator
       surf_num_c12_div_num_o16 ! ratio of number fractions, >1 for C star
@@ -98,7 +98,20 @@
          ! nu_max = nu_max_sun * M/Msun / ((R/Rsun)^3 (Teff/Teff_sun)^0.5)
          ! with nu_max_sun = 3100 microHz, Teff_sun = 5777
       acoustic_cutoff ! 0.5*g*sqrt(gamma1*rho/P) at surface
+      
+      
+   ! convective envelope properties
    
+      conv_env_top_mass ! TCZ in mass
+      conv_env_bot_mass ! BCZ in mass
+      conv_env_top_radius ! TCZ in radius
+      conv_env_bot_radius ! BCZ in radius 
+      conv_env_turnover_time_l_t ! mixing length evaluated at the BCZ / 
+                                 ! v_conv evaluated at one full mixing length above BCZ
+      conv_env_turnover_time_l_b ! mixing length evaluated at the BCZ / 
+                                 ! v_conv evaluated at one half mixing length above BCZ
+      conv_env_turnover_time_g ! dr/convective speed(r) integrated over the entire CZ
+         
    ! misc
       
       max_conv_vel_div_csound ! maximum value of the ratio of convective vel. to local sound speed

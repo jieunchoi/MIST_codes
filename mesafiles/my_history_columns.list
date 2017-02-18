@@ -24,7 +24,7 @@
       log_abs_Lgrav !log10 abs(eps_grav_integral) (in Lsun units)
       log_R ! log10 radius in Rsun units
       log_g ! log10 gravity
-      log_surf_z ! surface mass fraction in metals
+      log_surf_cell_z ! surface mass fraction in metals
       surf_avg_omega ! surf_v_rot/R
       surf_avg_v_rot ! km/sec rotational velocity at equator
       surf_num_c12_div_num_o16 ! ratio of number fractions, >1 for C star

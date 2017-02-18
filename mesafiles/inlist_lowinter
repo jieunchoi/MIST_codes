@@ -55,7 +55,7 @@
       terminal_interval = 10
       write_header_frequency = 10
 	  photo_digits = 5
-      photostep = 250
+      photo_interval = 250
 
       star_history_dbl_format = '(1pes32.16e3, 1x)'
       star_history_int_format = '(i32, 1x)'
@@ -133,20 +133,22 @@
       am_D_mix_factor = 0.033
       am_gradmu_factor = 0.05
 
+      !mass loss
       use_other_wind = .true.
-      RGB_wind_scheme = 'Reimers'
-      AGB_wind_scheme = 'Blocker'
-      RGB_to_AGB_wind_switch = 1d-4
-      Reimers_wind_eta = 0.1
-      Blocker_wind_eta = 0.2
+      
+      Reimers_scaling_factor = 0.1
+      Blocker_scaling_factor = 0.2
+      Vink_scaling_factor = 1.0
+
+      RGB_to_AGB_wind_switch = 1d-2
       max_wind = 1d-3
 
+      !diffusion
       do_element_diffusion = .true.
       diffusion_dt_limit = 3.15e13
       diffusion_min_T_at_surface = 1d3
       diffusion_min_dq_at_surface = 1d-3
-
-      radiation_turbulence_coeff = 1.0
+      turbulent_diffusion_D0 = 1
 	  
       !to help with breathing pulses
       include_dmu_dt_in_eps_grav = .true.
