@@ -57,32 +57,32 @@ if __name__ == "__main__":
 
     for inlistname in inlist_list:
         #Make individual directories for each mass
-        inlistdir = inlistname.replace('.inlist', '_dir')
+        onemassdir = inlistname.replace('.inlist', '_dir')
 
         #Define an absolute path to this directory.
-        pathtoinlistdir = os.path.join(dirname, inlistdir)
+        path_to_onemassdir = os.path.join(dirname, onemassdir)
 
         #Copy over the contents of the template directory and copy over the most recent my_history_columns.list and run_star_extras.f
         try:
-            shutil.copytree(os.path.join(os.environ['MESAWORK_DIR'], "cleanworkdir"), pathtoinlistdir)
+            shutil.copytree(os.path.join(os.environ['MESAWORK_DIR'], "cleanworkdir"), path_to_onemassdir)
             shutil.copy(os.path.join(os.environ['MIST_CODE_DIR'], 'mesafiles/my_history_columns.list'), os.path.join(os.path.join(os.environ['MESAWORK_DIR'], "cleanworkdir"), 'my_history_columns.list'))
             shutil.copy(os.path.join(os.environ['MIST_CODE_DIR'], 'mesafiles/run_star_extras.f'), os.path.join(os.path.join(os.environ['MESAWORK_DIR'], "cleanworkdir"), 'src/run_star_extras.f'))
         except OSError:
             pass
 
         #Populate each directory with appropriate inlists and rename as inlist_project
-        shutil.copy(os.path.join(tempstor_inlist_dir,inlistname), os.path.join(pathtoinlistdir, 'inlist_project'))
+        shutil.copy(os.path.join(tempstor_inlist_dir,inlistname), os.path.join(path_to_onemassdir, 'inlist_project'))
         
         #Populate each directory with the input abundance file named input_initial_composition.data
         ####RUN AARON'S CODE HERE
 
         #Create and move the SLURM file to the correct directory
         runbasefile = os.path.join(os.environ['MIST_CODE_DIR'], 'mesafiles/SLURM_MISTgrid.sh')
-        slurmfile = make_slurm_sh.make_slurm_sh(inlistname, pathtoinlistdir, runbasefile)
-        shutil.move(slurmfile, pathtoinlistdir)
+        slurmfile = make_slurm_sh.make_slurm_sh(inlistname, path_to_onemassdir, runbasefile)
+        shutil.move(slurmfile, path_to_onemassdir)
         
         #cd into the individual directory and submit the job
-        os.chdir(pathtoinlistdir)
+        os.chdir(path_to_onemassdir)
         print "sbatch " + slurmfile
         os.system("sbatch "+slurmfile)
         os.chdir(os.environ['MIST_CODE_DIR'])
