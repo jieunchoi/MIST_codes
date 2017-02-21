@@ -43,6 +43,9 @@ def write_fsps_iso(file, logage=False):
     Args:
         file: name of the MIST isochrone file
     
+    Keywords:
+        logage: specify the age format in the MIST file. FSPS assumes logage.
+    
     Returns:
         name of the FSPS isochrone file
     

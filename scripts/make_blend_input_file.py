@@ -13,7 +13,7 @@ Returns:
     None
     
 Example:
-    >>> make_blend_input_file('MIST_v0.1', '00030M_tau100.track', '00030M_PT.track')
+    >>> make_blend_input_file('MIST_v1.0_feh_p0.00_afe_p0.0_vvcrit0.4', '00030M_tau100.track', '00030M_PT.track')
     
 """
 
