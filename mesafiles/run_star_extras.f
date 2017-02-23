@@ -84,14 +84,7 @@
       else                      ! it is a restart
          call unpack_extra_info(s)
       end if
-      
-!     set OPACITIES: Zbase for Type 2 Opacities automatically to the Z for the star
-      s% Zbase = 1.0 - (s% job% initial_h1 + s% job% initial_h2 + &
-      s% job% initial_he3 + s% job% initial_he4)
-      write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
-      write(*,*) 'Zbase for Type 2 Opacities: ', s% Zbase
-      write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
-      
+            
 !     set ROTATION: extra param are set in inlist: star_job
       rot_full_off = s% job% extras_rpar(1) !1.2
       rot_full_on = s% job% extras_rpar(2) !1.8

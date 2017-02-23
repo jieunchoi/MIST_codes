@@ -21,16 +21,16 @@
 
       !network 
       change_net = .true.
-      new_net_name = 'mesa_49.net'
+      new_net_name = '<<NET>>'
 	  
       !first 100 models are run with simple_photosphere then switched to the following
       extras_lcpar = 1
       extras_cpar(1) = '<<BC_TABLE>>'
 
       !opacities with AGSS09 abundances
-      kappa_file_prefix = 'a09'
-      kappa_lowT_prefix = 'lowT_fa05_a09p'
-      kappa_CO_prefix = 'a09_co'
+      kappa_file_prefix = 'agss09_<<AFE>>'
+      kappa_lowT_prefix = 'lowT_agss09_<<AFE>>'
+      kappa_CO_prefix = 'agss09_<<AFE>>_co'
 
       !use jina
       set_rates_preference = .true.
@@ -117,7 +117,7 @@
       use_Type2_opacities = .true.
       kap_Type2_full_off_X = 1d-3
       kap_Type2_full_on_X = 1d-6
-      Zbase = 0.00 ! this is set to Z of the star in run_star_extras.f
+      Zbase = <<ZBASE>>
 	     
       !rotational mixing if applicable	 
       D_SH_factor =  1.0

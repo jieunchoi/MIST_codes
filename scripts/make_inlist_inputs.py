@@ -6,6 +6,11 @@ inlist files. Outputs lists of replacements that are inputs to make_replacements
 Args:
     runname: the name of the grid
     startype: the mass range of the models
+    afe: the [a/Fe] value of the grid as str
+    zbase: the Zbase corresponding to [Fe/H] and [a/Fe] as float
+
+Keywords:
+    net: the name of the nuclear network to be used
 
 Returns:
     the list of replacements
@@ -24,7 +29,7 @@ Acknowledgment:
 import sys
 import numpy as np
     
-def make_inlist_inputs(runname, startype):
+def make_inlist_inputs(runname, startype, afe, zbase, net='mesa_49.net'):
     
     #Array of all masses
     massgrid = lambda i,f,step: np.linspace(i,f,round(((f-i)/step))+1.0)
@@ -69,19 +74,31 @@ def make_inlist_inputs(runname, startype):
     mapfunc = lambda var: np.str(int(var)) if var == int(var) else np.str(var)
     masslist = map(mapfunc, bigmassgrid[massindex])
         
-    #Create BC lists, but LowDiffBC & HighDiffBC are special cases
+    #Create BC lists    
     if ('Diff' in startype):
         bctablelist = list([bctype1]*np.size(massindex))+list([bctype2]*np.size(massindex))
         bclabellist = list([bclabel1]*np.size(massindex))+list([bclabel2]*np.size(massindex))
     else:
         bctablelist = list([bctype]*np.size(massindex))
         bclabellist = list([bclabel]*np.size(massindex))
+
+    #Create net list
+    netlist = list([net]*np.size(massindex))
+    
+    #Create [a/Fe] lists
+    afelist = list([afe]*np.size(massindex))
+
+    #Create Zbase list
+    zbaselist = list([zbase]*np.size(massindex))
         
     #Make list of [replacement string, values]
     replist = [\
             ["<<MASS>>", masslist],\
             ["<<BC_LABEL>>", bclabellist],\
             ["<<BC_TABLE>>", bctablelist],\
+            ["<<AFE>>", afelist],\
+            ["<<NET>>", netlist],\
+            ["<<ZBASE>>", zbaselist],\
         ]
     
     #Special case for LowDiffBC
@@ -90,6 +107,9 @@ def make_inlist_inputs(runname, startype):
                 ["<<MASS>>", masslist*2],\
                 ["<<BC_LABEL>>", bclabellist],\
                 ["<<BC_TABLE>>", bctablelist],\
+                ["<<AFE>>", afelist*2],\
+                ["<<NET>>", netlist*2],\
+                ["<<ZBASE>>", zbaselist*2],\
             ]
 
     return replist

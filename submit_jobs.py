@@ -35,22 +35,46 @@ if __name__ == "__main__":
     try:
         os.mkdir(dirname)
     except OSError:
-        print "The directory already exists"
+        print "The directory already exists."
         sys.exit(0)
 
+    ###RUN AARON'S CODE HERE
+    ###generate the Zbase_val.txt file and the abundances list file
+    
     #Generate inlists using template inlist files
     tempstor_inlist_dir = os.path.join(os.environ['MESAWORK_DIR'], 'inlists/inlists_'+'_'.join(runname.split('/')))
     new_inlist_name = '<<MASS>>M<<BC_LABEL>>.inlist'
-    make_replacements.make_replacements(make_inlist_inputs.make_inlist_inputs(runname, 'VeryLow'), new_inlist_name,\
-        direc=tempstor_inlist_dir, file_base=os.path.join(os.environ['MIST_CODE_DIR'],'mesafiles/inlist_lowinter'), clear_direc=True)
-    make_replacements.make_replacements(make_inlist_inputs.make_inlist_inputs(runname, 'LowDiffBC'), new_inlist_name,\
-        direc=tempstor_inlist_dir, file_base=os.path.join(os.environ['MIST_CODE_DIR'],'mesafiles/inlist_lowinter'))
-    make_replacements.make_replacements(make_inlist_inputs.make_inlist_inputs(runname, 'Intermediate'), new_inlist_name,\
-        direc=tempstor_inlist_dir, file_base=os.path.join(os.environ['MIST_CODE_DIR'],'mesafiles/inlist_lowinter'))
-    make_replacements.make_replacements(make_inlist_inputs.make_inlist_inputs(runname, 'HighDiffBC'), new_inlist_name,\
-        direc=tempstor_inlist_dir, file_base=os.path.join(os.environ['MIST_CODE_DIR'],'mesafiles/inlist_high'))
-    make_replacements.make_replacements(make_inlist_inputs.make_inlist_inputs(runname, 'VeryHigh'), new_inlist_name,\
-        direc=tempstor_inlist_dir, file_base=os.path.join(os.environ['MIST_CODE_DIR'],'mesafiles/inlist_high'))
+    path_to_inlist_lowinter = os.path.join(os.environ['MIST_CODE_DIR'],'mesafiles/inlist_lowinter')
+    path_to_inlist_high = os.path.join(os.environ['MIST_CODE_DIR'],'mesafiles/inlist_high')
+    
+    #The nuclear network must be specified since it is an input to Aaron's code to get the abundances
+    net_name = 'mesa_49.net'
+    
+    #aFe value must be between -0.2 and 0.6 in steps of 0.2 (for opacity table reasons)
+    okay_Fe = [-0.2, 0.0, 0.2, 0.4, 0.6]
+    if aFe not in okay_Fe:
+        print "[a/Fe] must be one of the following: "+(" ").join([str(x) for x in okay_Fe])
+        sys.exit(0)
+    if aFe < 0:
+        afe_fmt = 'afe'+str(aFe)
+    else:
+        afe_fmt = 'afe+'+str(aFe)
+        
+    #Zbase needs to be set in MESA for Type II opacity tables. Get this from a file produced by Aaron's code
+    with open('Zbase_val.txt') as f:
+        Zbase = float(f.read())
+    
+    #Make the substitutions in the template inlists
+    make_replacements.make_replacements(make_inlist_inputs.make_inlist_inputs(runname, 'VeryLow', afe_formatted, zbase, net=net_name),\
+        new_inlist_name, direc=tempstor_inlist_dir, file_base=path_to_inlist_lowinter, clear_direc=True)
+    make_replacements.make_replacements(make_inlist_inputs.make_inlist_inputs(runname, 'LowDiffBC', afe, zbase, net=net_name),\
+        new_inlist_name, direc=tempstor_inlist_dir, file_base=path_to_inlist_lowinter)
+    make_replacements.make_replacements(make_inlist_inputs.make_inlist_inputs(runname, 'Intermediate', afe, zbase, net=net_name),\
+        new_inlist_name, direc=tempstor_inlist_dir, file_base=path_to_inlist_lowinter)
+    make_replacements.make_replacements(make_inlist_inputs.make_inlist_inputs(runname, 'HighDiffBC', afe, zbase, net=net_name),\
+        new_inlist_name, direc=tempstor_inlist_dir, file_base=path_to_inlist_high))
+    make_replacements.make_replacements(make_inlist_inputs.make_inlist_inputs(runname, 'VeryHigh', afe, zbase, net=net_name),\
+        new_inlist_name, direc=tempstor_inlist_dir, file_base=path_to_inlist_high)
         
     inlist_list = os.listdir(tempstor_inlist_dir)
     inlist_list.sort()
@@ -62,19 +86,20 @@ if __name__ == "__main__":
         #Define an absolute path to this directory.
         path_to_onemassdir = os.path.join(dirname, onemassdir)
 
-        #Copy over the contents of the template directory and copy over the most recent my_history_columns.list and run_star_extras.f
-        try:
-            shutil.copytree(os.path.join(os.environ['MESAWORK_DIR'], "cleanworkdir"), path_to_onemassdir)
-            shutil.copy(os.path.join(os.environ['MIST_CODE_DIR'], 'mesafiles/my_history_columns.list'), os.path.join(os.path.join(os.environ['MESAWORK_DIR'], "cleanworkdir"), 'my_history_columns.list'))
-            shutil.copy(os.path.join(os.environ['MIST_CODE_DIR'], 'mesafiles/run_star_extras.f'), os.path.join(os.path.join(os.environ['MESAWORK_DIR'], "cleanworkdir"), 'src/run_star_extras.f'))
-        except OSError:
-            pass
+        #Copy over the contents of the template directory
+        shutil.copytree(os.path.join(os.environ['MESAWORK_DIR'], "cleanworkdir"), path_to_onemassdir)
 
         #Populate each directory with appropriate inlists and rename as inlist_project
         shutil.copy(os.path.join(tempstor_inlist_dir,inlistname), os.path.join(path_to_onemassdir, 'inlist_project'))
         
+        #Populate each directory with the most recent my_history_columns.list and run_star_extras.f
+        shutil.copy(os.path.join(os.environ['MIST_CODE_DIR'], 'mesafiles/my_history_columns.list'),\
+                os.path.join(path_to_onemassdir, 'my_history_columns.list'))
+        shutil.copy(os.path.join(os.environ['MIST_CODE_DIR'], 'mesafiles/run_star_extras.f'),\
+                os.path.join(path_to_onemassdir, 'src/run_star_extras.f'))
+        
         #Populate each directory with the input abundance file named input_initial_composition.data
-        ####RUN AARON'S CODE HERE
+        #shutil.move()
 
         #Create and move the SLURM file to the correct directory
         runbasefile = os.path.join(os.environ['MIST_CODE_DIR'], 'mesafiles/SLURM_MISTgrid.sh')
