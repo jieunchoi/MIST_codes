@@ -12,6 +12,9 @@ The directory structure is as follows:
 Args:
     runname: the name of the grid
 
+Keywords:
+    doplot: if True, generates plots of EEPs and isochrones
+
 """
 
 import os
@@ -25,8 +28,18 @@ from scripts import reduce_jobs_utils
     
 if __name__ == "__main__":
     
-    runname = sys.argv[1]
-    
+    #Digest the inputs
+    if len(sys.argv) == 2:
+        runname = sys.argv[1]
+        doplot = False
+    elif len(sys.argv) < 2:
+        print "Usage: ./reduce_jobs name_of_grid doplot*"
+        print "* doplot is optional. It defaults to False."
+        sys.exit(0)
+    else:
+        runname = sys.argv[1]
+        doplot = sys.argv[2]
+                    
     #Rename the run directory XXX as XXX_raw
     rawdirname = runname+"_raw"
     os.system("mv " + os.path.join(os.environ['MIST_GRID_DIR'],runname) + " " + os.path.join(os.environ['MIST_GRID_DIR'],rawdirname))
@@ -69,19 +82,20 @@ if __name__ == "__main__":
     print "************************************************************"
     make_eeps_isos.make_eeps_isos(runname, basic=True)
     make_eeps_isos.make_eeps_isos(runname, basic=False)
-    
-    print "************************************************************"
-    print "******************PLOTTING THE EEPS FILES*******************"
-    print "************************************************************"
-    os.mkdir(os.path.join(newdirname, "plots"))
-    mesa_plot_grid.plot_HRD(runname)
-    mesa_plot_grid.plot_combine(runname, iso=False, remove_pdf=False)
 
-    print "************************************************************"
-    print "******************PLOTTING THE ISOCHRONES*******************"
-    print "************************************************************"
-    mesa_plot_grid.plot_iso(runname)
-    mesa_plot_grid.plot_combine(runname, iso=True, remove_pdf=False)
+    if doplot:
+        print "************************************************************"
+        print "******************PLOTTING THE EEPS FILES*******************"
+        print "************************************************************"
+        os.mkdir(os.path.join(newdirname, "plots"))
+        mesa_plot_grid.plot_HRD(runname)
+        mesa_plot_grid.plot_combine(runname, iso=False, remove_pdf=False)
+        
+        print "************************************************************"
+        print "******************PLOTTING THE ISOCHRONES*******************"
+        print "************************************************************"
+        mesa_plot_grid.plot_iso(runname)
+        mesa_plot_grid.plot_combine(runname, iso=True, remove_pdf=False)
     
     print "************************************************************"
     print "******COMPRESSING BOTH TRACKS AND REDUCED DIRECTORIES*******"

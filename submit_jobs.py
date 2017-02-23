@@ -8,6 +8,10 @@ Args:
     runname: the name of the grid
     FeH: metallicity
     aFe: alpha-enhancement
+
+Keywords:
+    vvcrit: rotation
+    net_name: name of the nuclear network. Input to the abundance code.
     
 Example:
     To run a [Fe/H] = 0, [a/Fe] = 0 grid called MIST_v0.1
@@ -26,10 +30,24 @@ from scripts import make_replacements
 if __name__ == "__main__":
 
     #Digest the inputs
-    runname = sys.argv[1]
-    FeH = sys.argv[2]
-    aFe = sys.argv[3]
-    dirname = os.path.join(os.environ['MIST_GRID_DIR'], runname)
+    if len(sys.argv) == 4:
+        runname = sys.argv[1]
+        FeH = float(sys.argv[2])
+        aFe = float(sys.argv[3])
+        vvcrit = 0.4
+        net_name = 'mesa_49.net'
+    elif len(sys.argv) < 4:
+        print "Usage: ./submit_jobs name_of_grid FeH aFe vvcrit* net_name*"
+        print "* vvcrit and net_name are optional. They default to 0.4 and mesa_49.net."
+        sys.exit(0)
+    else:
+        runname = sys.argv[1]
+        FeH = float(sys.argv[2])
+        aFe = float(sys.argv[3])
+        vvcrit = float(sys.argv[4])
+        net_name = sys.argv[5]
+
+    dirname = os.path.join(os.environ['MIST_GRID_DIR'], runname)    
     
     #Create a working directory
     try:
@@ -37,9 +55,6 @@ if __name__ == "__main__":
     except OSError:
         print "The directory already exists."
         sys.exit(0)
-
-    ###RUN AARON'S CODE HERE
-    ###generate the Zbase_val.txt file and the abundances list file
     
     #Generate inlists using template inlist files
     tempstor_inlist_dir = os.path.join(os.environ['MESAWORK_DIR'], 'inlists/inlists_'+'_'.join(runname.split('/')))
@@ -47,8 +62,6 @@ if __name__ == "__main__":
     path_to_inlist_lowinter = os.path.join(os.environ['MIST_CODE_DIR'],'mesafiles/inlist_lowinter')
     path_to_inlist_high = os.path.join(os.environ['MIST_CODE_DIR'],'mesafiles/inlist_high')
     
-    #The nuclear network must be specified since it is an input to Aaron's code to get the abundances
-    net_name = 'mesa_49.net'
     
     #aFe value must be between -0.2 and 0.6 in steps of 0.2 (for opacity table reasons)
     okay_Fe = [-0.2, 0.0, 0.2, 0.4, 0.6]
@@ -60,20 +73,24 @@ if __name__ == "__main__":
     else:
         afe_fmt = 'afe+'+str(aFe)
         
+    #Run Aaron's code to get the abundances
+    os.system("./"+os.path.join(os.environ["XA_CALC_DIR"], "initial_xa_calculator/initial_xa_calculator") +\
+        " " +  net_name + " " + str(FeH) + " " +str(aFe))
+        
     #Zbase needs to be set in MESA for Type II opacity tables. Get this from a file produced by Aaron's code
-    with open('Zbase_val.txt') as f:
+    with open('input_Zbase') as f:
         Zbase = float(f.read())
-    
+
     #Make the substitutions in the template inlists
-    make_replacements.make_replacements(make_inlist_inputs.make_inlist_inputs(runname, 'VeryLow', afe_formatted, zbase, net=net_name),\
+    make_replacements.make_replacements(make_inlist_inputs.make_inlist_inputs(runname, 'VeryLow', afe_formatted, zbase, vvcrit, net_name),\
         new_inlist_name, direc=tempstor_inlist_dir, file_base=path_to_inlist_lowinter, clear_direc=True)
-    make_replacements.make_replacements(make_inlist_inputs.make_inlist_inputs(runname, 'LowDiffBC', afe, zbase, net=net_name),\
+    make_replacements.make_replacements(make_inlist_inputs.make_inlist_inputs(runname, 'LowDiffBC', afe, zbase, vvcrit, net_name),\
         new_inlist_name, direc=tempstor_inlist_dir, file_base=path_to_inlist_lowinter)
-    make_replacements.make_replacements(make_inlist_inputs.make_inlist_inputs(runname, 'Intermediate', afe, zbase, net=net_name),\
+    make_replacements.make_replacements(make_inlist_inputs.make_inlist_inputs(runname, 'Intermediate', afe, zbase, vvcrit, net_name),\
         new_inlist_name, direc=tempstor_inlist_dir, file_base=path_to_inlist_lowinter)
-    make_replacements.make_replacements(make_inlist_inputs.make_inlist_inputs(runname, 'HighDiffBC', afe, zbase, net=net_name),\
-        new_inlist_name, direc=tempstor_inlist_dir, file_base=path_to_inlist_high))
-    make_replacements.make_replacements(make_inlist_inputs.make_inlist_inputs(runname, 'VeryHigh', afe, zbase, net=net_name),\
+    make_replacements.make_replacements(make_inlist_inputs.make_inlist_inputs(runname, 'HighDiffBC', afe, zbase, vvcrit, net_name),\
+        new_inlist_name, direc=tempstor_inlist_dir, file_base=path_to_inlist_high)
+    make_replacements.make_replacements(make_inlist_inputs.make_inlist_inputs(runname, 'VeryHigh', afe, zbase, vvcrit, net_name),\
         new_inlist_name, direc=tempstor_inlist_dir, file_base=path_to_inlist_high)
         
     inlist_list = os.listdir(tempstor_inlist_dir)
@@ -99,7 +116,7 @@ if __name__ == "__main__":
                 os.path.join(path_to_onemassdir, 'src/run_star_extras.f'))
         
         #Populate each directory with the input abundance file named input_initial_composition.data
-        #shutil.move()
+        shutil.move(os.path.join(os.environ['MIST_CODE_DIR'], 'input_initial_composition.data'), path_to_onemassdir)
 
         #Create and move the SLURM file to the correct directory
         runbasefile = os.path.join(os.environ['MIST_CODE_DIR'], 'mesafiles/SLURM_MISTgrid.sh')

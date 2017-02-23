@@ -8,9 +8,8 @@ Args:
     startype: the mass range of the models
     afe: the [a/Fe] value of the grid as str
     zbase: the Zbase corresponding to [Fe/H] and [a/Fe] as float
-
-Keywords:
-    net: the name of the nuclear network to be used
+    rot: initial v/vcrit 
+    net: name of the nuclear network
 
 Returns:
     the list of replacements
@@ -29,17 +28,16 @@ Acknowledgment:
 import sys
 import numpy as np
     
-def make_inlist_inputs(runname, startype, afe, zbase, net='mesa_49.net'):
+def make_inlist_inputs(runname, startype, afe, zbase, rot, net):
     
     #Array of all masses
     massgrid = lambda i,f,step: np.linspace(i,f,round(((f-i)/step))+1.0)
 
     bigmassgrid = np.unique(np.hstack((massgrid(0.1,0.3,0.05),\
-                                           massgrid(0.3,0.4,0.01), massgrid(0.4,0.9,0.05),\
-                                           massgrid(0.92,2.8,0.02), massgrid(3.0,8.0,0.2),\
-                                           massgrid(9,20,1), massgrid(20,40,2), massgrid(40,150,5),\
-                                           massgrid(150, 300, 25))
-                                        ))
+                                        massgrid(0.3,0.4,0.01), massgrid(0.4,0.9,0.05),\
+                                        massgrid(0.92,2.8,0.02), massgrid(3.0,8.0,0.2),\
+                                        massgrid(9,20,1), massgrid(20,40,2),\
+                                        massgrid(40,150,5),massgrid(150, 300, 25))))
 
     #Choose the correct mass range and boundary conditions                                   
     if (startype == 'VeryLow'):
@@ -81,15 +79,18 @@ def make_inlist_inputs(runname, startype, afe, zbase, net='mesa_49.net'):
     else:
         bctablelist = list([bctype]*np.size(massindex))
         bclabellist = list([bclabel]*np.size(massindex))
-
-    #Create net list
-    netlist = list([net]*np.size(massindex))
     
     #Create [a/Fe] lists
     afelist = list([afe]*np.size(massindex))
 
     #Create Zbase list
     zbaselist = list([zbase]*np.size(massindex))
+
+    #Create rot list
+    rotlist = list([rot]*np.size(massindex))
+
+    #Create net list
+    netlist = list([net]*np.size(massindex))
         
     #Make list of [replacement string, values]
     replist = [\
@@ -97,8 +98,9 @@ def make_inlist_inputs(runname, startype, afe, zbase, net='mesa_49.net'):
             ["<<BC_LABEL>>", bclabellist],\
             ["<<BC_TABLE>>", bctablelist],\
             ["<<AFE>>", afelist],\
-            ["<<NET>>", netlist],\
             ["<<ZBASE>>", zbaselist],\
+            ["<<ROT>>", rotlist],\
+            ["<<NET>>", netlist],\
         ]
     
     #Special case for LowDiffBC
@@ -108,8 +110,9 @@ def make_inlist_inputs(runname, startype, afe, zbase, net='mesa_49.net'):
                 ["<<BC_LABEL>>", bclabellist],\
                 ["<<BC_TABLE>>", bctablelist],\
                 ["<<AFE>>", afelist*2],\
-                ["<<NET>>", netlist*2],\
                 ["<<ZBASE>>", zbaselist*2],\
+                ["<<ROT>>", rotlist*2],\
+                ["<<NET>>", netlist*2],\
             ]
 
     return replist

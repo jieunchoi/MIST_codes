@@ -5,6 +5,8 @@ Computes H1, H2, He3, and He4 for an input metallicity ([Fe/H] or Z). Assumes pr
 
 Example Usage: <code>H1, H2, He3, He4, Z = calc_xyz.calc_xyz(-1.0, input_feh=True)</code>
 
+**Deprecated. As of MIST v2.0 we use <code>initial_xa_calculator</code> to get the initial abundances for a given [Fe/H] and [a/Fe].
+
 ## make_blend_input_file.py
 Generates the input file necessary to run the <code>./blend_eeps</code> executable in the iso package. It has the relevant mass range hard-coded in. In practice, the mass range and the functional form for the blending weights can be modified. Not intended for stand-alone use.
 
