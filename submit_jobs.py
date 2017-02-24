@@ -74,7 +74,7 @@ if __name__ == "__main__":
         afe_fmt = 'afe+'+str(aFe)
         
     #Run Aaron's code to get the abundances
-    os.system("./"+os.path.join(os.environ["XA_CALC_DIR"], "initial_xa_calculator/initial_xa_calculator") +\
+    os.system("./"+os.path.join(os.environ["XA_CALC_DIR"], "initial_xa_calculator") +\
         " " +  net_name + " " + str(FeH) + " " +str(aFe))
         
     #Zbase needs to be set in MESA for Type II opacity tables. Get this from a file produced by Aaron's code
