@@ -78,7 +78,7 @@ def make_replacements(replist, name_str, direc='inlists', file_base='inlist_proj
             if keys[i] == "<<MASS>>":
                 inlist_file = inlist_file.replace(keys[i], reformat_massname.reformat_massname(val_vec[i]))
             else:
-                inlist_file = inlist_file.replace(keys[i], val_vec[i])
+                inlist_file = inlist_file.replace(keys[i], str(val_vec[i]))
         
         inlist_file = os.path.join(direc, inlist_file)
         
