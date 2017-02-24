@@ -78,8 +78,10 @@ if __name__ == "__main__":
         " " +  net_name + " " + str(FeH) + " " +str(aFe))
         
     #Zbase needs to be set in MESA for Type II opacity tables. Get this from a file produced by Aaron's code
-    with open('input_Zbase') as f:
-        Zbase = float(f.read())
+    with open('input_XYZ') as f:
+        Xval = float(f.readline())
+        Yval = float(f.readline())
+        zbase = float(f.readline())
 
     #Make the substitutions in the template inlists
     make_replacements.make_replacements(make_inlist_inputs.make_inlist_inputs(runname, 'VeryLow', afe_formatted, zbase, vvcrit, net_name),\
@@ -115,8 +117,8 @@ if __name__ == "__main__":
         shutil.copy(os.path.join(os.environ['MIST_CODE_DIR'], 'mesafiles/run_star_extras.f'),\
                 os.path.join(path_to_onemassdir, 'src/run_star_extras.f'))
         
-        #Populate each directory with the input abundance file named input_initial_composition.data
-        shutil.move(os.path.join(os.environ['MIST_CODE_DIR'], 'input_initial_composition.data'), path_to_onemassdir)
+        #Populate each directory with the input abundance file named input_initial_xa.data
+        shutil.move(os.path.join(os.environ['MIST_CODE_DIR'], 'input_initial_xa.data'), path_to_onemassdir)
 
         #Create and move the SLURM file to the correct directory
         runbasefile = os.path.join(os.environ['MIST_CODE_DIR'], 'mesafiles/SLURM_MISTgrid.sh')

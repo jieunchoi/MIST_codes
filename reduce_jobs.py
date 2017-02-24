@@ -68,6 +68,12 @@ if __name__ == "__main__":
     os.system("mv tracks_summary.txt " + newdirname)
     
     print "************************************************************"
+    print "****************SAVING THE ABUNDANCES FILE******************"
+    print "************************************************************"
+    abunfile = glob.glob(os.path.join(os.path.join(os.environ['MIST_GRID_DIR'],rawdirname),'*dir/input_initial_xa.data'))[0]
+    os.system("cp " + abunfile + " " + newdirname)
+    
+    print "************************************************************"
     print "****************SORTING THE INLIST FILES********************"
     print "************************************************************"
     reduce_jobs_utils.save_inlists(rawdirname)
