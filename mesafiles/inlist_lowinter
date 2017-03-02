@@ -149,7 +149,36 @@
       diffusion_min_T_at_surface = 1d3
       diffusion_min_dq_at_surface = 1d-3
       turbulent_diffusion_D0 = 1
-	  
+      
+      diffusion_gamma_full_on = 165
+      diffusion_gamma_full_off = 175
+                 
+      diffusion_num_classes = 7
+              
+      diffusion_class_representative(1) = 'h1'
+      diffusion_class_representative(2) = 'he3'
+      diffusion_class_representative(3) = 'he4'
+      diffusion_class_representative(4) = 'o16'
+      diffusion_class_representative(5) = 'ne20'
+      diffusion_class_representative(6) = 'ne22'
+      diffusion_class_representative(7) = 'fe56'
+              
+      diffusion_class_A_max(1) = 2
+      diffusion_class_A_max(2) = 3
+      diffusion_class_A_max(3) = 4
+      diffusion_class_A_max(4) = 16
+      diffusion_class_A_max(5) = 21
+      diffusion_class_A_max(6) = 22
+      diffusion_class_A_max(7) = 10000
+              
+      diffusion_class_typical_charge(1) = 1
+      diffusion_class_typical_charge(2) = 2
+      diffusion_class_typical_charge(3) = 2
+      diffusion_class_typical_charge(4) = 8
+      diffusion_class_typical_charge(5) = 10
+      diffusion_class_typical_charge(6) = 10
+      diffusion_class_typical_charge(7) = 21
+      
       !to help with breathing pulses
       include_dmu_dt_in_eps_grav = .true.
 
