@@ -20,6 +20,7 @@ Keywords:
 import os
 import sys
 import subprocess
+import glob
 
 from scripts import mesa_plot_grid
 from scripts import make_eeps_isos
@@ -71,7 +72,9 @@ if __name__ == "__main__":
     print "****************SAVING THE ABUNDANCES FILE******************"
     print "************************************************************"
     abunfile = glob.glob(os.path.join(os.path.join(os.environ['MIST_GRID_DIR'],rawdirname),'*dir/input_initial_xa.data'))[0]
+    xyzfile = glob.glob(os.path.join(os.path.join(os.environ['MIST_GRID_DIR'],rawdirname),'*dir/input_XYZ'))[0]
     os.system("cp " + abunfile + " " + newdirname)
+    os.system("cp " + xyzfile + " " + newdirname) 
     
     print "************************************************************"
     print "****************SORTING THE INLIST FILES********************"

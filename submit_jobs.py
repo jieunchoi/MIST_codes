@@ -118,8 +118,9 @@ if __name__ == "__main__":
         shutil.copy(os.path.join(os.environ['MIST_CODE_DIR'], 'mesafiles/run_star_extras.f'),\
                 os.path.join(path_to_onemassdir, 'src/run_star_extras.f'))
         
-        #Populate each directory with the input abundance file named input_initial_xa.data
+        #Populate each directory with the input abundance file named input_initial_xa.data and input_XYZ
         shutil.copy(os.path.join(os.environ['MIST_CODE_DIR'], 'input_initial_xa.data'), path_to_onemassdir)
+        shutil.copy(os.path.join(os.environ['MIST_CODE_DIR'], 'input_XYZ'), path_to_onemassdir)
 
         #Create and move the SLURM file to the correct directory
         runbasefile = os.path.join(os.environ['MIST_CODE_DIR'], 'mesafiles/SLURM_MISTgrid.sh')

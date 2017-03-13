@@ -65,7 +65,11 @@ def make_iso_input_file(runname, mode, basic, incomplete=[]):
         iso_file = runname_format+"_full.iso\n"
     
     dirname = runname.split('/')[-1]
-    fehstr, feh, afestr, afe, vvcrit = dirname.split('_')
+    dirname_split = dirname.split('_')
+    feh = dirname_split[1]
+    afe = dirname_split[3]
+    vvcrit = dirname_split[4]
+
     fehval = float(feh[1:])*1.0
     if 'm' in feh:
         fehval *= -1.0
@@ -73,7 +77,7 @@ def make_iso_input_file(runname, mode, basic, incomplete=[]):
     if 'm' in afe:
         afeval *= -1.0
 
-    with open('input_XYZ') as f:
+    with open(os.path.join(os.path.join(os.environ['MIST_GRID_DIR'], runname),'input_XYZ')) as f:
         Xval = float(f.readline())
         Yval = float(f.readline())
         Zval = float(f.readline())
