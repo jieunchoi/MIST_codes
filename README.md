@@ -3,7 +3,7 @@ Routines to run and process a grid of MIST models on the Odyssey computing clust
 
 ## Prerequisites
 ### Software
-* MESA v9575 : http://mesa.sourceforge.net/
+* a customized version of MESA v9575 : http://mesa.sourceforge.net/ (http://waps.cfa.harvard.edu/MIST/data/tarballs_v1.0/MESA_files.tar.gz)
 * mesasdk (for MESA installation) : http://www.astro.wisc.edu/~townsend/static.php?ref=mesasdk
 * iso : https://github.com/dotbot2000/iso
 * initial_xa_calculator : https://github.com/dotbot2000/initial_xa_calculator
