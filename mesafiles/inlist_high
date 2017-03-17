@@ -31,6 +31,7 @@
       kappa_file_prefix = 'agss09_<<AFE>>'
       kappa_lowT_prefix = 'lowT_agss09_<<AFE>>'
       kappa_CO_prefix = 'agss09_<<AFE>>_co'
+      kappa_config_file = 'kap_config_file.txt'
 
       !use jina
       set_rates_preference = .true.
