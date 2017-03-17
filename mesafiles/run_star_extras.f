@@ -25,13 +25,12 @@
     use star_def
     use const_def
     use crlibm_lib
-    use rates_def
-    use net_def
       
     implicit none
     
     real(dp) :: original_diffusion_dt_limit
     real(dp) :: burn_check = 0.0
+    real(dp) :: rot_set_check = 0.0
     logical :: wd_diffusion = .false.
           
     contains
@@ -66,7 +65,7 @@
         logical, intent(in) :: restart
         integer, intent(out) :: ierr
         type (star_info), pointer :: s
-        real(dp) :: core_ov_full_on, core_ov_full_off, frac, rot_full_off, rot_full_on, frac2, vct30, vct100
+        real(dp) :: frac, vct30, vct100
         ierr = 0
         call star_ptr(id, s, ierr)
         if (ierr /= 0) return
@@ -76,41 +75,7 @@
         else
             call unpack_extra_info(s)
         end if
-              
-! set ROTATION: extra param are set in inlist: star_job
-        rot_full_off = s% job% extras_rpar(1) !1.2
-        rot_full_on = s% job% extras_rpar(2) !1.8
-        
-        if (s% job% extras_rpar(3) > 0.0) then
-            if (s% star_mass < rot_full_off) then
-                frac2 = 0
-                write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
-                write(*,*) 'no rotation'
-                write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
-            else if (s% star_mass >= rot_full_off .and. s% star_mass <= rot_full_on) then
-                frac2 = (s% star_mass - rot_full_off) / &
-                (rot_full_on - rot_full_off)
-                frac2 = 0.5d0*(1 - cos(pi*frac2))
-                s% job% set_near_zams_omega_div_omega_crit_steps = 10
-                s% job% new_omega_div_omega_crit = s% job% extras_rpar(3) * frac2
-                write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
-                write(*,*) 'new omega_div_omega_crit, fraction', s% job% new_omega_div_omega_crit, frac2
-                write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
-            else
-                frac2 = 1.0
-                s% job% set_near_zams_omega_div_omega_crit_steps = 10
-                s% job% new_omega_div_omega_crit = s% job% extras_rpar(3) * frac2 !nominally 0.4
-                write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
-                write(*,*) 'new omega_div_omega_crit, fraction', s% job% new_omega_div_omega_crit, frac2
-                write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
-            end if
-        else
-            write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
-            write(*,*) 'no rotation'
-            write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
-        end if
-        
-        
+                      
 ! set VARCONTROL: for massive stars, turn up varcontrol gradually to help them evolve
         vct30 = 1e-4
         vct100 = 3e-3
@@ -290,14 +255,13 @@
         
     integer function extras_finish_step(id, id_extra)
         integer, intent(in) :: id, id_extra
-        integer :: ierr, r, burn_category
-        real(dp) :: envelope_mass_fraction, L_He, L_tot, min_center_h1_for_diff, critmass, feh
-        real(dp) :: category_factors(num_categories)
+        integer :: ierr
+        real(dp) :: envelope_mass_fraction, L_He, L_tot, min_center_h1_for_diff, &
+            critmass, feh, rot_full_off, rot_full_on, frac2
         real(dp), parameter :: huge_dt_limit = 3.15d16 ! ~1 Gyr
         real(dp), parameter :: new_varcontrol_target = 1d-3
         real(dp), parameter :: Zsol = 0.0142
         type (star_info), pointer :: s
-        type (Net_General_Info), pointer :: g
 	    logical :: diff_test1, diff_test2, diff_test3
         character (len=strlen) :: photoname
         
@@ -307,10 +271,6 @@
         extras_finish_step = keep_going
         call store_extra_info(s)
         
-        ierr = 0
-        call get_net_ptr(s% net_handle, g, ierr)
-        if (ierr /= 0) stop 'bad handle'	  
-    
 ! set BC: change to tables after running on simple photosphere
         if (s% model_number == 100) then
            write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
@@ -318,7 +278,40 @@
            write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
            s% which_atm_option = s% job% extras_cpar(1)
         endif
-        
+
+! set ROTATION: extra param are set in inlist: star_job
+        rot_full_off = s% job% extras_rpar(1) !1.2
+        rot_full_on = s% job% extras_rpar(2) !1.8
+
+        if (rot_set_check == 0) then
+            if (s% job% extras_rpar(3) > 0.0) then
+                if (s% star_mass < rot_full_off) then
+                    frac2 = 0.0
+                else if (s% star_mass >= rot_full_off .and. s% star_mass <= rot_full_on) then
+                    frac2 = (s% star_mass - rot_full_off) / (rot_full_on - rot_full_off)
+                    frac2 = 0.5d0*(1 - cos(pi*frac2))
+                else
+                    frac2 = 1.0
+                end if
+                
+                !check if ZAMS is achieved, then set rotation
+                if ((abs(log10(s% L_nuc_burn_total * Lsun / s% L(1))) < 0.005) .and. (s% star_age > 1d2)) then
+                    write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
+                    write(*,*) 'new omega_div_omega_crit, fraction', s% job% extras_rpar(3) * frac2, frac2
+                    write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
+                    s% job% new_omega_div_omega_crit = s% job% extras_rpar(3) * frac2
+                    s% job% set_near_zams_omega_div_omega_crit_steps = 10
+                    rot_set_check = 1
+                end if
+            else
+                write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
+                write(*,*) 'no rotation'
+                write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
+                rot_set_check = 1
+            end if   
+            
+        end if
+
 ! increase VARCONTROL and MDOT: increase varcontrol and Mdot when the model hits the TPAGB phase
         if ((s% initial_mass < 10) .and. (s% center_h1 < 1d-4) .and. (s% center_he4 < 1d-4)) then
             !try turning up Mdot
@@ -354,8 +347,6 @@
      
 ! treat postAGB: suppress late burning by turn off burning post-AGB and also save a model and photo
         envelope_mass_fraction = 1d0 - max(s% he_core_mass, s% c_core_mass, s% o_core_mass)/s% star_mass
-        category_factors(:) = 1.0 !turn off burning except for H
-        category_factors(3:) = 0.0
         if ((s% initial_mass < 10) .and. (envelope_mass_fraction < 0.1) .and. (s% center_h1 < 1d-4) .and. (s% center_he4 < 1d-4) &
         .and. (s% L_phot > 3.0) .and. (s% Teff > 7000.0)) then
 	    	if (burn_check == 0.0) then !only print the first time
@@ -369,10 +360,9 @@
 	    		call star_save_for_restart(id, photoname, ierr)
 	    		
 	    		!turn off burning
-	    		do r=1,g% num_reactions
-	    			burn_category = reaction_categories(g% reaction_id(r))
-	    			s% rate_factors(r) = category_factors(burn_category)
-	    		end do
+                s% category_factors(3:)=0.0
+                call set_rate_factors_from_categories(id,ierr)
+                if(ierr/=0) return
 	    		burn_check = 1.0
                 
                 !diffusion
