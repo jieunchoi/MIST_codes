@@ -38,8 +38,9 @@
       surf_avg_v_div_v_crit ! ratio of rotational velocity to critical rotational velocity
       surf_avg_Lrad_div_Ledd ! ratio of surface radiative luminosity to eddington luminosity
       v_div_csound_surf ! velocity divided by sound speed at outermost grid point
-      surf_r_equatorial_div_r_polar !equatorial radius divided by polar radius
-
+      surf_r_equatorial_div_r ! equatorial radius
+      surf_r_polar_div_r ! polar radius
+      
    ! mass fractions near surface (averaged over the outer 1e−6% of the total stellar mass)
      
       surface h1
