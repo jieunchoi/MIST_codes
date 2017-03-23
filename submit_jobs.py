@@ -122,6 +122,9 @@ if __name__ == "__main__":
         shutil.copy(os.path.join(os.environ['MIST_CODE_DIR'], 'input_initial_xa.data'), path_to_onemassdir)
         shutil.copy(os.path.join(os.environ['MIST_CODE_DIR'], 'input_XYZ'), path_to_onemassdir)
 
+        #Populate each directory with the opacity configuration file
+        shutil.copy(os.path.join(os.environ['MIST_CODE_DIR'], 'mesafiles/kap_config_file.txt'), path_to_onemassdir)
+
         #Create and move the SLURM file to the correct directory
         runbasefile = os.path.join(os.environ['MIST_CODE_DIR'], 'mesafiles/SLURM_MISTgrid.sh')
         slurmfile = make_slurm_sh.make_slurm_sh(inlistname, path_to_onemassdir, runbasefile)

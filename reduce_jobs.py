@@ -33,13 +33,15 @@ if __name__ == "__main__":
     if len(sys.argv) == 2:
         runname = sys.argv[1]
         doplot = False
-    elif len(sys.argv) < 2:
-        print "Usage: ./reduce_jobs name_of_grid doplot*"
-        print "* doplot is optional. It defaults to False."
+        dobotheeps = False
+    elif ((len(sys.argv) < 2) or (len(sys.argv) == 3)):
+        print "Usage: ./reduce_jobs name_of_grid doplot* dobotheeps*"
+        print "* doplot and dobotheeps are optional, but both must be set at the same time. They both default to False."
         sys.exit(0)
     else:
         runname = sys.argv[1]
         doplot = sys.argv[2]
+        dobotheeps = sys.argv[3]
                     
     #Rename the run directory XXX as XXX_raw
     rawdirname = runname+"_raw"
@@ -89,8 +91,9 @@ if __name__ == "__main__":
     print "************************************************************"
     print "**********************MAKE ISOCHRONES***********************"
     print "************************************************************"
-    make_eeps_isos.make_eeps_isos(runname, basic=True)
     make_eeps_isos.make_eeps_isos(runname, basic=False)
+    if dobotheeps:
+        make_eeps_isos.make_eeps_isos(runname, basic=True)
 
     if doplot:
         print "************************************************************"
