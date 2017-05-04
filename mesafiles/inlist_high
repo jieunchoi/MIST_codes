@@ -24,9 +24,11 @@
       new_net_name = '<<NET>>'
 	  
       !first 100 models are run with simple_photosphere then switched to the following
-      extras_lcpar = 1
+      !need the [a/Fe] info to pick the correct BC table
+      extras_lcpar = 2
       extras_cpar(1) = '<<BC_TABLE>>'
-
+      extras_cpar(2) = '<<AFE>>'
+      
       !opacities with AGSS09 abundances
       kappa_file_prefix = 'agss09_<<AFE>>'
       kappa_lowT_prefix = 'lowT_agss09_<<AFE>>'
@@ -119,6 +121,9 @@
       kap_Type2_full_off_X = 1d-3
       kap_Type2_full_on_X = 1d-6
       Zbase = <<ZBASE>>
+
+      !low T Type2 opacties          
+      use_other_kap = .true.
 	     
       !rotational mixing if applicable	 
       D_SH_factor =  1.0

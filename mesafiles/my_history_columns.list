@@ -40,6 +40,7 @@
       v_div_csound_surf ! velocity divided by sound speed at outermost grid point
       surf_r_equatorial_div_r ! equatorial radius
       surf_r_polar_div_r ! polar radius
+      total_angular_momentum
       
    ! mass fractions near surface (averaged over the outer 1e−6% of the total stellar mass)
      

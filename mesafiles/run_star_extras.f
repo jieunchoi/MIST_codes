@@ -25,6 +25,7 @@
     use star_def
     use const_def
     use crlibm_lib
+    use chem_def
       
     implicit none
     
@@ -32,9 +33,10 @@
     real(dp) :: burn_check = 0.0
     real(dp) :: rot_set_check = 0.0
     logical :: wd_diffusion = .false.
+    real(dp) :: X_C_init, X_N_init
           
     contains
-    
+        
     subroutine extras_controls(id, ierr)
         integer, intent(in) :: id
         integer, intent(out) :: ierr
@@ -52,6 +54,8 @@
         s% how_many_extra_profile_columns => how_many_extra_profile_columns
         s% data_for_extra_profile_columns => data_for_extra_profile_columns  
         s% other_wind => low_mass_wind_scheme
+        s% other_kap_get_Type1 => kapCN_get_Type1
+        s% other_kap_get_Type2 => kapCN_get_Type2
         
         s% job% warn_run_star_extras =.false.       
          
@@ -65,7 +69,9 @@
         logical, intent(in) :: restart
         integer, intent(out) :: ierr
         type (star_info), pointer :: s
+        integer :: j, cid
         real(dp) :: frac, vct30, vct100
+        character(len=256) :: photosphere_summary, tau100_summary
         ierr = 0
         call star_ptr(id, s, ierr)
         if (ierr /= 0) return
@@ -75,7 +81,18 @@
         else
             call unpack_extra_info(s)
         end if
-                      
+
+! set initial C and N abundances for low T opacities during TPAGB
+        call kapCN_init(ierr)        
+        
+        X_C_init = 0d0
+        X_N_init = 0d0
+        do j=1,s% species
+            cid = s% chem_id(j)
+            if(chem_isos% Z(cid)==6) X_C_init = X_C_init + s% xa(j,1)
+            if(chem_isos% Z(cid)==7) X_N_init = X_N_init + s% xa(j,1)
+        end do
+                        
 ! set VARCONTROL: for massive stars, turn up varcontrol gradually to help them evolve
         vct30 = 1e-4
         vct100 = 3e-3
@@ -93,7 +110,12 @@
             write(*,*) 'varcontrol_target is set to ', s% varcontrol_target
             write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
         end if
-    
+        
+! set the correct summary file for the BC tables depending on [a/Fe]        
+        photosphere_summary = 'table_' // trim(s% job% extras_cpar(2)) // '_summary.txt'
+        tau100_summary = 'table100_' // trim(s% job% extras_cpar(2)) // '_summary.txt'
+        call table_atm_init(.true., tau100_summary, photosphere_summary, ierr)
+        
     end function extras_startup
     
     
@@ -116,7 +138,7 @@
         ierr = 0
         call star_ptr(id, s, ierr)
         if (ierr /= 0) return
-        how_many_extra_history_columns = 7
+        how_many_extra_history_columns = 8
     end function how_many_extra_history_columns
     
     
@@ -128,7 +150,8 @@
         type (star_info), pointer :: s
 	    real(dp) :: ocz_top_radius, ocz_bot_radius, &
             ocz_top_mass, ocz_bot_mass, mixing_length_at_bcz, &
-            dr, ocz_turnover_time_g, ocz_turnover_time_l_b, ocz_turnover_time_l_t
+            dr, ocz_turnover_time_g, ocz_turnover_time_l_b, ocz_turnover_time_l_t, &
+            env_binding_E, total_env_binding_E
         integer :: i, k, n_conv_bdy, nz, k_ocz_bot, k_ocz_top
 	    
         ierr = 0
@@ -220,6 +243,19 @@
         vals(6) = ocz_turnover_time_l_b
         names(7) = 'conv_env_turnover_time_l_t'
         vals(7) = ocz_turnover_time_l_t
+    
+! output info about the ENV.: binding energy
+
+        total_env_binding_E = 0.0        
+        do k=1,s% nz
+            if (s% m(k) > (s% he_core_mass * Msun)) then !envelope is defined to be H-rich
+                env_binding_E = s% dm(k) * (s% energy(k) - (s% cgrav(1) * s% m(k))/s% r(k))
+                total_env_binding_E = total_env_binding_E + env_binding_E
+            end if
+        end do
+        
+        names(8) = 'envelope_binding_energy'
+        vals(8) = total_env_binding_E
     
     end subroutine data_for_extra_history_columns
     
@@ -614,5 +650,269 @@
         
     end subroutine move_extra_info
     
+    subroutine kapCN_get_Type1( &
+           id, k, handle, zbar, X, Zbase, log10_rho, log10_T,  &
+           species, chem_id, net_iso, xa, &
+           lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
+           kap, dln_kap_dlnRho, dln_kap_dlnT, ierr)
+        
+        use kap_lib, only: kap_get_Type1
+        
+        implicit none
+        ! INPUT
+        integer, intent(in) :: id ! star id if available; 0 otherwise
+        integer, intent(in) :: k ! cell number or 0 if not for a particular cell         
+        integer, intent(in) :: handle ! from alloc_kap_handle
+        real(dp), intent(in) :: zbar ! average ion charge
+        real(dp), intent(in) :: X ! the hydrogen mass fraction
+        real(dp), intent(in) :: Zbase ! the metallicity
+        real(dp), intent(in) :: log10_rho ! the density
+        real(dp), intent(in) :: log10_T ! the temperature
+        integer, intent(in) :: species
+        integer, pointer :: chem_id(:) ! maps species to chem id
+           ! index from 1 to species
+        integer, pointer :: net_iso(:) ! maps chem id to species number
+           ! index from 1 to num_chem_isos (defined in chem_def)
+           ! value is 0 if the iso is not in the current net
+           ! else is value between 1 and number of species in current net
+        real(dp), intent(in) :: xa(:) ! mass fractions
+        double precision, intent(in) :: lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT
+           ! free_e := total combined number per nucleon of free electrons and positrons
+        
+        ! OUTPUT
+        real(dp), intent(out) :: kap ! opacity
+        real(dp), intent(out) :: dln_kap_dlnRho ! partial derivative at constant T
+        real(dp), intent(out) :: dln_kap_dlnT   ! partial derivative at constant Rho
+        integer, intent(out) :: ierr ! 0 means AOK.
+
+        call kap_get_Type1( handle, zbar, X, Zbase, log10_rho, log10_T, &
+                            lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
+                            kap, dln_kap_dlnRho, dln_kap_dlnT, ierr)
+        
+    end subroutine kapCN_get_Type1
+
+    subroutine kapCN_get_Type2( &
+           id, k, handle, zbar, X, Z, Zbase, XC, XN, XO, XNe, &
+           log10_rho, log10_T, species, chem_id, net_iso, xa, &
+           lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, use_Zbase_for_Type1, &
+           frac_Type2, kap, dln_kap_dlnRho, dln_kap_dlnT, ierr)
+
+        !use chem_def
+        use kap_lib, only: kap_get_Type2
+
+        ! INPUT
+        integer, intent(in) :: id ! star id if available; 0 otherwise
+        integer, intent(in) :: k ! cell number or 0 if not for a particular cell         
+        integer, intent(in) :: handle ! from alloc_kap_handle
+        real(dp), intent(in) :: zbar ! average ion charge
+        real(dp), intent(in) :: X, Z, Zbase, XC, XN, XO, XNe ! composition    
+        real(dp), intent(in) :: log10_rho ! density
+        real(dp), intent(in) :: log10_T ! temperature
+        real(dp), intent(in) :: lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT
+           ! free_e := total combined number per nucleon of free electrons and positrons
+        logical, intent(in) :: use_Zbase_for_Type1
+
+        integer, intent(in) :: species
+        integer, pointer :: chem_id(:) ! maps species to chem id
+           ! index from 1 to species
+           ! value is between 1 and num_chem_isos         
+        integer, pointer :: net_iso(:) ! maps chem id to species number
+           ! index from 1 to num_chem_isos (defined in chem_def)
+           ! value is 0 if the iso is not in the current net
+           ! else is value between 1 and number of species in current net
+        real(dp), intent(in) :: xa(:) ! mass fractions
+        
+        ! OUTPUT
+        real(dp), intent(out) :: frac_Type2
+        real(dp), intent(out) :: kap ! opacity
+        real(dp), intent(out) :: dln_kap_dlnRho ! partial derivative at constant T
+        real(dp), intent(out) :: dln_kap_dlnT   ! partial derivative at constant Rho
+        integer, intent(out) :: ierr ! 0 means AOK.
+        
+        logical, parameter :: debug=.false.
+        logical :: try_kapCN
+        real(dp) :: log10_R
+
+        !for converting sp <-> dp
+        real(sp) :: Z_sp, X_sp, fC, fN, logRho_sp, logT_sp
+        real(sp) :: kap_sp, dlnkap_dlnRho_sp, dlnkap_dlnT_sp
+
+        ierr=99
+        log10_R = log10_Rho - 3*log10_T + 18d0
+        
+        try_kapCN = X_C_init > 0d0 .and. X_N_init > 0d0 .and. log10_T < 4d0
+
+        if(try_kapCN)then
+
+           Z_sp=real(Zbase,sp); X_sp=real(X,sp); 
+           logRho_sp=real(log10_Rho,sp); logT_sp=real(log10_T,sp)
+
+           !Lederer & Aringer tables use Lodders (2003) abundance scale
+           fC=real(XC/X_C_init,sp)
+           fN=real(XN/X_N_init,sp)
+
+           call kapCN_get(Z_sp,X_sp,fC,fN,logRho_sp,logT_sp,kap_sp, &
+                          dlnkap_dlnRho_sp, dlnkap_dlnT_sp, ierr)
+
+           if(debug.or.kap_sp==1.0)then
+              write(*,*) 'logRho=',log10_Rho
+              write(*,*) 'logR=',log10_R
+              write(*,*) 'logT=',log10_T
+              write(*,*) 'XC=', XC
+              write(*,*) 'XN=', XN
+              write(*,*) 'Zbase=', Zbase
+              write(*,*) 'Zsp=', Z_sp
+              write(*,*) 'Xsp=', X_sp
+              write(*,*) 'fC=', fC
+              write(*,*) 'fN=', fN
+              write(*,*) 'kap_sp=', kap_sp
+              write(*,*) 'X_C_init=', X_C_init
+              write(*,*) 'X_N_init=', X_N_init
+              write(*,*) 'ierr=', ierr
+              write(*,*)
+           endif
+
+           if(ierr==0)then
+              kap = real(kap_sp,dp)
+              dln_kap_dlnRho = real(dlnkap_dlnRho_sp,dp)
+              dln_kap_dlnT = real(dlnkap_dlnT_sp,dp)
+           endif
+
+        endif
+
+        if(.not.try_kapCN .or. ierr/=0)then
+           call kap_get_Type2( &
+           handle, zbar, X, Z, Zbase, XC, XN, XO, XNe, &
+           log10_rho, log10_T,&
+           lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, use_Zbase_for_type1, &
+           frac_Type2, kap, dln_kap_dlnRho, dln_kap_dlnT, ierr)
+        endif
+
+        frac_Type2 = 1d0
+
+    end subroutine kapCN_get_Type2
     
+! borrowed directly from atm/private/table_atm.f90;
+! modified to deallocate allocated arrays before allocating them again with new dimensions
+     subroutine table_atm_init(use_cache, tau100_summary, photosphere_summary, ierr)
+        use atm_def
+        use utils_lib, only : alloc_iounit, free_iounit, mesa_error
+        implicit none
+        logical, intent(in) :: use_cache
+        character(len=256) :: tau100_summary, photosphere_summary
+        integer, intent(out) :: ierr
+            
+        integer :: nZ, ng, nT, i, j, iounit
+        integer, pointer :: ibound(:,:), tmp_version(:)
+        character(len=256) :: filename
+            
+        ierr = 0
+        iounit = alloc_iounit(ierr)
+        if (ierr /= 0) return
+            
+        ai_two_thirds => ai_two_thirds_info
+        ai_100 => ai_100_info  
+            
+        call load_table_summary(atm_photosphere_tables, photosphere_summary, ai_two_thirds, ierr)
+        if (ierr /= 0) return         
+        call load_table_summary(atm_tau_100_tables, tau100_summary, ai_100, ierr)
+        if (ierr /= 0) return
+            
+        call free_iounit(iounit)
+        table_atm_is_initialized = .true.
+
+        contains
+
+        subroutine load_table_summary(which_atm_option, fname, ai, ierr)
+            use const_def, only: mesa_data_dir
+            use crlibm_lib, only: str_to_vector
+            integer, intent(in) :: which_atm_option
+            character(len=*), intent(in) :: fname
+            type (Atm_Info), pointer :: ai
+            integer, intent(out) :: ierr
+              
+            integer :: nvec
+            character (len=500) :: buf
+            real(dp), target :: vec_ary(20)
+            real(dp), pointer :: vec(:)
+              
+            vec => vec_ary
+              
+            filename = trim(mesa_data_dir)//'/atm_data/' // trim(fname)
+              
+            open(iounit,file=trim(filename),action='read',status='old',iostat=ierr)
+            if (ierr/= 0) then
+                write(*,*) 'table_atm_init: missing atm data'
+                write(*,*) trim(filename)
+                write(*,*)
+                write(*,*)
+                write(*,*)
+                write(*,*)
+                write(*,*)
+                write(*,*) 'FATAL ERROR: missing or bad atm data.'
+                call mesa_error(__FILE__,__LINE__)
+            endif
+        
+            !read first line and (nZ, nT, ng)
+            read(iounit,*)            !first line is text, skip it
+            read(iounit,*) nZ, nT, ng
+              
+            ai% nZ = nZ
+            ai% nT = nT
+            ai% ng = ng
+            ai% which_atm_option = which_atm_option
+        
+            deallocate(ai% Teff_array, ai% logg_array, ai% Teff_bound, ai% logZ, ai% alphaFe, &
+                 ai% Pgas_interp1, ai% T_interp1, ai% have_atm_table, ai% atm_mix, ai% table_atm_files)
+              
+            allocate( &
+                 ai% Teff_array(nT), ai% logg_array(ng), ai% Teff_bound(ng), &
+                 ai% logZ(nZ), ai% alphaFe(nZ), &
+                 ai% Pgas_interp1(4*ng*nT*nZ), ai% T_interp1(4*ng*nT*nZ), &
+                 ai% have_atm_table(nZ), ai% atm_mix(nZ), ai% table_atm_files(nZ))
+              
+            ai% Pgas_interp(1:4,1:ng,1:nT,1:nZ) => ai% Pgas_interp1(1:4*ng*nT*nZ)
+            ai% T_interp(1:4,1:ng,1:nT,1:nZ) => ai% T_interp1(1:4*ng*nT*nZ)
+              
+            allocate(ibound(ng,nZ), tmp_version(nZ))
+              
+            ai% have_atm_table(:) = .false.
+              
+            !read filenames and headers
+            read(iounit,*)            !text
+            do i=1,nZ
+                read(iounit,'(a)') ai% table_atm_files(i)
+                read(iounit,'(14x,i4)') tmp_version(i)
+                read(iounit,1) ai% logZ(i), ai% alphaFe(i), ai% atm_mix(i), ibound(1:ng,i)
+                !ibound(1:ng,i) = ibound(1,i)
+            enddo
+        
+            !read Teff_array
+            read(iounit,*)            !text
+            read(iounit,2) ai% Teff_array(:)
+              
+            !read logg_array
+            read(iounit,*)            !text
+            read(iounit,3) ai% logg_array(:)
+              
+            close(iounit)
+        
+            1 format(13x,f5.2,8x,f4.1,1x,a8,1x,15x,99i4)
+            2 format(13f7.0)
+            3 format(13f7.2)
+        
+            !determine table boundaries
+            do i=1,ng           ! -- for each logg, smallest Teff at which Pgas->0
+                ai% Teff_bound(i) = ai% Teff_array(ibound(i,1))
+                do j=2,nZ
+                    ai% Teff_bound(i) = min( ai% Teff_bound(i) , ai% Teff_array(ibound(i,j)) )
+                enddo
+            enddo
+        
+            deallocate(ibound, tmp_version)
+        
+        end subroutine load_table_summary
+        
+      end subroutine table_atm_init
+     
     end module run_star_extras
