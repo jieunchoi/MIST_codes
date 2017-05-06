@@ -26,11 +26,12 @@
     use const_def
     use crlibm_lib
     use chem_def
+	use kapCN
       
     implicit none
     
     real(dp) :: original_diffusion_dt_limit
-    real(dp) :: burn_check = 0.0
+    real(dp) :: postAGB_check = 0.0
     real(dp) :: rot_set_check = 0.0
     logical :: wd_diffusion = .false.
     real(dp) :: X_C_init, X_N_init
@@ -299,7 +300,6 @@
         real(dp), parameter :: Zsol = 0.0142
         type (star_info), pointer :: s
 	    logical :: diff_test1, diff_test2, diff_test3
-        character (len=strlen) :: photoname
         
         ierr = 0
         call star_ptr(id, s, ierr)
@@ -378,25 +378,18 @@
         
         end if
      
-! treat postAGB: suppress late burning by turn off burning post-AGB and also save a model and photo
+! treat postAGB: save a model
         envelope_mass_fraction = 1d0 - max(s% he_core_mass, s% c_core_mass, s% o_core_mass)/s% star_mass
         if ((s% initial_mass < 10) .and. (envelope_mass_fraction < 0.1) .and. (s% center_h1 < 1d-4) .and. (s% center_he4 < 1d-4) &
         .and. (s% L_phot > 3.0) .and. (s% Teff > 7000.0)) then
-	    	if (burn_check == 0.0) then !only print the first time
+	    	if (postAGB_check == 0.0) then !only print the first time
 	    		write(*,*) '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
-	    		write(*,*) 'now at post AGB phase, turning off all burning except for H & saving a model + photo'
+	    		write(*,*) 'now at post AGB phase, saving a model'
 	    		write(*,*) '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
 	    		
-	    		!save a model and photo
+	    		!save a model
 	    		call star_write_model(id, s% job% save_model_filename, ierr)
-	    		photoname = 'photos/pAGB_photo'
-	    		call star_save_for_restart(id, photoname, ierr)
-	    		
-	    		!turn off burning
-                s% category_factors(3:)=0.0
-                call set_rate_factors_from_categories(id,ierr)
-                if(ierr/=0) return
-	    		burn_check = 1.0
+	    		postAGB_check = 1.0
                 
                 !diffusion
                 s% do_Ne22_sedimentation_heating = .true.
