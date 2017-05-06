@@ -378,7 +378,7 @@
         
         end if
      
-! treat postAGB: save a model
+! postAGB: save a model
         envelope_mass_fraction = 1d0 - max(s% he_core_mass, s% c_core_mass, s% o_core_mass)/s% star_mass
         if ((s% initial_mass < 10) .and. (envelope_mass_fraction < 0.1) .and. (s% center_h1 < 1d-4) .and. (s% center_he4 < 1d-4) &
         .and. (s% L_phot > 3.0) .and. (s% Teff > 7000.0)) then
