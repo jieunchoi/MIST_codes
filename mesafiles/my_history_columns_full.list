@@ -6,9 +6,9 @@
      
    ! information about abundance transitions
    
-      he_core_mass ! h1 boundary is outermost location where h1 mass fraction is < 0.01
-      c_core_mass ! he4 boundary is outermost location where h1 mass fraction is < 0.01
-      o_core_mass ! c12 boundary is outermost location where h1 mass fraction is < 0.01
+      he_core_mass ! h1 boundary is outermost location where h1 mass fraction is < 1e-4
+      c_core_mass ! he4 boundary is outermost location where h1 mass fraction is < 1e-4
+      o_core_mass ! c12 boundary is outermost location where h1 mass fraction is < 1e-4
          
    ! conditions near surface
 
@@ -16,9 +16,9 @@
       log_L_div_Ledd ! log10 (luminosity/Eddington luminosity)
       log_LH ! log10 power_h_burn
       log_LHe ! log10 power_he_burn
-      log_LZ  !log10 total burning power excluding LH and LHe and photodisintegrations
+      log_LZ  ! log10 total burning power excluding LH and LHe and photodisintegrations
       log_Teff ! log10 effective temperature
-      log_abs_Lgrav !log10 abs(eps_grav_integral) (in Lsun units)
+      log_abs_Lgrav ! log10 abs(eps_grav_integral) (in Lsun units)
       log_R ! log10 radius in Rsun units
       log_g ! log10 gravity
       log_surf_cell_z ! surface mass fraction in metals
@@ -38,9 +38,9 @@
       surf_r_equatorial_div_r ! equatorial radius
       surf_r_polar_div_r ! polar radius
       total_angular_momentum
-
+              
    ! mass fractions near surface (averaged over the outer 1e−6% of the total stellar mass)
-	       
+       
       surface h1
       surface he3
       surface he4
@@ -81,7 +81,7 @@
       center mg24
       center si28
  
-   ! log10 total luminosity for reaction categories (Lsun units)
+    ! log10 total luminosity for reaction categories (Lsun units)
       
       pp
       cno
@@ -101,8 +101,16 @@
          ! nu_max = nu_max_sun * M/Msun / ((R/Rsun)^3 (Teff/Teff_sun)^0.5)
          ! with nu_max_sun = 3100 microHz, Teff_sun = 5777
       acoustic_cutoff ! 0.5*g*sqrt(gamma1*rho/P) at surface
+               
+   ! misc
       
-      
+      max_conv_vel_div_csound ! maximum value of the ratio of convective vel. to local sound speed
+      max_gradT_div_grada ! maximum value of superadiabaticity
+      gradT_excess_alpha ! between 0 and 1; 0 means no MLT++, 1 means MLT++ fully on
+      min_Pgas_div_P ! beta to check stability
+      max_L_rad_div_Ledd ! lambda to check stability
+      e_thermal ! sum over all zones of Cp*T*dm
+              
    ! convective envelope properties
    
       conv_env_top_mass ! TCZ in mass
@@ -114,12 +122,3 @@
       conv_env_turnover_time_l_b ! mixing length evaluated at the BCZ / 
                                  ! v_conv evaluated at one half mixing length above BCZ
       conv_env_turnover_time_g ! dr/convective speed(r) integrated over the entire CZ
-         
-   ! misc
-      
-      max_conv_vel_div_csound ! maximum value of the ratio of convective vel. to local sound speed
-      max_gradT_div_grada ! maximum value of superadiabaticity
-      gradT_excess_alpha ! between 0 and 1; 0 means no MLT++, 1 means MLT++ fully on
-      min_Pgas_div_P ! beta to check stability
-      max_L_rad_div_Ledd ! lambda to check stability
-      e_thermal ! sum over all zones of Cp*T*dm
