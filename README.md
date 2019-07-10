@@ -13,7 +13,7 @@ The following environment variables must be set in your e.g., <code>.bashrc</cod
 
 * <code>$ISO_DIR</code> = path to the iso directory.
 * <code>$MIST_CODE_DIR</code> = path to this directory.
-* <code>$XA_CALC_DIR</code> = path to the abudance calculator directory.
+* <code>$XA_CALC_DIR</code> = path to the abundance calculator directory.
 * <code>$MIST_GRID_DIR</code> = path to where the MIST models will be computed.
 * <code>$STORE_DIR</code> = path to where the processed tarballs will be stored.
 * <code>$MESAWORK_DIR</code> = path to the directory where <code>inlists</code> and <code>cleanworkdir</code> will be stored.
